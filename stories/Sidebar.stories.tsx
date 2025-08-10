@@ -1,3 +1,4 @@
+import './tailwind.css'
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarGroupTrigger, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge, SidebarTrigger } from '../src'

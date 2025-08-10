@@ -1,5 +1,5 @@
 {
-  "name": "@equal-ds/ui",
+  "name": "equal-ds-ui",
   "version": "0.0.1",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
   "author": "",

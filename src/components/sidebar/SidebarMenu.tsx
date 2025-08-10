@@ -1,12 +1,65 @@
 import React from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
 import { useSidebarContext } from './SidebarProvider'
 
 export interface SidebarMenuProps extends React.HTMLAttributes<HTMLUListElement> {}
 export function SidebarMenu({ className, children, ...props }: SidebarMenuProps): JSX.Element {
+  const { open } = useSidebarContext()
   const containerRef = React.useRef<HTMLUListElement | null>(null)
   const [indicator, setIndicator] = React.useState<{ top: number; left: number; width: number; height: number; visible: boolean }>({ top: 0, left: 0, width: 0, height: 0, visible: false })
+
+  const [tooltip, setTooltip] = React.useState<{ top: number; left: number; visible: boolean }>({ top: 0, left: 0, visible: false })
+  const [tooltipLabel, setTooltipLabel] = React.useState<string>('')
+  const tooltipLabelRef = React.useRef<string>('')
+  const [textVisible, setTextVisible] = React.useState<boolean>(false)
+  const [tooltipWidth, setTooltipWidth] = React.useState<number | null>(null)
+  const textFadeTimeout = React.useRef<number | null>(null)
+  const rafPendingRef = React.useRef<boolean>(false)
+  const pendingDataRef = React.useRef<{ clientY: number; label: string; tRect: DOMRect; cRect: DOMRect } | null>(null)
+
+  const measureRef = React.useRef<HTMLSpanElement | null>(null)
+
+  const flushPointerFrame = React.useCallback(() => {
+    rafPendingRef.current = false
+    const data = pendingDataRef.current
+    if (!data) return
+
+    const { clientY, label, tRect, cRect } = data
+
+    // Update hover indicator
+    setIndicator({
+      top: tRect.top - cRect.top + (containerRef.current?.scrollTop ?? 0),
+      left: tRect.left - cRect.left + (containerRef.current?.scrollLeft ?? 0),
+      width: tRect.width,
+      height: tRect.height,
+      visible: true,
+    })
+
+    // Tooltip position (fixed next to sidebar)
+    const sidebarRight = cRect.right
+    setTooltip({ top: clientY, left: sidebarRight + 20, visible: true })
+
+    if (label !== tooltipLabelRef.current) {
+      setTextVisible(false)
+      // Measure next label width via hidden measurer
+      requestAnimationFrame(() => {
+        tooltipLabelRef.current = label
+        // Update measurer text
+        if (measureRef.current) {
+          measureRef.current.textContent = label
+          const w = measureRef.current.getBoundingClientRect().width
+          // container has px-2 (8px each side) -> add 16
+          setTooltipWidth(Math.ceil(w + 16))
+        }
+        setTooltipLabel(label)
+        if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current)
+        textFadeTimeout.current = window.setTimeout(() => setTextVisible(true), 16)
+      })
+    } else {
+      setTextVisible(true)
+    }
+  }, [])
 
   const handlePointerMove = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
     const container = containerRef.current
@@ -18,34 +71,77 @@ export function SidebarMenu({ className, children, ...props }: SidebarMenuProps)
     const cRect = container.getBoundingClientRect()
     const tRect = targetButton.getBoundingClientRect()
 
-    setIndicator({
-      top: tRect.top - cRect.top + container.scrollTop,
-      left: tRect.left - cRect.left + container.scrollLeft,
-      width: tRect.width,
-      height: tRect.height,
-      visible: true,
-    })
-  }, [])
+    pendingDataRef.current = {
+      clientY: e.clientY,
+      label: targetButton.getAttribute('aria-label') || targetButton.textContent?.trim() || '',
+      tRect,
+      cRect,
+    }
+
+    if (!rafPendingRef.current) {
+      rafPendingRef.current = true
+      requestAnimationFrame(flushPointerFrame)
+    }
+  }, [flushPointerFrame])
 
   const handleLeave = React.useCallback(() => {
     setIndicator((prev) => ({ ...prev, visible: false }))
+    setTooltip((prev) => ({ ...prev, visible: false }))
+    setTextVisible(false)
   }, [])
 
+  React.useEffect(() => () => { if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current) }, [])
+
+  const tooltipElement = (!open && tooltip.visible)
+    ? createPortal(
+        <div
+          aria-hidden
+          className={cn(
+            'pointer-events-none fixed z-[9999] rounded-md border border-border bg-background px-2 py-1 text-sm shadow tooltip-follow transition-[width,opacity,transform] duration-150 ease-out',
+            textVisible ? 'opacity-100' : 'opacity-0',
+          )}
+          style={{ top: tooltip.top, left: tooltip.left, transform: 'translateY(-50%)', width: tooltipWidth ?? 'auto' }}
+        >
+          {/* Arrow: border (outer) */}
+          <span
+            className="pointer-events-none absolute left-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-transparent"
+            style={{ borderRightColor: 'rgb(var(--border))' }}
+            aria-hidden
+          />
+          {/* Arrow: fill (inner) */}
+          <span
+            className="pointer-events-none absolute left-[-7px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-transparent"
+            style={{ borderRightColor: 'rgb(var(--background))' }}
+            aria-hidden
+          />
+          <span className={cn('block transition-opacity duration-150 whitespace-nowrap', textVisible ? 'opacity-100' : 'opacity-0')}>
+            {tooltipLabel}
+          </span>
+          {/* Hidden measurer for smooth width animation */}
+          <span ref={measureRef} className="absolute left-[-9999px] top-[-9999px] text-sm whitespace-nowrap" aria-hidden />
+        </div>,
+        document.body,
+      )
+    : null
+
   return (
-    <ul
-      ref={containerRef}
-      onMouseMove={handlePointerMove}
-      onMouseLeave={handleLeave}
-      className={cn('relative px-1 py-2 space-y-1', className)}
-      {...props}
-    >
-      <div
-        aria-hidden
-        className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
-        style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
-      />
-      {children}
-    </ul>
+    <>
+      {tooltipElement}
+      <ul
+        ref={containerRef}
+        onMouseMove={handlePointerMove}
+        onMouseLeave={handleLeave}
+        className={cn('relative px-1 py-2 space-y-1', className)}
+        {...props}
+      >
+        <div
+          aria-hidden
+          className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
+          style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
+        />
+        {children}
+      </ul>
+    </>
   )
 }
 
@@ -86,21 +182,19 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
   React.useEffect(() => {
     if (!wasActiveRef.current && computedActive) {
       setJustActivated(true)
-      const t = setTimeout(() => setJustActivated(false), 180)
+      const t = setTimeout(() => setJustActivated(false), 240)
       return () => clearTimeout(t)
     }
     wasActiveRef.current = computedActive
   }, [computedActive])
 
   const baseClass = cn(
-    'w-full inline-flex items-center rounded-lg py-2.5 text-sm',
+    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors transition-transform will-change-[transform]',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    'transition-[color,transform] duration-200 ease-out',
-    // Keep left alignment and consistent spacing to prevent horizontal jumps
-    'justify-start px-3 gap-3',
+    open ? 'justify-start' : 'justify-center',
     computedActive
       ? cn(
-          'bg-gradient-to-b from-white to-primary-300/40 text-primary font-semibold border-t border-l border-r border-b-4 border-primary-400 active:border-primary-400/60 active:from-white active:to-primary-300/30 active:translate-y-[1px]',
+          'bg-gradient-to-b from-white to-primary-300/40 text-primary font-semibold border border-border shadow-[inset_0_-4px_0_0_rgb(var(--primary-400))] active:shadow-[inset_0_-3px_0_0_rgb(var(--primary-400))] active:from-white active:to-primary-300/30',
           justActivated && 'animate-sidebar-pop-in',
         )
       : cn('text-foreground hover:text-primary-500'),
@@ -110,19 +204,8 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
 
   const content = (
     <>
-      {icon ? (
-        <span className={cn('shrink-0 w-5 h-5 text-current')} aria-hidden>
-          {icon}
-        </span>
-      ) : null}
-      <span
-        className={cn(
-          'text-left truncate overflow-hidden transition-[opacity,max-width,transform] duration-200 ease-out',
-          open ? 'flex-1 opacity-100 max-w-[240px] translate-x-0' : 'flex-none opacity-0 max-w-0 -translate-x-1',
-        )}
-      >
-        {children}
-      </span>
+      {icon ? <span className="shrink-0 w-5 h-5 text-current" aria-hidden>{icon}</span> : null}
+      {open ? <span className="flex-1 text-left truncate">{children}</span> : null}
       {endAdornment && open ? <span className="shrink-0 ml-auto" aria-hidden>{endAdornment}</span> : null}
     </>
   )
@@ -165,18 +248,7 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
     </button>
   )
 
-  if (open || !inferredLabel) return element
-
-  return (
-    <Tooltip.Provider delayDuration={120}>
-      <Tooltip.Root>
-        <Tooltip.Trigger asChild>{element}</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content side="right" align="center" sideOffset={8} className={cn('z-50 rounded-md border border-border bg-background px-2 py-1 text-sm shadow')}>{inferredLabel}</Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  )
+  return element
 }
 
 export interface SidebarMenuBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {}
