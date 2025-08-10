@@ -2,7 +2,23 @@
   "name": "equal-ds-ui",
   "version": "0.0.1",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
-  "author": "",
+  "author": "Equal DS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/equal-ds-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/equal-ds-ui/issues"
+  },
+  "homepage": "https://github.com/your-org/equal-ds-ui#readme",
+  "keywords": [
+    "react",
+    "design-system",
+    "tailwind",
+    "radix",
+    "sidebar",
+    "shadcn"
+  ],
   "license": "MIT",
   "type": "module",
   "sideEffects": [
