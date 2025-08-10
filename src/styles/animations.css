@@ -1,0 +1,45 @@
+/* Animations and utility classes that should NOT be overwritten by token sync. */
+
+/* Collapsible content smooth open/close */
+@keyframes sidebar-collapse-down {
+  from { height: 0; opacity: 0; }
+  to { height: var(--radix-collapsible-content-height); opacity: 1; }
+}
+@keyframes sidebar-collapse-up {
+  from { height: var(--radix-collapsible-content-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
+}
+.sidebar-collapsible[data-state="open"] {
+  overflow: hidden;
+  animation: sidebar-collapse-down 200ms ease-out forwards;
+}
+.sidebar-collapsible[data-state="closed"] {
+  overflow: hidden;
+  animation: sidebar-collapse-up 150ms ease-in forwards;
+}
+
+/* Pop-in animation for newly active tab */
+@keyframes sidebar-pop-in {
+  0% { transform: translateY(2px); }
+  60% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+.animate-sidebar-pop-in {
+  animation: sidebar-pop-in 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  animation-fill-mode: both;
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+
+/* Tooltip smooth follow and text fade */
+@keyframes tooltip-follow-pop {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.tooltip-follow {
+  animation: tooltip-follow-pop 120ms ease-out;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+

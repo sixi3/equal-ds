@@ -1,8 +1,13 @@
 @import '../src/styles/shadcn-theme.css';
+@import '../src/styles/animations.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body, #storybook-root { height: 100%; }
+html, body, #storybook-root { height: 100%; overflow: hidden; }
+
+/* Utility present in older theme, re-adding locally for Storybook */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none; }
 
 

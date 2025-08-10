@@ -18,7 +18,7 @@ export function Sidebar({ className, variant = 'inset', ...props }: SidebarProps
         'bg-white text-foreground border-border shadow-sm',
         side === 'left' ? 'border-r' : 'border-l',
         'transition-[width] duration-200 ease-out',
-        'w-[255px] data-[state=closed]:w-[70px] overflow-x-hidden',
+        'w-[255px] data-[state=closed]:w-[70px] overflow-x-hidden overflow-y-hidden',
         'flex flex-col h-full min-h-0',
         className,
       )}

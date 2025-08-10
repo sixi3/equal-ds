@@ -38,7 +38,20 @@ export function SidebarContent({ className, children, ...props }: SidebarContent
 
   return (
     <div className={cn('relative flex-1 min-h-0', className)} {...props}>
-      <div ref={scrollRef} className={cn('px-2 py-3 space-y-8 h-full overflow-y-auto scrollbar-hide')}>
+      <div
+        ref={scrollRef}
+        className={cn(
+          'px-2 py-3 space-y-8 h-full overflow-y-auto',
+          'overscroll-contain',
+        )}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        /* Hide webkit scrollbar */
+        onScrollCapture={() => {
+          if (!scrollRef.current) return
+          // no-op trigger to ensure style applies
+          scrollRef.current.style.setProperty('--_noop', '1')
+        }}
+      >
         {children}
       </div>
       <div
