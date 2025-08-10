@@ -1,12 +1,12 @@
 import React from 'react'
 import { cn } from '../../lib/cn'
 import { Headphones } from 'lucide-react'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext } from './SidebarProvider'
 
 export interface SidebarFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function SidebarFooter({ className, ...props }: SidebarFooterProps): JSX.Element {
-  const { open } = useSidebarContext()
+function SidebarFooterImpl({ className, ...props }: SidebarFooterProps): JSX.Element {
+  const { open } = useSidebarOpenContext()
   
   return (
     <div className={cn('mt-auto border-t border-border', className)} {...props}>
@@ -38,5 +38,7 @@ export function SidebarFooter({ className, ...props }: SidebarFooterProps): JSX.
     </div>
   )
 }
+
+export const SidebarFooter = React.memo(SidebarFooterImpl)
 
 

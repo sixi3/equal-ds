@@ -1,13 +1,13 @@
 import React from 'react'
 import { cn } from '../../lib/cn'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext } from './SidebarProvider'
 
 export interface SidebarTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   srLabel?: string
 }
 
-export function SidebarTrigger({ className, srLabel = 'Toggle sidebar', children, ...props }: SidebarTriggerProps): JSX.Element {
-  const { toggle, open } = useSidebarContext()
+function SidebarTriggerImpl({ className, srLabel = 'Toggle sidebar', children, ...props }: SidebarTriggerProps): JSX.Element {
+  const { toggle, open } = useSidebarOpenContext()
   return (
     <button
       type="button"
@@ -29,5 +29,7 @@ export function SidebarTrigger({ className, srLabel = 'Toggle sidebar', children
     </button>
   )
 }
+
+export const SidebarTrigger = React.memo(SidebarTriggerImpl)
 
 

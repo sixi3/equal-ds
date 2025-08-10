@@ -2,11 +2,11 @@ import React from 'react'
 import * as Collapsible from '@radix-ui/react-collapsible'
 import { cn } from '../../lib/cn'
 import { ChevronDown } from 'lucide-react'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext } from './SidebarProvider'
 
 export interface SidebarGroupProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Root> {}
 
-export function SidebarGroup({ className, children, ...props }: SidebarGroupProps): JSX.Element {
+function SidebarGroupImpl({ className, children, ...props }: SidebarGroupProps): JSX.Element {
   return (
     <Collapsible.Root className={cn('group', className)} {...props}>
       {children}
@@ -16,20 +16,20 @@ export function SidebarGroup({ className, children, ...props }: SidebarGroupProp
 
 export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function SidebarGroupLabel({ className, ...props }: SidebarGroupLabelProps): JSX.Element {
-  return <div className={cn(' text-xs uppercase text-muted-foreground', className)} {...props} />
-}
+const SidebarGroupLabelImpl = ({ className, ...props }: SidebarGroupLabelProps): JSX.Element => (
+  <div className={cn(' text-xs uppercase text-muted-foreground', className)} {...props} />
+)
 
 export interface SidebarGroupContentProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Content> {}
 
-export function SidebarGroupContent({ className, ...props }: SidebarGroupContentProps): JSX.Element {
-  return <Collapsible.Content className={cn('space-y-2 sidebar-collapsible', className)} {...props} />
-}
+const SidebarGroupContentImpl = ({ className, ...props }: SidebarGroupContentProps): JSX.Element => (
+  <Collapsible.Content className={cn('space-y-2 sidebar-collapsible', className)} {...props} />
+)
 
 export interface SidebarGroupTriggerProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Trigger> {}
 
-export function SidebarGroupTrigger({ className, children, ...props }: SidebarGroupTriggerProps): JSX.Element {
-  const { open } = useSidebarContext()
+function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroupTriggerProps): JSX.Element {
+  const { open } = useSidebarOpenContext()
   
   return (
     <Collapsible.Trigger
@@ -62,5 +62,10 @@ export function SidebarGroupTrigger({ className, children, ...props }: SidebarGr
     </Collapsible.Trigger>
   )
 }
+
+export const SidebarGroup = React.memo(SidebarGroupImpl)
+export const SidebarGroupLabel = React.memo(SidebarGroupLabelImpl)
+export const SidebarGroupContent = React.memo(SidebarGroupContentImpl)
+export const SidebarGroupTrigger = React.memo(SidebarGroupTriggerImpl)
 
 

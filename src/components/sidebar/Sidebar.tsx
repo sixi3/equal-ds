@@ -1,13 +1,13 @@
 import React from 'react'
 import { cn } from '../../lib/cn'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext } from './SidebarProvider'
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   variant?: 'floating' | 'inset'
 }
 
-export function Sidebar({ className, variant = 'inset', ...props }: SidebarProps): JSX.Element {
-  const { open, side } = useSidebarContext()
+function SidebarImpl({ className, variant = 'inset', ...props }: SidebarProps): JSX.Element {
+  const { open, side } = useSidebarOpenContext()
   return (
     <nav
       aria-label={props['aria-label'] ?? 'Primary'}
@@ -26,5 +26,7 @@ export function Sidebar({ className, variant = 'inset', ...props }: SidebarProps
     />
   )
 }
+
+export const Sidebar = React.memo(SidebarImpl)
 
 

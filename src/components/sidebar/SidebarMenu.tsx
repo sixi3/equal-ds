@@ -1,11 +1,11 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext, useSidebarActiveItemContext } from './SidebarProvider'
 
 export interface SidebarMenuProps extends React.HTMLAttributes<HTMLUListElement> {}
-export function SidebarMenu({ className, children, ...props }: SidebarMenuProps): JSX.Element {
-  const { open } = useSidebarContext()
+function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): JSX.Element {
+  const { open } = useSidebarOpenContext()
   const containerRef = React.useRef<HTMLUListElement | null>(null)
   const [indicator, setIndicator] = React.useState<{ top: number; left: number; width: number; height: number; visible: boolean }>({ top: 0, left: 0, width: 0, height: 0, visible: false })
 
@@ -150,16 +150,20 @@ export interface SidebarMenuItemProps extends React.LiHTMLAttributes<HTMLLIEleme
   disabled?: boolean
 }
 
-export function SidebarMenuItem({ className, active, disabled, ...props }: SidebarMenuItemProps): JSX.Element {
+const SidebarMenuItemImpl = React.forwardRef<HTMLLIElement, SidebarMenuItemProps>(function SidebarMenuItem(
+  { className, active, disabled, ...props },
+  ref,
+) {
   return (
     <li
+      ref={ref}
       data-active={active ? '' : undefined}
       aria-disabled={disabled || undefined}
       className={cn('list-none relative z-10', className)}
       {...props}
     />
   )
-}
+})
 
 export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean
@@ -172,8 +176,9 @@ export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLB
   itemId?: string
 }
 
-export function SidebarMenuButton({ className, icon, endAdornment, label, href, active, disabled, itemId, children, ...props }: SidebarMenuButtonProps): JSX.Element {
-  const { open, activeItem, setActiveItem } = useSidebarContext()
+function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, active, disabled, itemId, children, ...props }: SidebarMenuButtonProps): JSX.Element {
+  const { open } = useSidebarOpenContext()
+  const { activeItem, setActiveItem } = useSidebarActiveItemContext()
   const inferredLabel = label ?? (typeof children === 'string' ? children : undefined)
   const computedActive = active ?? (itemId ? activeItem === itemId : false)
   const wasActiveRef = React.useRef<boolean>(computedActive)
@@ -210,6 +215,22 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
     </>
   )
 
+  const onClickAnchor = React.useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      ;(props as any)?.onClick?.(e)
+      if (!disabled && itemId && setActiveItem) setActiveItem(itemId)
+    },
+    [disabled, itemId, setActiveItem, props],
+  )
+
+  const onClickButton = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      props.onClick?.(e)
+      if (!disabled && itemId && setActiveItem) setActiveItem(itemId)
+    },
+    [disabled, itemId, setActiveItem, props],
+  )
+
   const element = href ? (
     <a
       href={href}
@@ -218,12 +239,7 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
       className={baseClass}
       data-sidebar-menu-button
       data-active={computedActive ? '' : undefined}
-      onClick={(e) => {
-        ;(props as any)?.onClick?.(e)
-        if (!disabled && itemId && setActiveItem) {
-          setActiveItem(itemId)
-        }
-      }}
+      onClick={onClickAnchor}
       {...(props as any)}
     >
       {content}
@@ -236,12 +252,7 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
       data-sidebar-menu-button
       data-active={computedActive ? '' : undefined}
       disabled={disabled}
-      onClick={(e) => {
-        props.onClick?.(e)
-        if (!disabled && itemId && setActiveItem) {
-          setActiveItem(itemId)
-        }
-      }}
+      onClick={onClickButton}
       {...props}
     >
       {content}
@@ -252,8 +263,7 @@ export function SidebarMenuButton({ className, icon, endAdornment, label, href, 
 }
 
 export interface SidebarMenuBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {}
-export function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps): JSX.Element {
-  return (
+const SidebarMenuBadgeImpl = ({ className, ...props }: SidebarMenuBadgeProps): JSX.Element => (
     <span
       className={cn(
         'inline-flex items-center justify-center rounded-full border border-border px-1.5 text-2xs h-5',
@@ -262,12 +272,17 @@ export function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps)
       )}
       {...props}
     />
-  )
-}
+)
 
 export interface SidebarSeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
-export function SidebarSeparator({ className, ...props }: SidebarSeparatorProps): JSX.Element {
-  return <hr className={cn('border-t border-border my-4', className)} {...props} />
-}
+const SidebarSeparatorImpl = ({ className, ...props }: SidebarSeparatorProps): JSX.Element => (
+  <hr className={cn('border-t border-border my-4', className)} {...props} />
+)
+
+export const SidebarMenu = React.memo(SidebarMenuImpl)
+export const SidebarMenuItem = React.memo(SidebarMenuItemImpl)
+export const SidebarMenuButton = React.memo(SidebarMenuButtonImpl)
+export const SidebarMenuBadge = React.memo(SidebarMenuBadgeImpl)
+export const SidebarSeparator = React.memo(SidebarSeparatorImpl)
 
 

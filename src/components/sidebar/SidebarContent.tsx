@@ -3,7 +3,7 @@ import { cn } from '../../lib/cn'
 
 export interface SidebarContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function SidebarContent({ className, children, ...props }: SidebarContentProps): JSX.Element {
+function SidebarContentImpl({ className, children, ...props }: SidebarContentProps): JSX.Element {
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const [showTopFade, setShowTopFade] = React.useState(false)
   const [showBottomFade, setShowBottomFade] = React.useState(false)
@@ -36,6 +36,8 @@ export function SidebarContent({ className, children, ...props }: SidebarContent
     }
   }, [])
 
+  const scrollStyles = React.useMemo(() => ({ scrollbarWidth: 'none', msOverflowStyle: 'none' } as const), [])
+
   return (
     <div className={cn('relative flex-1 min-h-0', className)} {...props}>
       <div
@@ -44,7 +46,7 @@ export function SidebarContent({ className, children, ...props }: SidebarContent
           'px-2 py-3 space-y-8 h-full overflow-y-auto',
           'overscroll-contain',
         )}
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        style={scrollStyles}
         /* Hide webkit scrollbar */
         onScrollCapture={() => {
           if (!scrollRef.current) return
@@ -69,5 +71,7 @@ export function SidebarContent({ className, children, ...props }: SidebarContent
     </div>
   )
 }
+
+export const SidebarContent = React.memo(SidebarContentImpl)
 
 

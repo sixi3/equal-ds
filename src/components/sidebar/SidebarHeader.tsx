@@ -1,11 +1,11 @@
 import React from 'react'
 import { cn } from '../../lib/cn'
-import { useSidebarContext } from './SidebarProvider'
+import { useSidebarOpenContext } from './SidebarProvider'
 
 export interface SidebarHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function SidebarHeader({ className, ...props }: SidebarHeaderProps): JSX.Element {
-  const { open } = useSidebarContext()
+function SidebarHeaderImpl({ className, ...props }: SidebarHeaderProps): JSX.Element {
+  const { open } = useSidebarOpenContext()
   
   return (
     <div className={cn(
@@ -21,5 +21,7 @@ export function SidebarHeader({ className, ...props }: SidebarHeaderProps): JSX.
     )} {...props} />
   )
 }
+
+export const SidebarHeader = React.memo(SidebarHeaderImpl)
 
 

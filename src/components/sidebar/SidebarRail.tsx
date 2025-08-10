@@ -3,8 +3,10 @@ import { cn } from '../../lib/cn'
 
 export interface SidebarRailProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function SidebarRail({ className, ...props }: SidebarRailProps): JSX.Element {
-  return <div className={cn('w-14', className)} {...props} />
-}
+const SidebarRailImpl = ({ className, ...props }: SidebarRailProps): JSX.Element => (
+  <div className={cn('w-14', className)} {...props} />
+)
+
+export const SidebarRail = React.memo(SidebarRailImpl)
 
 
