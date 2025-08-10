@@ -4,6 +4,24 @@ import { cn } from '../../lib/cn'
 import { useSidebarOpenContext, useSidebarActiveItemContext } from './SidebarProvider'
 
 export interface SidebarMenuProps extends React.HTMLAttributes<HTMLUListElement> {}
+// Singleton tooltip root to avoid scattering portals under <body>
+let tooltipRootEl: HTMLElement | null = null
+function getTooltipRoot(): HTMLElement | null {
+  if (typeof document === 'undefined') return null
+  if (tooltipRootEl && document.body.contains(tooltipRootEl)) return tooltipRootEl
+  const existing = document.getElementById('eds-tooltip-root') as HTMLElement | null
+  if (existing) {
+    tooltipRootEl = existing
+    return tooltipRootEl
+  }
+  const el = document.createElement('div')
+  el.id = 'eds-tooltip-root'
+  el.setAttribute('data-equal-ds', 'tooltip-root')
+  document.body.appendChild(el)
+  tooltipRootEl = el
+  return tooltipRootEl
+}
+
 function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): JSX.Element {
   const { open } = useSidebarOpenContext()
   const containerRef = React.useRef<HTMLUListElement | null>(null)
@@ -19,6 +37,24 @@ function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): J
   const pendingDataRef = React.useRef<{ clientY: number; label: string; tRect: DOMRect; cRect: DOMRect } | null>(null)
 
   const measureRef = React.useRef<HTMLSpanElement | null>(null)
+
+  // Stable portal container per menu instance
+  const tooltipContainerRef = React.useRef<HTMLElement | null>(null)
+  const [portalMounted, setPortalMounted] = React.useState(false)
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return
+    const root = getTooltipRoot()
+    if (!root) return
+    const el = document.createElement('div')
+    tooltipContainerRef.current = el
+    root.appendChild(el)
+    setPortalMounted(true)
+    return () => {
+      if (root.contains(el)) root.removeChild(el)
+      tooltipContainerRef.current = null
+      setPortalMounted(false)
+    }
+  }, [])
 
   const flushPointerFrame = React.useCallback(() => {
     rafPendingRef.current = false
@@ -92,15 +128,22 @@ function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): J
 
   React.useEffect(() => () => { if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current) }, [])
 
-  const tooltipElement = (!open && tooltip.visible)
+  const tooltipElement = portalMounted && tooltipContainerRef.current
     ? createPortal(
         <div
           aria-hidden
           className={cn(
             'pointer-events-none fixed z-[9999] rounded-md border border-border bg-background px-2 py-1 text-sm shadow tooltip-follow transition-[width,opacity,transform] duration-150 ease-out',
-            textVisible ? 'opacity-100' : 'opacity-0',
+            textVisible && !open && tooltip.visible ? 'opacity-100' : 'opacity-0',
           )}
-          style={{ top: tooltip.top, left: tooltip.left, transform: 'translateY(-50%)', width: tooltipWidth ?? 'auto' }}
+          style={{
+            top: tooltip.top,
+            left: tooltip.left,
+            transform: 'translateY(-50%)',
+            width: tooltipWidth ?? 'auto',
+            // Keep mounted, only toggle visibility
+            visibility: !open && tooltip.visible ? 'visible' : 'hidden',
+          }}
         >
           {/* Arrow: border (outer) */}
           <span
@@ -120,7 +163,7 @@ function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): J
           {/* Hidden measurer for smooth width animation */}
           <span ref={measureRef} className="absolute left-[-9999px] top-[-9999px] text-sm whitespace-nowrap" aria-hidden />
         </div>,
-        document.body,
+        tooltipContainerRef.current,
       )
     : null
 
