@@ -90,11 +90,11 @@ export function SidebarProvider(props: SidebarProviderProps): JSX.Element {
 
   const setActive = useCallback(
     (next: string | null) => {
-      if (isActiveControlled) {
-        onActiveItemChange?.(next)
-      } else {
+      // Always notify consumers when the active item changes
+      if (!isActiveControlled) {
         setInternalActiveItem(next)
       }
+      onActiveItemChange?.(next)
     },
     [isActiveControlled, onActiveItemChange],
   )

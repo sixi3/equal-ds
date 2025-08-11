@@ -124,6 +124,8 @@ function SidebarMenuImpl({ className, children, ...props }: SidebarMenuProps): J
     setIndicator((prev) => ({ ...prev, visible: false }))
     setTooltip((prev) => ({ ...prev, visible: false }))
     setTextVisible(false)
+    // Reset active hover state on leave to avoid stale highlight
+    pendingDataRef.current = null
   }, [])
 
   React.useEffect(() => () => { if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current) }, [])
