@@ -81,9 +81,12 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
     let mounted = true
     ;(async () => {
       try {
+        // Use variable specifiers with Vite ignore to avoid pre-bundle resolution when deps are not installed
+        const coreId = '@dnd-kit/core'
+        const sortableId = '@dnd-kit/sortable'
         const [core, sortable] = await Promise.all([
-          import('@dnd-kit/core').catch(() => null),
-          import('@dnd-kit/sortable').catch(() => null),
+          import(/* @vite-ignore */ coreId).catch(() => null),
+          import(/* @vite-ignore */ sortableId).catch(() => null),
         ])
         if (!mounted) return
         if (core && sortable) {
