@@ -244,7 +244,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
     open ? 'justify-start' : 'justify-center',
     computedActive
       ? cn(
-          'bg-gradient-to-b from-white to-primary-300/40 text-primary font-semibold border border-border shadow-[inset_0_-4px_0_0_rgb(var(--primary-400))] active:shadow-[inset_0_-3px_0_0_rgb(var(--primary-400))] active:from-white active:to-primary-300/30',
+          'bg-gradient-to-b from-white to-primary-300/20 text-primary font-semibold border border-border shadow-[inset_0_-4px_0_0_rgb(var(--primary-400))] active:shadow-[inset_0_-3px_0_0_rgb(var(--primary-400))] active:from-white active:to-primary-300/30',
           justActivated && 'animate-sidebar-pop-in',
         )
       : cn('text-foreground hover:text-primary-500'),

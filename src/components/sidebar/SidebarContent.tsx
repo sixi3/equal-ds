@@ -1,7 +1,6 @@
 import React from 'react'
 import { cn } from '../../lib/cn'
-import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors, DragOverEvent } from '@dnd-kit/core'
-import { SortableContext, arrayMove, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+// DnD is optional; we will try to load it dynamically at runtime
 import { useSidebarOpenContext } from './SidebarProvider'
 import { SortableGroupContext } from './SortableGroupContext'
 import * as Collapsible from '@radix-ui/react-collapsible'
@@ -15,23 +14,31 @@ export interface SidebarContentProps extends React.HTMLAttributes<HTMLDivElement
 
 interface SortableGroupWrapperProps { id: string; children: React.ReactNode }
 function SortableGroupWrapper({ id, children }: SortableGroupWrapperProps): JSX.Element {
-  const sortable = useSortable({ id })
+  const outer = React.useContext(SortableGroupContext)
+  const useSortableRef = (outer as any)?.__dnd?.useSortable ?? (() => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, transform: null, transition: null, isDragging: false }))
+  const sortable = useSortableRef({ id })
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = sortable
   const ctx = React.useMemo(
-    () => ({ active: true, attributes, listeners, setNodeRef, transform, transition, isDragging, id }),
-    [attributes, listeners, setNodeRef, transform, transition, isDragging, id],
+    () => ({
+      // DnD state
+      active: true,
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+      id,
+      // Preserve extra fields coming from the parent provider
+      onHandlePress: outer.onHandlePress,
+      isOver: outer.isOver,
+      dragging: outer.dragging,
+      isActive: outer.isActive,
+    }),
+    [attributes, listeners, setNodeRef, transform, transition, isDragging, id, outer.onHandlePress, outer.isOver, outer.dragging, outer.isActive],
   )
   return <SortableGroupContext.Provider value={ctx}>{children}</SortableGroupContext.Provider>
 }
-
-function GroupChip(): JSX.Element {
-  return (
-    <div className="rounded-md border border-border bg-background px-2 py-1 opacity-95 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-      Release when done to reorder
-    </div>
-  )
-}
-
 function InsertionIndicator({ containerRef, beforeId, ids }: { containerRef: React.RefObject<HTMLDivElement>; beforeId: string; ids: string[] }) {
   const [style, setStyle] = React.useState<React.CSSProperties | null>(null)
   React.useEffect(() => {
@@ -66,6 +73,29 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const [showTopFade, setShowTopFade] = React.useState(false)
   const [showBottomFade, setShowBottomFade] = React.useState(false)
+  const [dndCore, setDndCore] = React.useState<any>(null)
+  const [dndSortable, setDndSortable] = React.useState<any>(null)
+
+  // Try to load dnd-kit dynamically at runtime (only in environments where it exists)
+  React.useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const [core, sortable] = await Promise.all([
+          import('@dnd-kit/core').catch(() => null),
+          import('@dnd-kit/sortable').catch(() => null),
+        ])
+        if (!mounted) return
+        if (core && sortable) {
+          setDndCore(core)
+          setDndSortable(sortable)
+        }
+      } catch {
+        // ignore if not installed
+      }
+    })()
+    return () => { mounted = false }
+  }, [])
 
   React.useEffect(() => {
     const el = scrollRef.current
@@ -123,9 +153,8 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
 
   const currentOrder: string[] = Array.isArray(groupOrder) ? groupOrder : internalOrder ?? []
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
-  )
+  // We avoid calling dnd-kit hooks like useSensors to prevent errors when dynamically importing.
+  // DndContext without sensors will use its internal defaults, which is sufficient here.
 
   const [activeId, setActiveId] = React.useState<string | null>(null)
   const [pressedHandle, setPressedHandle] = React.useState<boolean>(false)
@@ -137,18 +166,23 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
     setPressedHandle(true)
   }, [])
 
-  const handleDragOver = React.useCallback((event: DragOverEvent) => {
+  const handleDragOver = React.useCallback((event: any) => {
     const { over } = event
-    setOverId(over ? String(over.id) : null)
-  }, [])
+    // Only set overId if we're actually hovering over a different group
+    const newOverId = over ? String(over.id) : null
+    if (newOverId !== overId) {
+      setOverId(newOverId)
+    }
+  }, [overId])
 
   const clearDragState = React.useCallback(() => {
     setActiveId(null)
     setPressedHandle(false)
-    setOverId(null)
+    // Small delay to prevent flickering of visual states
+    setTimeout(() => setOverId(null), 100)
   }, [])
 
-  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+  const handleDragEnd = React.useCallback((event: any) => {
     const { active, over } = event
     clearDragState()
     // Proactively blur any focused drag handle to ensure it fades
@@ -162,10 +196,16 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
     const oldIndex = currentOrder.indexOf(String(active.id))
     const newIndex = currentOrder.indexOf(String(over.id))
     if (oldIndex < 0 || newIndex < 0) return
+    const arrayMove = dndSortable?.arrayMove ?? ((arr: string[], from: number, to: number) => {
+      const copy = arr.slice()
+      const [item] = copy.splice(from, 1)
+      copy.splice(to, 0, item)
+      return copy
+    })
     const next = arrayMove(currentOrder, oldIndex, newIndex)
     if (onGroupOrderChange) onGroupOrderChange(next)
     if (!groupOrder) setInternalOrder(next)
-  }, [currentOrder, onGroupOrderChange, groupOrder, clearDragState])
+  }, [currentOrder, onGroupOrderChange, groupOrder, clearDragState, dndSortable])
 
   const handleDragCancel = React.useCallback(() => {
     clearDragState()
@@ -218,24 +258,37 @@ function SidebarContentImpl({ className, children, reorderGroups = false, defaul
           }
         }}
       >
-        {reorderGroups && open ? (
-          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-            <SortableContext items={currentOrder} strategy={verticalListSortingStrategy}>
+        {reorderGroups && open && dndCore && dndSortable ? (
+          <SortableGroupContext.Provider value={{ active: true, __dnd: { useSortable: dndSortable.useSortable } } as any}>
+            <dndCore.DndContext onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+              <dndSortable.SortableContext items={currentOrder} strategy={dndSortable.verticalListSortingStrategy}>
               {(currentOrder ?? []).map((id) => {
                 const original = groupChildren.find((c) => c.props?.id === id)
                 if (!original) return null
                 return (
-                  <SortableGroupContext.Provider key={id} value={{ active: true, onHandlePress: () => setPressedHandle(true), id, isOver: overId === id, dragging, isActive: activeId === id }}>
-                    <SortableGroupWrapper id={id}>
-                      {pressedHandle ? React.cloneElement(original, { open: false }) : original}
-                    </SortableGroupWrapper>
-                  </SortableGroupContext.Provider>
+                    <SortableGroupContext.Provider
+                      key={id}
+                      value={{
+                        active: true,
+                        onHandlePress: () => setPressedHandle(true),
+                        id,
+                        isOver: overId === id,
+                        dragging,
+                        isActive: activeId === id,
+                        __dnd: { useSortable: dndSortable.useSortable },
+                      } as any}
+                    >
+                      <SortableGroupWrapper id={id}>
+                        {pressedHandle ? React.cloneElement(original, { open: false }) : original}
+                      </SortableGroupWrapper>
+                    </SortableGroupContext.Provider>
                 )
               })}
-            </SortableContext>
+              </dndSortable.SortableContext>
             {/* insertion indicator removed in favor of background highlight on hovered group */}
             {/* No preview overlay during drag */}
-          </DndContext>
+            </dndCore.DndContext>
+          </SortableGroupContext.Provider>
         ) : (
           renderWithOrder
         )}

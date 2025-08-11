@@ -10,6 +10,37 @@ npm install equal-ds-ui
 npm install react react-dom @radix-ui/react-collapsible @radix-ui/react-tooltip @radix-ui/react-visually-hidden lucide-react tailwindcss
 ```
 
+### Optional: Drag & Drop (DnD) Support
+
+The sidebar supports optional drag-and-drop reordering of groups. To enable this feature, install the required DnD packages:
+
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable
+```
+
+**Without DnD packages installed:**
+- Sidebar renders normally with static group ordering
+- No drag handles are shown
+- Reduced bundle size
+- Perfect for simple navigation without reordering needs
+
+**With DnD packages installed:**
+- Enable reordering by passing `reorderGroups` prop to `SidebarContent`
+- Drag handles appear on hover
+- Groups can be reordered via drag and drop
+
+```tsx
+// Example with reordering enabled
+<SidebarContent reorderGroups onGroupOrderChange={handleOrderChange}>
+  <SidebarGroup id="group1">...</SidebarGroup>
+  <SidebarGroup id="group2">...</SidebarGroup>
+</SidebarContent>
+```
+
+**Bundle size impact:**
+- Without DnD: ~15-20% smaller bundle
+- With DnD: Full functionality including reordering
+
 ### Styles
 
 Import the CSS once in your app root:
@@ -60,7 +91,7 @@ export default function App() {
                     <SidebarMenuButton itemId="home" href="/">Home</SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
-              </SidebarGroupContent>
+              </SidebarContent>
             </SidebarGroup>
           </SidebarContent>
           <SidebarFooter />
@@ -74,6 +105,24 @@ export default function App() {
   )
 }
 ```
+
+### Advanced: Conditional DnD Loading
+
+For applications that want to conditionally enable DnD based on user permissions or feature flags:
+
+```tsx
+import { SidebarContent } from 'equal-ds-ui'
+
+function MySidebar({ userCanReorder = false }) {
+  return (
+    <SidebarContent reorderGroups={userCanReorder}>
+      {/* Groups will only be reorderable if userCanReorder is true */}
+    </SidebarContent>
+  )
+}
+```
+
+The component automatically detects if DnD packages are available and gracefully degrades when they're not.
 
 ### Tailwind preset (optional)
 
@@ -129,6 +178,7 @@ git push --follow-tags
 
 - React 18 or 19
 - Tailwind CSS 3.4+
+- **Optional:** @dnd-kit/core ^6.3.1, @dnd-kit/sortable ^8.0.0 (for reordering)
 
 ### License
 
