@@ -1,6 +1,6 @@
 {
   "name": "equal-ds-ui",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind. Features an optional drag-and-drop sidebar with reorderable groups. Install without @dnd-kit/* for a smaller bundle, or with DnD for full reordering functionality.",
   "author": "Equal DS",
   "repository": {
