@@ -1,11 +1,12 @@
 "use client"
 import React from 'react'
+import type { DraggableAttributes } from '@dnd-kit/core'
 
 export interface DndKitListeners { [key: string]: any }
 
 export interface SortableGroupContextValue {
   active: boolean
-  attributes?: Record<string, unknown>
+  attributes?: DraggableAttributes
   listeners?: any
   setNodeRef?: (node: HTMLElement | null) => void
   transform?: { x: number; y: number; scaleX?: number; scaleY?: number } | null
@@ -23,7 +24,7 @@ export interface SortableGroupContextValue {
     isOver: boolean
   }
   dndKit?: {
-    attributes?: Record<string, unknown>
+    attributes?: DraggableAttributes
     listeners?: DndKitListeners
     setNodeRef?: (node: HTMLElement | null) => void
   }
@@ -32,19 +33,6 @@ export interface SortableGroupContextValue {
   }
 }
 
-export const SortableGroupContext = React.createContext<SortableGroupContextValue>({
-  active: false,
-  // Safe no-op defaults so consumers can render outside DnD context
-  attributes: undefined,
-  listeners: undefined,
-  setNodeRef: undefined,
-  transform: null,
-  transition: null,
-  isDragging: false,
-  id: undefined,
-  isOver: false,
-  dragging: false,
-  isActive: false,
-})
+export const SortableGroupContext = React.createContext<SortableGroupContextValue>({ active: false })
 
 

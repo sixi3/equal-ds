@@ -35,7 +35,7 @@ function SidebarGroupImpl({ className, children, ...props }: SidebarGroupProps):
   return (
     <Collapsible.Root
       ref={setNodeRef as any}
-      className={cn('group relative', isDragging && 'z-10 opacity-60 pointer-events-none', className)}
+      className={cn('group relative', isDragging && 'z-10 opacity-60 border border-border pointer-events-none', className)}
       data-id={sortableId}
       style={style}
       {...props}
@@ -63,7 +63,6 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
   const { open } = useSidebarOpenContext()
   const sortable = React.useContext(SortableGroupContext)
   const { active, listeners, attributes, onHandlePress, isOver, dragging, isActive } = sortable
-  const dndAvailable = Boolean(listeners) && Boolean(attributes)
   
   return (
     <Collapsible.Trigger
@@ -80,32 +79,31 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
         <div className={cn(
           'flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-muted-foreground rounded-md w-full bg-transparent',
           open ? 'justify-start' : 'justify-center',
-          isActive && open && 'px-1 outline outline-1 outline-border',
+          dragging && open && 'px-1 outline outline-1 outline-border',
+          isOver && open && 'px-1 outline outline-2 outline-primary-400'
         )}>
         {open && (
           <div className="min-w-0 truncate flex items-center gap-1">
-            {dndAvailable && (
-              <span
-                className={cn(
-                  'inline-flex h-5 w-5 items-center justify-center rounded opacity-10 transition-opacity duration-150',
-                  'group-hover/trigger:opacity-100 focus:opacity-100',
-                  'text-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                )}
-                tabIndex={0}
-                aria-label="Reorder group"
-                role="button"
-                data-drag-handle
-                {...((attributes ?? {}) as any)}
-                {...((listeners ?? {}) as any)}
-                onClick={(e) => { e.preventDefault(); safeCall(onHandlePress, 'drag handle press') }}
-                onMouseDown={(e) => { e.stopPropagation(); safeCall(onHandlePress, 'drag handle press') }}
-                onMouseUp={(e) => { (e.currentTarget as HTMLElement)?.blur?.() }}
-                onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter' || e.key === ' ') safeCall(onHandlePress, 'drag handle press (kbd)') }}
-                onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') (e.currentTarget as HTMLElement)?.blur?.() }}
-              >
-                <GripVertical className="h-4 w-4" aria-hidden />
-              </span>
-            )}
+            <span
+              className={cn(
+                'inline-flex h-5 w-5 items-center justify-center rounded opacity-10 transition-opacity duration-150',
+                'group-hover/trigger:opacity-100 focus:opacity-100',
+                'text-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              )}
+              tabIndex={0}
+              aria-label="Reorder group"
+              role="button"
+              data-drag-handle
+              {...(attributes as any)}
+              {...(listeners as any)}
+              onClick={(e) => { e.preventDefault(); safeCall(onHandlePress, 'drag handle press') }}
+              onMouseDown={(e) => { e.stopPropagation(); safeCall(onHandlePress, 'drag handle press') }}
+              onMouseUp={(e) => { (e.currentTarget as HTMLElement)?.blur?.() }}
+              onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter' || e.key === ' ') safeCall(onHandlePress, 'drag handle press (kbd)') }}
+              onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') (e.currentTarget as HTMLElement)?.blur?.() }}
+            >
+              <GripVertical className="h-4 w-4" aria-hidden />
+            </span>
             <span className={cn('truncate', isActive && 'opacity-50 pointer-events-none')}>{children}</span>
           </div>
         )}

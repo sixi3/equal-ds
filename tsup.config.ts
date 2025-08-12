@@ -18,10 +18,6 @@ export default defineConfig({
     'lucide-react',
     'class-variance-authority',
     'tailwind-merge',
-    // mark dnd-kit externals so consumers can opt-in
-    '@dnd-kit/core',
-    '@dnd-kit/sortable',
-    '@dnd-kit/utilities',
   ],
   treeshake: true,
   target: 'es2020',
