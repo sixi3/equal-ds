@@ -19,7 +19,7 @@ export const Default: Story = {
       <div className="h-screen flex">
         <SidebarProvider
           defaultOpen
-          defaultActiveItem={selected}
+          activeItem={selected}
           onActiveItemChange={(id) => setSelected(id ?? 'consent-templates')}
         >
           <Sidebar aria-label="Primary" className="shrink-0">
@@ -31,7 +31,7 @@ export const Default: Story = {
             </SidebarHeader>
             <SidebarContent>
               {/* AA ECOSYSTEM */}
-              <SidebarGroup defaultOpen>
+              <SidebarGroup id="aa" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>AA ECOSYSTEM</SidebarGroupLabel>
                 </SidebarGroupTrigger>
@@ -63,7 +63,7 @@ export const Default: Story = {
               </SidebarGroup>
 
               {/* BULK OPERATIONS */}
-              <SidebarGroup defaultOpen>
+              <SidebarGroup id="bulk" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>BULK OPERATIONS</SidebarGroupLabel>
                 </SidebarGroupTrigger>
@@ -86,7 +86,7 @@ export const Default: Story = {
               </SidebarGroup>
 
               {/* ANALYTICS */}
-              <SidebarGroup defaultOpen>
+              <SidebarGroup id="analytics" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>ANALYTICS</SidebarGroupLabel>
                 </SidebarGroupTrigger>
@@ -106,7 +106,7 @@ export const Default: Story = {
               </SidebarGroup>
 
               {/* ADMIN & SETUP */}
-              <SidebarGroup defaultOpen>
+              <SidebarGroup id="admin" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>ADMIN & SETUP</SidebarGroupLabel>
                 </SidebarGroupTrigger>
@@ -126,7 +126,7 @@ export const Default: Story = {
               </SidebarGroup>
 
               {/* REFERENCE & DOCS */}
-              <SidebarGroup defaultOpen>
+              <SidebarGroup id="docs" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>REFERENCE & DOCS</SidebarGroupLabel>
                 </SidebarGroupTrigger>
