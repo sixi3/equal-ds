@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #storybook-root { height: 100%; overflow: hidden; }
+html, body, #storybook-root { height: 100%; }
 
 /* Utility present in older theme, re-adding locally for Storybook */
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

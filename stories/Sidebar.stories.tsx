@@ -15,6 +15,205 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => {
     const [selected, setSelected] = React.useState<string>('consent-templates')
+
+    // Group order for demo: ids match groupId props below
+    const initialGroups = ['aa', 'bulk', 'analytics', 'admin', 'docs']
+    const [groupOrder, setGroupOrder] = React.useState<string[]>(initialGroups)
+
+    // AA ECOSYSTEM
+    const aaItems = [
+      { id: 'account-aggregator', label: 'Account Aggregator', icon: <Component className="w-5 h-5" /> },
+      { id: 'fip', label: 'FIP', icon: <Landmark className="w-5 h-5" /> },
+      { id: 'purpose', label: 'Purpose', icon: <FileQuestion className="w-5 h-5" /> },
+      { id: 'consent-templates', label: 'Consent Templates', icon: <LayoutTemplate className="w-5 h-5" /> },
+      { id: 'consent-requests', label: 'Consent Requests', icon: <FileStack className="w-5 h-5" /> },
+      { id: 'fi-notifications', label: 'FI Notifications', icon: <BellDot className="w-5 h-5" /> },
+      { id: 'data-fetch-request', label: 'Data Fetch Request', icon: <Grid2x2Plus className="w-5 h-5" /> },
+    ]
+    const [aaOrder, setAaOrder] = React.useState<string[]>(aaItems.map((x) => x.id))
+    const aaById = React.useMemo(() => Object.fromEntries(aaItems.map((x) => [x.id, x])), [])
+
+    // BULK OPERATIONS
+    const bulkItems = [
+      { id: 'bulk-consent-request', label: 'Bulk Consent Request', icon: <Braces className="w-5 h-5" /> },
+      { id: 'bulk-data-fetch', label: 'Bulk Data Fetch', icon: <FileInput className="w-5 h-5" /> },
+      { id: 'bulk-consent-revoke', label: 'Bulk Consent Revoke', icon: <FileX2 className="w-5 h-5" /> },
+      { id: 'bulk-csv-upload', label: 'Bulk CSV Upload', icon: <FileStack className="w-5 h-5" /> },
+    ]
+    const [bulkOrder, setBulkOrder] = React.useState<string[]>(bulkItems.map((x) => x.id))
+    const bulkById = React.useMemo(() => Object.fromEntries(bulkItems.map((x) => [x.id, x])), [])
+
+    // ANALYTICS
+    const analyticsItems = [
+      { id: 'insights', label: 'Insights', icon: <TextSearch className="w-5 h-5" /> },
+      { id: 'analytics', label: 'Analytics', icon: <ChartLine className="w-5 h-5" /> },
+      { id: 'pdf-analytics', label: 'PDF Analytics', icon: <FileChartPie className="w-5 h-5" /> },
+    ]
+    const [analyticsOrder, setAnalyticsOrder] = React.useState<string[]>(analyticsItems.map((x) => x.id))
+    const analyticsById = React.useMemo(() => Object.fromEntries(analyticsItems.map((x) => [x.id, x])), [])
+
+    // ADMIN & SETUP
+    const adminItems = [
+      { id: 'settings', label: 'Settings', icon: <Cog className="w-5 h-5" /> },
+      { id: 'manage-apps', label: 'Manage Apps', icon: <MonitorCog className="w-5 h-5" /> },
+      { id: 'admin', label: 'Admin', icon: <UserCog className="w-5 h-5" /> },
+    ]
+    const [adminOrder, setAdminOrder] = React.useState<string[]>(adminItems.map((x) => x.id))
+    const adminById = React.useMemo(() => Object.fromEntries(adminItems.map((x) => [x.id, x])), [])
+
+    // REFERENCE & DOCS
+    const docsItems = [
+      { id: 'central-registry', label: 'Central Registry', icon: <BookText className="w-5 h-5" /> },
+      { id: 'integration-docs', label: 'Integration Docs', icon: <FileCode2 className="w-5 h-5" /> },
+      { id: 'mis', label: 'MIS', icon: <ChartPie className="w-5 h-5" /> },
+    ]
+    const [docsOrder, setDocsOrder] = React.useState<string[]>(docsItems.map((x) => x.id))
+    const docsById = React.useMemo(() => Object.fromEntries(docsItems.map((x) => [x.id, x])), [])
+    
+    return (
+      <div className="h-screen flex">
+        <SidebarProvider
+          defaultOpen
+          activeItem={selected}
+          onActiveItemChange={(id) => setSelected(id ?? 'consent-templates')}
+        >
+          <Sidebar aria-label="Primary" className="shrink-0">
+            <SidebarHeader className="flex items-center justify-between h-16">
+              <div className="font-semibold">FinPro</div>
+              <SidebarTrigger srLabel="Collapse sidebar" className="h-8 w-8">
+                <ArrowLeftCircle className="h-5 w-5" />
+              </SidebarTrigger>
+            </SidebarHeader>
+            <SidebarContent reorderableGroups onGroupReorder={(next) => setGroupOrder(next)}>
+              {/* AA ECOSYSTEM */}
+              {groupOrder.map((groupId) => {
+                if (groupId === 'aa') return (
+                  <SidebarGroup key="aa" groupId="aa" defaultOpen>
+                    <SidebarGroupTrigger>
+                      <SidebarGroupLabel>AA ECOSYSTEM</SidebarGroupLabel>
+                    </SidebarGroupTrigger>
+                    <SidebarGroupContent>
+                      <SidebarMenu reorderable onReorder={(next) => setAaOrder(next)}>
+                        {aaOrder.map((id) => {
+                          const item = aaById[id]
+                          return (
+                            <SidebarMenuItem key={id} draggable dragId={id}>
+                              <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                )
+                if (groupId === 'bulk') return (
+                  <SidebarGroup key="bulk" groupId="bulk" defaultOpen>
+                    <SidebarGroupTrigger>
+                      <SidebarGroupLabel>BULK OPERATIONS</SidebarGroupLabel>
+                    </SidebarGroupTrigger>
+                    <SidebarGroupContent>
+                      <SidebarMenu reorderable onReorder={(next) => setBulkOrder(next)}>
+                        {bulkOrder.map((id) => {
+                          const item = bulkById[id]
+                          return (
+                            <SidebarMenuItem key={id} draggable dragId={id}>
+                              <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                )
+                if (groupId === 'analytics') return (
+                  <SidebarGroup key="analytics" groupId="analytics" defaultOpen>
+                    <SidebarGroupTrigger>
+                      <SidebarGroupLabel>ANALYTICS</SidebarGroupLabel>
+                    </SidebarGroupTrigger>
+                    <SidebarGroupContent>
+                      <SidebarMenu reorderable onReorder={(next) => setAnalyticsOrder(next)}>
+                        {analyticsOrder.map((id) => {
+                          const item = analyticsById[id]
+                          return (
+                            <SidebarMenuItem key={id} draggable dragId={id}>
+                              <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                )
+                if (groupId === 'admin') return (
+                  <SidebarGroup key="admin" groupId="admin" defaultOpen>
+                    <SidebarGroupTrigger>
+                      <SidebarGroupLabel>ADMIN & SETUP</SidebarGroupLabel>
+                    </SidebarGroupTrigger>
+                    <SidebarGroupContent>
+                      <SidebarMenu reorderable onReorder={(next) => setAdminOrder(next)}>
+                        {adminOrder.map((id) => {
+                          const item = adminById[id]
+                          return (
+                            <SidebarMenuItem key={id} draggable dragId={id}>
+                              <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                )
+                if (groupId === 'docs') return (
+                  <SidebarGroup key="docs" groupId="docs" defaultOpen>
+                    <SidebarGroupTrigger>
+                      <SidebarGroupLabel>REFERENCE & DOCS</SidebarGroupLabel>
+                    </SidebarGroupTrigger>
+                    <SidebarGroupContent>
+                      <SidebarMenu reorderable onReorder={(next) => setDocsOrder(next)}>
+                        {docsOrder.map((id) => {
+                          const item = docsById[id]
+                          return (
+                            <SidebarMenuItem key={id} draggable dragId={id}>
+                              <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                )
+                return null
+              })}
+            </SidebarContent>
+            <SidebarFooter />
+          </Sidebar>
+          <div className="flex-1 p-6 space-y-4">
+            <SidebarTrigger>
+              <ArrowLeftCircle className="h-5 w-5" />
+            </SidebarTrigger>
+            <div>Selected: {selected}</div>
+            <div>Group order: {groupOrder.join(' , ')}</div>
+          </div>
+        </SidebarProvider>
+      </div>
+    )
+  },
+}
+
+export const Reorderable: Story = {
+  render: () => {
+    const initial = [
+      { id: 'account-aggregator', label: 'Account Aggregator', icon: <Component className="w-5 h-5" /> },
+      { id: 'fip', label: 'FIP', icon: <Landmark className="w-5 h-5" /> },
+      { id: 'purpose', label: 'Purpose', icon: <FileQuestion className="w-5 h-5" /> },
+      { id: 'consent-templates', label: 'Consent Templates', icon: <LayoutTemplate className="w-5 h-5" /> },
+      { id: 'consent-requests', label: 'Consent Requests', icon: <FileStack className="w-5 h-5" /> },
+      { id: 'fi-notifications', label: 'FI Notifications', icon: <BellDot className="w-5 h-5" /> },
+    ]
+    const [order, setOrder] = React.useState<string[]>(initial.map((x) => x.id))
+    const [selected, setSelected] = React.useState<string>('consent-templates')
+    const byId = React.useMemo(() => Object.fromEntries(initial.map((x) => [x.id, x])), [])
+
     return (
       <div className="h-screen flex">
         <SidebarProvider
@@ -30,117 +229,20 @@ export const Default: Story = {
               </SidebarTrigger>
             </SidebarHeader>
             <SidebarContent>
-              {/* AA ECOSYSTEM */}
               <SidebarGroup id="aa" defaultOpen>
                 <SidebarGroupTrigger>
                   <SidebarGroupLabel>AA ECOSYSTEM</SidebarGroupLabel>
                 </SidebarGroupTrigger>
                 <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="account-aggregator" icon={<Component className="w-5 h-5" />}>Account Aggregator</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="fip" icon={<Landmark className="w-5 h-5" />}>FIP</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="purpose" icon={<FileQuestion className="w-5 h-5" />}>Purpose</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="consent-templates" icon={<LayoutTemplate className="w-5 h-5" />}>Consent Templates</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="consent-requests" icon={<FileStack className="w-5 h-5" />}>Consent Requests</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="fi-notifications" icon={<BellDot className="w-5 h-5" />}>FI Notifications</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="data-fetch-request" icon={<Grid2x2Plus className="w-5 h-5" />}>Data Fetch Request</SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-              {/* BULK OPERATIONS */}
-              <SidebarGroup id="bulk" defaultOpen>
-                <SidebarGroupTrigger>
-                  <SidebarGroupLabel>BULK OPERATIONS</SidebarGroupLabel>
-                </SidebarGroupTrigger>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="bulk-consent-request" icon={<Braces className="w-5 h-5" />}>Bulk Consent Request</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="bulk-data-fetch" icon={<FileInput className="w-5 h-5" />}>Bulk Data Fetch</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="bulk-consent-revoke" icon={<FileX2 className="w-5 h-5" />}>Bulk Consent Revoke</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="bulk-csv-upload" icon={<FileStack className="w-5 h-5" />}>Bulk CSV Upload</SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-              {/* ANALYTICS */}
-              <SidebarGroup id="analytics" defaultOpen>
-                <SidebarGroupTrigger>
-                  <SidebarGroupLabel>ANALYTICS</SidebarGroupLabel>
-                </SidebarGroupTrigger>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="insights" icon={<TextSearch className="w-5 h-5" />}>Insights</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="analytics" icon={<ChartLine className="w-5 h-5" />}>Analytics</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="pdf-analytics" icon={<FileChartPie className="w-5 h-5" />}>PDF Analytics</SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-              {/* ADMIN & SETUP */}
-              <SidebarGroup id="admin" defaultOpen>
-                <SidebarGroupTrigger>
-                  <SidebarGroupLabel>ADMIN & SETUP</SidebarGroupLabel>
-                </SidebarGroupTrigger>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="settings" icon={<Cog className="w-5 h-5" />}>Settings</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="manage-apps" icon={<MonitorCog className="w-5 h-5" />}>Manage Apps</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="admin" icon={<UserCog className="w-5 h-5" />}>Admin</SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-              {/* REFERENCE & DOCS */}
-              <SidebarGroup id="docs" defaultOpen>
-                <SidebarGroupTrigger>
-                  <SidebarGroupLabel>REFERENCE & DOCS</SidebarGroupLabel>
-                </SidebarGroupTrigger>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="central-registry" icon={<BookText className="w-5 h-5" />}>Central Registry</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="integration-docs" icon={<FileCode2 className="w-5 h-5" />}>Integration Docs</SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton itemId="mis" icon={<ChartPie className="w-5 h-5" />}>MIS</SidebarMenuButton>
-                    </SidebarMenuItem>
+                  <SidebarMenu reorderable onReorder={(next) => setOrder(next)}>
+                    {order.map((id) => {
+                      const item = byId[id]
+                      return (
+                        <SidebarMenuItem key={id} draggable dragId={id}>
+                          <SidebarMenuButton itemId={id} icon={item.icon}>{item.label}</SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )
+                    })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
@@ -151,7 +253,7 @@ export const Default: Story = {
             <SidebarTrigger>
               <ArrowLeftCircle className="h-5 w-5" />
             </SidebarTrigger>
-            <div>Selected: {selected}</div>
+            <div>Order: {order.join(' , ')}</div>
           </div>
         </SidebarProvider>
       </div>
