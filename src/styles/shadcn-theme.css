@@ -1,25 +1,25 @@
 :root {
   /* Map design tokens to shadcn variables */
-  --background: 248 254 255; /* #F8FEFF */
+  --background: 250 250 250; /* #FAFAFA */
   --foreground: 15 51 64; /* #0F3340 */
   --primary: 15 51 64; /* #0F3340 */
   --primary-foreground: 255 255 255; /* #FFFFFF */
-  --secondary: 243 248 252; /* #F3F8FC */
-  --secondary-foreground: 117 117 117; /* #757575 */
-  --muted: 246 252 255; /* #F6FCFF */
-  --muted-foreground: 112 132 151; /* #708497 */
-  --accent: 246 252 255; /* #F6FCFF */
-  --accent-foreground: 0 0 0; /* #000000 */
+  --secondary: 231 237 240; /* #E7EDF0 */
+  --secondary-foreground: 102 109 120; /* #666D78 */
+  --muted: 250 250 250; /* #FAFAFA */
+  --muted-foreground: 231 237 240; /* #E7EDF0 */
+  --accent: 250 250 250; /* #FAFAFA */
+  --accent-foreground: 15 16 18; /* #0F1012 */
   --destructive: 202 115 115; /* #CA7373 */
   --destructive-foreground: 255 255 255; /* #FFFFFF */
-  --border: 231 237 240; /* #E7EDF0 */
-  --input: 231 237 240; /* #E7EDF0 */
+  --border: 217 240 255; /* #D9F0FF */
+  --input: 217 240 255; /* #D9F0FF */
   --ring: 15 51 64; /* #0F3340 */
   --radius: 0.375rem;
   --primary-50: 248 254 255;
   --primary-100: 240 249 255;
   --primary-200: 229 245 255;
-  --primary-300: 195 231 255;
+  --primary-300: 217 240 255;
   --primary-400: 193 228 251;
   --primary-500: 15 51 64;
   --primary-600: 15 31 64;
@@ -27,15 +27,15 @@
   --primary-800: 85 106 125;
   --primary-900: 71 90 102;
   --gray-50: 255 255 255;
-  --gray-100: 246 252 255;
+  --gray-100: 250 250 250;
   --gray-200: 243 248 252;
   --gray-300: 240 246 250;
   --gray-400: 250 253 255;
   --gray-500: 231 237 240;
-  --gray-600: 144 155 170;
-  --gray-700: 117 117 117;
-  --gray-800: 112 132 151;
-  --gray-900: 0 0 0;
+  --gray-600: 145 156 171;
+  --gray-700: 102 109 120;
+  --gray-800: 59 63 69;
+  --gray-900: 15 16 18;
   --success-50: 230 244 236;
   --success-100: 45 134 89;
   --warning-50: 224 245 255;
@@ -61,15 +61,15 @@
   --neutral: 172 115 43;
   --neutral-foreground: 255 255 255;
   --text-primary: 15 51 64;
-  --text-secondary: 117 117 117;
-  --text-tertiary: 144 155 170;
+  --text-secondary: 102 109 120;
+  --text-tertiary: 145 156 171;
   --text-inverse: 255 255 255;
-  --text-muted: 112 132 151;
-  --background-primary: 248 254 255;
+  --text-muted: 231 237 240;
+  --background-primary: 250 250 250;
   --background-secondary: 255 255 255;
-  --background-tertiary: 243 248 252;
+  --background-tertiary: 231 237 240;
   --background-inverse: 15 51 64;
-  --border-default: 231 237 240;
+  --border-default: 217 240 255;
   --border-hover: 193 228 251;
   --border-focus: 15 51 64;
   --border-light: 231 237 240;
@@ -80,8 +80,8 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
-  --radius-full: 9999px;
-  --spacing-0: 0;
+  --radius-full: 624.938rem;
+  --spacing-0: 0rem;
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
   --spacing-3: 0.75rem;
@@ -94,8 +94,8 @@
   --spacing-16: 4rem;
   --spacing-20: 5rem;
   --spacing-24: 6rem;
-  --font-sans: "Helvetica Neue", Inter, system-ui, sans-serif;
-  --font-mono: "Fira Code", Monaco, Consolas, monospace;
+  --font-sans: String value;
+  --font-mono: String value;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -105,34 +105,33 @@
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
   --font-size-5xl: 3rem;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --line-height-tight: 1.22;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.06), 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
-  --shadow-base: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --font-weight-normal: 25rem;
+  --font-weight-medium: 31.25rem;
+  --font-weight-semibold: 37.5rem;
+  --font-weight-bold: 43.75rem;
+  --line-height-tight: 0.076rem;
+  --line-height-normal: 0.094rem;
+  --line-height-relaxed: 0.109rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 .dark {
   --background: 15 51 64; /* #0F3340 */
   --foreground: 255 255 255; /* #FFFFFF */
   --primary: 15 31 64; /* #0F1F40 */
   --primary-foreground: 255 255 255; /* #FFFFFF */
-  --secondary: 112 132 151; /* #708497 */
+  --secondary: 59 63 69; /* #3B3F45 */
   --secondary-foreground: 255 255 255; /* #FFFFFF */
-  --muted: 112 132 151; /* #708497 */
+  --muted: 59 63 69; /* #3B3F45 */
   --muted-foreground: 250 253 255; /* #FAFDFF */
-  --accent: 112 132 151; /* #708497 */
+  --accent: 59 63 69; /* #3B3F45 */
   --accent-foreground: 255 255 255; /* #FFFFFF */
   --destructive: 202 115 115; /* #CA7373 */
   --destructive-foreground: 255 255 255; /* #FFFFFF */
-  --border: 112 132 151; /* #708497 */
-  --input: 112 132 151; /* #708497 */
+  --border: 59 63 69; /* #3B3F45 */
+  --input: 59 63 69; /* #3B3F45 */
   --ring: 15 31 64; /* #0F1F40 */
   --radius: 0.375rem;
 }
