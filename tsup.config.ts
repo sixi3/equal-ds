@@ -12,6 +12,7 @@ export default defineConfig({
     'react-dom',
     'tailwindcss',
     '@radix-ui/react-collapsible',
+    '@radix-ui/react-dropdown-menu',
     '@radix-ui/react-tooltip',
     '@radix-ui/react-visually-hidden',
     '@radix-ui/react-dialog',

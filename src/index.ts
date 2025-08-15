@@ -3,6 +3,7 @@
 
 export { cn } from './lib/cn'
 export * from './components/sidebar'
+export * from './components/dropdown'
 
 
 

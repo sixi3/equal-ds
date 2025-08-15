@@ -5,6 +5,15 @@ import '../stories/tailwind.css'
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
+    controls: {
+      matchers: {
+        color: /(background|color|border|text)$/i,
+        date: /Date$/,
+      },
+      // Enhanced controls display
+      expanded: true,
+      sort: 'requiredFirst',
+    },
   },
 }
 

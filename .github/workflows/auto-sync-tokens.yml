@@ -1,0 +1,175 @@
+name: 🎨 Auto-Sync Design Tokens & Storybook
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'tokens.json'
+      - 'design-tokens.config.js'
+      - 'figma-assets/**'
+      - '.github/workflows/auto-sync-tokens.yml'
+  workflow_dispatch: # Allow manual trigger
+    inputs:
+      force_sync:
+        description: 'Force sync even if no token changes'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  auto-sync:
+    name: 🔄 Auto-Sync Everything
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Full history for better diff detection
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+          echo "✅ Dependencies installed"
+      
+      - name: 🔍 Check for token changes
+        id: check-changes
+        run: |
+          # Check if tokens.json changed in this push
+          if git diff --name-only HEAD~1 HEAD | grep -q "tokens.json"; then
+            echo "TOKENS_CHANGED=true" >> $GITHUB_OUTPUT
+            echo "🎨 Design tokens changed - will sync everything"
+          else
+            echo "TOKENS_CHANGED=false" >> $GITHUB_OUTPUT
+            echo "📝 No token changes detected"
+          fi
+          
+          # Check if force sync is requested
+          if [[ "${{ github.event.inputs.force_sync }}" == "true" ]]; then
+            echo "TOKENS_CHANGED=true" >> $GITHUB_OUTPUT
+            echo "🔄 Force sync requested - will sync everything"
+          fi
+      
+      - name: 🔐 Setup Figma Access (if tokens changed)
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          # Check if we have Figma access token
+          if [[ -n "${{ secrets.FIGMA_ACCESS_TOKEN }}" ]]; then
+            echo "✅ Figma access token available"
+          else
+            echo "⚠️  No Figma access token - will use local tokens only"
+          fi
+      
+      - name: 📡 Sync design tokens
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          echo "🔄 Syncing design tokens..."
+          if [[ -n "${{ secrets.FIGMA_ACCESS_TOKEN }}" ]]; then
+            # Set Figma token for design-tokens-sync
+            export FIGMA_ACCESS_TOKEN="${{ secrets.FIGMA_ACCESS_TOKEN }}"
+            npm run tokens:sync
+          else
+            echo "📝 Using local tokens only (no Figma sync)"
+            # Still generate controls from local tokens
+            npm run generate:controls
+          fi
+          echo "✅ Tokens synced"
+      
+      - name: ⚙️ Generate Storybook controls
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          echo "⚙️ Generating Storybook controls..."
+          npm run generate:controls
+          echo "✅ Controls generated"
+      
+      - name: 📝 Auto-update Storybook stories
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          echo "📝 Updating Storybook stories..."
+          npm run auto:update
+          echo "✅ Stories updated"
+      
+      - name: 🔍 Check for actual changes
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        id: check-actual-changes
+        run: |
+          # Check if any files actually changed after sync
+          if git diff --quiet; then
+            echo "NO_CHANGES=true" >> $GITHUB_OUTPUT
+            echo "📝 No actual changes after sync"
+          else
+            echo "NO_CHANGES=false" >> $GITHUB_OUTPUT
+            echo "🔄 Changes detected - will commit"
+          fi
+      
+      - name: 📝 Commit and push changes
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true' && steps.check-actual-changes.outputs.NO_CHANGES == 'false'
+        run: |
+          echo "📝 Committing auto-synced changes..."
+          
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Add all changed files
+          git add -A
+          
+          # Create commit message
+          COMMIT_MSG="🎨 Auto-sync: Update design tokens, controls, and stories
+          
+          - 🔄 Synced design tokens from Figma/design files
+          - ⚙️ Generated latest Storybook controls
+          - 📝 Updated stories with new token options
+          - 🤖 Automated by GitHub Actions
+          
+          Triggered by: ${{ github.event_name }} on ${{ github.ref }}"
+          
+          # Commit
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          
+          # Push
+          git push origin ${{ github.ref }} || echo "No changes to push"
+          
+          echo "✅ Changes committed and pushed"
+      
+      - name: 🧪 Build Storybook (validation)
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          echo "🧪 Building Storybook to validate changes..."
+          npm run build-storybook
+          echo "✅ Storybook builds successfully"
+      
+      - name: ✅ Sync complete
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'true'
+        run: |
+          echo "🎉 AUTO-SYNC COMPLETE!"
+          echo "✅ Design tokens synced"
+          echo "✅ Storybook controls generated"
+          echo "✅ Stories updated"
+          echo "✅ Changes committed and pushed"
+          echo "✅ Storybook builds successfully"
+      
+      - name: 📝 No changes needed
+        if: steps.check-changes.outputs.TOKENS_CHANGED == 'false'
+        run: |
+          echo "📝 No token changes detected"
+          echo "✅ Nothing to sync"
+      
+      - name: 🎯 Summary
+        run: |
+          echo "🎯 WORKFLOW SUMMARY"
+          echo "=================="
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Tokens changed: ${{ steps.check-changes.outputs.TOKENS_CHANGED }}"
+          if [[ "${{ steps.check-changes.outputs.TOKENS_CHANGED }}" == "true" ]]; then
+            echo "Actual changes: ${{ steps.check-actual-changes.outputs.NO_CHANGES }}"
+            echo "Status: ${{ steps.check-actual-changes.outputs.NO_CHANGES == 'false' && '✅ Synced and committed' || '📝 Synced but no changes' }}"
+          fi

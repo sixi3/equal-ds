@@ -191,6 +191,32 @@ npm run storybook
 npm test
 ```
 
+### 🎨 Design System Automation
+
+This design system includes **zero-touch automation** for keeping everything in sync:
+
+- **🔄 Auto-Sync**: Design tokens automatically sync from Figma
+- **⚙️ Auto-Generate**: Storybook controls automatically generated
+- **📝 Auto-Update**: Stories automatically updated with new tokens
+- **🤖 GitHub Actions**: Everything syncs automatically on git push
+
+**Quick Start:**
+```bash
+# Full automation (recommended)
+npm run full:update
+
+# Test GitHub Actions workflow
+npm run test:workflow
+
+# Start Storybook
+npm run storybook
+```
+
+**For complete automation setup, see:**
+- [Design Controls Guide](docs/DESIGN-CONTROLS.md)
+- [GitHub Actions Setup](docs/GITHUB-ACTIONS-SETUP.md)
+- [Automation Summary](docs/AUTOMATION-SUMMARY.md)
+
 ### Release & publish
 
 1) Ensure you are logged in to npm and have 2FA set up.
