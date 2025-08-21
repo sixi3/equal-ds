@@ -39,6 +39,7 @@
     "./shadcn-theme.css": "./dist/shadcn-theme.css",
     "./animations.css": "./dist/animations.css",
     "./theme.css": "./dist/shadcn-theme.css",
+    "./typography.css": "./dist/typography.css",
     "./tailwind-preset": {
       "import": "./dist/tailwind-preset.js",
       "require": "./dist/tailwind-preset.cjs"
@@ -94,7 +95,7 @@
   },
   "scripts": {
     "build": "tsup --config tsup.config.ts && npm run build:assets",
-    "build:assets": "mkdir -p dist && cp src/styles/shadcn-theme.css dist/shadcn-theme.css && cp src/styles/animations.css dist/animations.css && cp src/data/tokens.js dist/tokens.js && cp src/data/tokens.cjs dist/tokens.cjs",
+    "build:assets": "mkdir -p dist && cp src/styles/shadcn-theme.css dist/shadcn-theme.css && cp src/styles/animations.css dist/animations.css && cp src/styles/typography.css dist/typography.css",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",

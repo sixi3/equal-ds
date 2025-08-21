@@ -44,7 +44,7 @@ function SidebarGroupImpl({ className, children, groupId, open: openProp, defaul
 export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const SidebarGroupLabelImpl = ({ className, ...props }: SidebarGroupLabelProps): JSX.Element => (
-  <div data-sidebar-group-label className={cn(' text-xs uppercase text-muted-foreground', className)} {...props} />
+  <div data-sidebar-group-label className={cn(' text-xs uppercase text-text-secondary font-medium', className)} {...props} />
 )
 
 export interface SidebarGroupContentProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Content> {}
@@ -146,7 +146,7 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
       {...props}
     >
       <div className={cn(
-        'flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-muted-foreground',
+        'flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-text-secondary',
         open ? 'justify-start' : 'justify-center'
       )}>
         {open && (
@@ -174,7 +174,7 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
           <ChevronDown
             aria-hidden
             className={cn(
-              'h-3 w-3 shrink-0 transition-transform duration-200 ease-out text-muted-foreground',
+              'h-3 w-3 shrink-0 transition-transform duration-200 ease-out text-text-primary',
               'group-data-[state=open]:rotate-180',
             )}
           />

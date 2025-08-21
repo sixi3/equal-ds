@@ -9,7 +9,7 @@ function SidebarFooterImpl({ className, ...props }: SidebarFooterProps): JSX.Ele
   const { open } = useSidebarOpenContext()
   
   return (
-    <div className={cn('mt-auto border-t border-border', className)} {...props}>
+    <div className={cn('mt-auto border-t border-border-light', className)} {...props}>
       <div className="p-3">
         <button
           className={cn(

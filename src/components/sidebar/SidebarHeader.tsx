@@ -9,7 +9,7 @@ function SidebarHeaderImpl({ className, ...props }: SidebarHeaderProps): JSX.Ele
   
   return (
     <div className={cn(
-      'px-3 py-2 border-b border-border',
+      'px-3 py-2 border-b border-border-light',
       open
         ? 'text-left'
         : cn(

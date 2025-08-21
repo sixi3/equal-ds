@@ -395,7 +395,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
         >
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/10 border border-border/50 transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
+            className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
             style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
           />
           {children}
@@ -498,7 +498,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
           'bg-gradient-to-b from-white to-primary-200 text-primary font-semibold border border-border shadow-[inset_0_-4px_0_0_rgb(var(--primary-400))] active:shadow-[inset_0_-3px_0_0_rgb(var(--primary-400))] active:from-white active:to-primary-300/30',
           justActivated && 'animate-sidebar-pop-in',
         )
-      : cn('text-foreground hover:text-primary-500 hover:bg-muted/50'),
+      : cn('text-foreground'),
     disabled && 'opacity-40 pointer-events-none text-muted-foreground',
     className,
   )

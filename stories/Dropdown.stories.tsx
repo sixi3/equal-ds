@@ -5,6 +5,8 @@ import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSepar
 import { ChevronDown, Settings, User, LogOut, CreditCard } from 'lucide-react'
 import { cn } from '../src/lib/cn'
 import { useState } from 'react'
+import { CopyCodeButton } from '../src/story-utils/CopyCodeButton'
+import { generateDropdownSnippet, generateFinProSnippet } from '../src/story-utils/snippets'
 
 // Enhanced design token mappings with clear labels
 // These provide both hex values and token names in the controls
@@ -465,6 +467,50 @@ const meta = {
         defaultValue: { summary: '16px' },
         category: 'Layout'
       }
+    },
+    labelTypography: {
+      control: { type: 'select' },
+      options: [
+        'text-ui-label',
+        'text-ui-button',
+        'text-ui-caption',
+        'text-body-xs',
+        'text-body-small',
+        'text-body-base',
+        'text-h6',
+        'text-h5',
+        'text-h4'
+      ],
+      description: 'Typography style for dropdown labels',
+      defaultValue: 'text-ui-label',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'text-ui-label' },
+        category: 'Typography'
+      }
+    },
+    headerTypography: {
+      control: { type: 'select' },
+      options: [
+        'text-h1',
+        'text-h2',
+        'text-h3',
+        'text-h4',
+        'text-h5',
+        'text-h6',
+        'text-body-large',
+        'text-body-base',
+        'text-display-small',
+        'text-display-medium',
+        'text-display-large'
+      ],
+      description: 'Typography style for section headers',
+      defaultValue: 'text-h2',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'text-h2' },
+        category: 'Typography'
+      }
     }
   },
 } satisfies Meta
@@ -493,6 +539,8 @@ function ExampleDropdown({
   hoverBorderBottomWidth = '2px',
   hoverBorderRadius = '--border-radius-md (Medium - 6px)',
   dropdownGap = '16px',
+  labelTypography = 'text-ui-label',
+  headerTypography = 'text-h2',
 }: { 
   label: string
   showLabel?: boolean
@@ -514,6 +562,8 @@ function ExampleDropdown({
   hoverBorderBottomWidth?: string
   hoverBorderRadius?: string
   dropdownGap?: string
+  labelTypography?: string
+  headerTypography?: string
 }) {
   const [isHovered, setIsHovered] = useState(false)
   const [isClicked, setIsClicked] = useState(false)
@@ -604,7 +654,7 @@ function ExampleDropdown({
   return (
     <div className="space-y-2 w-full">
       {showLabel && (
-        <label className="block text-sm font-medium text-foreground">
+        <label className={cn(labelTypography || 'text-ui-label', 'text-foreground')}>
           {label}
         </label>
       )}
@@ -656,8 +706,14 @@ function ExampleDropdown({
 
 export const Default: Story = {
   render: (args) => (
-    <div className="flex flex-wrap gap-4 p-8">
-      <ExampleDropdown label="User Menu" {...args} />
+    <div className="flex flex-col gap-4 p-8">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-foreground">Example usage</h3>
+        <CopyCodeButton generator={generateDropdownSnippet} args={args} />
+      </div>
+      <div className="flex flex-wrap gap-4">
+        <ExampleDropdown label="User Menu" {...args} />
+      </div>
     </div>
   ),
   args: {
@@ -839,22 +895,15 @@ export const WithLabels: Story = {
 export const FinPro: Story = {
   render: (args: any) => (
     <div className="min-h-screen bg-[#FAFAFA] p-6">
-      {/* Header Section */}
-      <div className="bg-white border border-[#E7EDF0] rounded-lg p-6 shadow-sm mb-6">
-        <h1 className="text-2xl font-medium text-[#0F3340] mb-2">FinPro Console - Dropdown Components</h1>
-        <p className="text-sm text-[#666D78]">
-          Professional dropdown components with consistent spacing and labeling, inspired by FinPro Console design.
-        </p>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-h4 text-foreground">FinPro layout</h3>
+        <CopyCodeButton generator={generateFinProSnippet} args={args} />
       </div>
-
-      {/* Filter Section with Dropdowns - Single Large Container */}
-      <div className="bg-white border border-[#E7EDF0] rounded-xl p-6 shadow-sm" style={{ minHeight: '140px', boxSizing: 'border-box' }}>
+      <div className="bg-white border border-border-light rounded-xl p-3 shadow-sm" style={{ minHeight: '140px', boxSizing: 'border-box' }}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-medium text-[#0F3340]">Filter By</h2>
+          <h2 className={cn(args.headerTypography || 'text-h2', 'text-[#0F3340]')}>Filter By</h2>
           <div className="w-4 h-4 bg-[#3B3F45] rounded" />
         </div>
-        
-        {/* Four Equal-Width Dropdowns in Single Container */}
         <div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 w-full"
           style={{ 
@@ -892,48 +941,6 @@ export const FinPro: Story = {
           </div>
         </div>
       </div>
-
-      {/* Additional Section with Different Dropdown Variants */}
-      <div className="bg-white border border-[#E7EDF0] rounded-xl p-6 shadow-sm mt-6" style={{ minHeight: '140px', boxSizing: 'border-box' }}>
-        <h2 className="text-xl font-medium text-[#0F3340] mb-6">Additional Controls</h2>
-        
-        <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 w-full"
-          style={{ 
-            gap: args.dropdownGap,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))'
-          }}
-        >
-          <div className="w-full">
-            <ExampleDropdown 
-              label="Data Range" 
-              {...args} 
-              showLabel={true}
-            />
-          </div>
-          <div className="w-full">
-            <ExampleDropdown 
-              label="Frequency" 
-              {...args} 
-              showLabel={true}
-            />
-          </div>
-          <div className="w-full">
-            <ExampleDropdown 
-              label="FI Types" 
-              {...args} 
-              showLabel={true}
-            />
-          </div>
-          <div className="w-full">
-            <ExampleDropdown 
-              label="User Role" 
-              {...args} 
-              showLabel={true}
-            />
-          </div>
-        </div>
-      </div>
     </div>
   ),
   args: {
@@ -946,7 +953,7 @@ export const FinPro: Story = {
     contentAlignment: 'start',
     sideOffset: 6,
     showLabel: true,
-    borderTopWidth: '1px',
+    borderTopWidth: "1px",
     borderRightWidth: '1px',
     borderBottomWidth: "3px",
     borderLeftWidth: '1px',
@@ -956,6 +963,8 @@ export const FinPro: Story = {
     hoverBorderBottomWidth: "3px",
     hoverBorderRadius: '--border-radius-md (Medium - 6px)',
     dropdownGap: "20px",
+    labelTypography: 'text-ui-label',
+    headerTypography: "text-display-small",
   },
 }
 
