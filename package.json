@@ -36,18 +36,12 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./shadcn-theme.css": "./dist/shadcn-theme.css",
+    "./tokens.css": "./dist/tokens.css",
     "./animations.css": "./dist/animations.css",
-    "./theme.css": "./dist/shadcn-theme.css",
-    "./typography.css": "./dist/typography.css",
+    "./theme.css": "./dist/tokens.css",
     "./tailwind-preset": {
       "import": "./dist/tailwind-preset.js",
       "require": "./dist/tailwind-preset.cjs"
-    },
-    "./tokens": {
-      "import": "./dist/tokens.js",
-      "require": "./dist/tokens.cjs",
-      "default": "./dist/tokens.js"
     }
   },
   "peerDependencies": {
@@ -95,14 +89,14 @@
   },
   "scripts": {
     "build": "tsup --config tsup.config.ts && npm run build:assets",
-    "build:assets": "mkdir -p dist && cp src/styles/shadcn-theme.css dist/shadcn-theme.css && cp src/styles/animations.css dist/animations.css && cp src/styles/typography.css dist/typography.css",
+    "build:assets": "mkdir -p dist && cp src/styles/animations.css dist/animations.css && cp src/styles/tokens.css dist/tokens.css",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "strip:publish": "find dist -name '*.map' -delete && find dist -name '*.d.cts' -delete && rm -f dist/theme.css",
+    "strip:publish": "find dist -name '*.map' -delete && find dist -name '*.d.cts' -delete && rm -f dist/shadcn-theme.css dist/typography.css",
     "tokens:init": "design-tokens-sync init",
     "tokens:sync": "design-tokens-sync sync",
     "tokens:watch": "design-tokens-sync watch",
