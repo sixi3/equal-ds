@@ -36,14 +36,13 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./tokens.css": "./dist/tokens.css",
     "./shadcn-theme.css": "./dist/shadcn-theme.css",
     "./animations.css": "./dist/animations.css",
-    "./theme.css": "./dist/tokens.css",
+    "./theme.css": "./dist/shadcn-theme.css",
     "./typography.css": "./dist/typography.css",
     "./tailwind-preset": {
-      "import": "./dist/tokens.tailwind.preset.js",
-      "require": "./dist/tokens.tailwind.preset.cjs"
+      "import": "./dist/tailwind-preset.js",
+      "require": "./dist/tailwind-preset.cjs"
     },
     "./tokens": {
       "import": "./dist/tokens.js",
