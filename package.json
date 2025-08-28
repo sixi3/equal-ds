@@ -1,6 +1,6 @@
 {
   "name": "equal-ds-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
   "author": "Equal DS",
   "repository": {
@@ -107,8 +107,6 @@
     "tokens:sync": "design-tokens-sync sync",
     "tokens:watch": "design-tokens-sync watch",
     "tokens:validate": "design-tokens-sync validate",
-
-
     "tokens:analytics": "design-tokens-sync analytics report",
     "prepublishOnly": "npm run tokens:sync && npm run build && npm run strip:publish"
   },
