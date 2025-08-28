@@ -1,4 +1,15 @@
-# 🚀 **GitHub Actions Auto-Sync Setup**
+# ⚠️ **DEPRECATED - See CURRENT-SYSTEM.md**
+
+## 🔄 **Migration Notice**
+This documentation describes GitHub Actions for the **old system** that has been replaced with a much simpler architecture.
+
+**👉 See `CURRENT-SYSTEM.md` for the current implementation.**
+
+The new system only needs basic `tokens:sync` functionality - no complex automation required!
+
+---
+
+# 🚀 **GitHub Actions Auto-Sync Setup** (DEPRECATED)
 
 ## 🎯 **What This Achieves**
 

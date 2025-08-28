@@ -15,7 +15,7 @@ function SidebarImpl({ className, variant = 'inset', ...props }: SidebarProps): 
       data-side={side}
       data-variant={variant}
       className={cn(
-        'bg-white text-foreground border-border-light shadow-sm',
+        'bg-white text-foreground border-border-light',
         side === 'left' ? 'border-r' : 'border-l',
         'transition-[width] duration-200 ease-out',
         'w-[255px] data-[state=closed]:w-[70px] overflow-x-hidden overflow-y-hidden',

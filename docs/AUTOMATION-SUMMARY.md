@@ -1,4 +1,13 @@
-# 🎉 **Complete Automation Summary**
+# ⚠️ **DEPRECATED - See CURRENT-SYSTEM.md**
+
+## 🔄 **Migration Notice**
+This documentation describes the **old system** that has been replaced with a much simpler, more robust architecture. 
+
+**👉 See `CURRENT-SYSTEM.md` for the current implementation.**
+
+---
+
+# 🎉 **Complete Automation Summary** (DEPRECATED)
 
 ## 🚀 **What We've Built**
 

@@ -12,7 +12,7 @@ function measureGroupRects(list: HTMLElement): Record<string, DOMRect> {
 }
 
 const GROUP_DROP_THRESHOLD_PX = 12
-const GROUP_INDICATOR_GAP_PX = -12
+const GROUP_INDICATOR_GAP_PX = 4
 
 type GroupDropIndicator = { top: number; left: number; width: number; visible: boolean }
 
@@ -87,7 +87,17 @@ function SidebarContentImpl({ className, children, reorderableGroups = false, on
     if (!container) return
     const cRect = container.getBoundingClientRect()
     const tRect = targetEl.getBoundingClientRect()
-    const top = atEnd ? (tRect.bottom + GROUP_INDICATOR_GAP_PX) : (tRect.top - GROUP_INDICATOR_GAP_PX)
+    
+    // Position indicator precisely between groups with proper spacing
+    let top: number
+    if (atEnd) {
+      // After the last group
+      top = tRect.bottom + GROUP_INDICATOR_GAP_PX
+    } else {
+      // Before the target group
+      top = tRect.top - GROUP_INDICATOR_GAP_PX
+    }
+    
     setDropIndicator({
       top: top - cRect.top + (container.scrollTop ?? 0),
       left: tRect.left - cRect.left + (container.scrollLeft ?? 0),
@@ -207,7 +217,7 @@ function SidebarContentImpl({ className, children, reorderableGroups = false, on
         <div
           ref={scrollRef}
           className={cn(
-            'px-2 pt-1 pb-3 space-y-8 h-full overflow-y-auto relative',
+            'px-2 pt-1 pb-3 space-y-2 h-full overflow-y-auto relative',
             'overscroll-contain',
           )}
           style={scrollStyles}
@@ -268,19 +278,19 @@ function SidebarContentImpl({ className, children, reorderableGroups = false, on
           {/* Group drop indicator (render after children to avoid space-y top gap) */}
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute z-[100] h-[2px] transition-all duration-75 ease-out', dropIndicator.visible && reorderableGroups && open ? 'opacity-100' : 'opacity-0')}
-            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--primary-400))' }}
+            className={cn('pointer-events-none absolute z-20 h-[2px] transition-all duration-75 ease-out shadow-sm', dropIndicator.visible && reorderableGroups && open ? 'opacity-100' : 'opacity-0')}
+            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--color-primary-400))' }}
           />
         </div>
         <div
           className={cn(
-            'pointer-events-none absolute inset-x-0 top-0 h-10 z-10 bg-gradient-to-b from-gray-600/20 to-transparent transition-opacity duration-200',
+            'pointer-events-none absolute inset-x-0 top-0 h-10 z-10 bg-gradient-to-b from-gray-700/20 to-transparent transition-opacity duration-200',
             showTopFade ? 'opacity-100' : 'opacity-0',
           )}
         />
         <div
           className={cn(
-            'pointer-events-none absolute inset-x-0 bottom-0 h-10 z-10 bg-gradient-to-t from-gray-600/20 to-transparent transition-opacity duration-200',
+            'pointer-events-none absolute inset-x-0 bottom-0 h-10 z-10 bg-gradient-to-t from-gray-700/20 to-transparent transition-opacity duration-200',
             showBottomFade ? 'opacity-100' : 'opacity-0',
           )}
         />

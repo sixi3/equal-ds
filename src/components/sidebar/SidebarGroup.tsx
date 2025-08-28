@@ -44,7 +44,7 @@ function SidebarGroupImpl({ className, children, groupId, open: openProp, defaul
 export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const SidebarGroupLabelImpl = ({ className, ...props }: SidebarGroupLabelProps): JSX.Element => (
-  <div data-sidebar-group-label className={cn(' text-xs uppercase text-text-secondary font-medium', className)} {...props} />
+  <div data-sidebar-group-label className={cn(' text-xs uppercase text-text-secondary font-medium tracking-widest pt-0.25', className)} {...props} />
 )
 
 export interface SidebarGroupContentProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Content> {}
@@ -83,10 +83,10 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
     el.style.gap = '8px'
     el.style.padding = '6px 10px'
     el.style.borderRadius = '8px'
-    el.style.border = '1px solid rgb(var(--border))'
-    el.style.background = 'rgb(var(--background))'
+    el.style.border = '1px solid var(--color-border-default)'
+    el.style.background = 'var(--color-background-secondary)'
     el.style.boxShadow = 'var(--shadow-md)'
-    el.style.color = 'rgb(var(--foreground))'
+    el.style.color = 'rgb(var(--color-text-primary))'
 
     const svg = current.querySelector('svg')?.cloneNode(true) as SVGElement | null
     if (svg) {
@@ -94,7 +94,7 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
       wrap.style.display = 'inline-flex'
       wrap.style.width = '20px'
       wrap.style.height = '20px'
-      wrap.style.color = 'rgb(var(--muted-foreground))'
+      wrap.style.color = 'rgb(var(--color-text-muted))'
       wrap.appendChild(svg)
       el.appendChild(wrap)
     }
@@ -140,41 +140,40 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
     <Collapsible.Trigger
       className={cn(
         'group/trigger w-full flex flex-col rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        'px-2 py-3',
+        'px-1 py-3',
         className,
       )}
       {...props}
     >
       <div className={cn(
-        'flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-text-secondary',
-        open ? 'justify-start' : 'justify-center'
+        'flex items-center text-xs font-semibold uppercase tracking-widest text-secondary',
+        open ? 'justify-start gap-2' : 'justify-center'
       )}>
+        {/* Handle - only visible when reordering is enabled and sidebar is open */}
+        {open && reorderCtx?.enabled ? (
+          <span
+            ref={handleRef}
+            className="inline-flex items-center justify-center w-4 h-4 opacity-50 hover:opacity-100 cursor-grab active:cursor-grabbing group/icon"
+            draggable
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+          >
+            <GripVertical className="w-3 h-3 text-secondary" />
+          </span>
+        ) : null}
+        {/* Label text */}
         {open && (
-          <div className="min-w-0 truncate flex items-center gap-2">
-            {/* Handle - only visible when reordering is enabled */}
-            {reorderCtx?.enabled ? (
-              <span
-                ref={handleRef}
-                className="inline-flex items-center justify-center w-4 h-4 opacity-50 hover:opacity-100 cursor-grab active:cursor-grabbing group/icon"
-                draggable
-                onDragStart={onDragStart}
-                onDragEnd={onDragEnd}
-              >
-                <GripVertical className="w-3 h-3" />
-              </span>
-            ) : null}
-            <div ref={labelRef} className="min-w-0 truncate py-0.5">{children}</div>
-          </div>
+          <div ref={labelRef} className="min-w-0 break-words">{children}</div>
         )}
         <div className={cn(
-          'h-px bg-border',
+          'h-px bg-border-default',
           open ? 'flex-1' : 'w-3'
         )} />
-        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full transition-colors group-hover/trigger:bg-gray-300/40">
+        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full transition-colors group-hover/trigger:bg-primary-300/20">
           <ChevronDown
             aria-hidden
             className={cn(
-              'h-3 w-3 shrink-0 transition-transform duration-200 ease-out text-text-primary',
+              'h-3 w-3 shrink-0 transition-transform duration-200 ease-out text-secondary',
               'group-data-[state=open]:rotate-180',
             )}
           />

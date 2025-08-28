@@ -46,7 +46,10 @@ export function resolveControlValue(friendlyName: string | undefined): string {
 
 export function resolveControlCssVar(friendlyName: string | undefined): string | undefined {
   if (!friendlyName) return undefined
-  const labelMatch = friendlyName.match(/\(([^)]+)\)$/)
+  // If a direct color value is provided, return it as-is
+  const trimmed = friendlyName.trim()
+  // First, handle labeled options like "--color-gray-100 (Gray 100)" by mapping the label
+  const labelMatch = trimmed.match(/\(([^)]+)\)$/)
   const label = labelMatch ? labelMatch[1] : undefined
 
   const labelToVar: Record<string, string> = {
@@ -78,5 +81,21 @@ export function resolveControlCssVar(friendlyName: string | undefined): string |
   }
 
   const varName = label ? labelToVar[label] : undefined
-  return varName ? `rgb(var(${varName}))` : undefined
+  if (varName) {
+    return `rgb(var(${varName}))`
+  }
+  // Handle direct values and raw CSS variables
+  if (trimmed.startsWith('#') || trimmed.startsWith('rgb(') || trimmed.startsWith('hsl(')) {
+    return trimmed
+  }
+  // If a raw CSS variable name is given, normalize to rgb(var(--...)) when possible
+  if (trimmed.startsWith('--')) {
+    return `rgb(var(${trimmed}))`
+  }
+  if (trimmed.startsWith('var(')) {
+    // Ensure we wrap with rgb(var(--...)) only once
+    const varWrapped = trimmed.replace(/^var\((.*)\)$/, '$1')
+    return `rgb(var(${varWrapped}))`
+  }
+  return undefined
 }

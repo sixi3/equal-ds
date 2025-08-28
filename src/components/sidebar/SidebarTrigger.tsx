@@ -14,8 +14,8 @@ function SidebarTriggerImpl({ className, srLabel = 'Toggle sidebar', children, .
       aria-label={srLabel}
       onClick={toggle}
       className={cn(
-        'grid place-items-center h-8 w-8 rounded-md border border-transparent text-foreground leading-none',
-        ' hover:bg-primary-300/20 hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors',
+        'grid place-items-center h-8 w-8 rounded-md border border-transparent text-text-primary leading-none',
+        ' hover:bg-primary-300/20 hover:border-border-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 transition-all duration-200 ease-out',
         className,
       )}
       {...props}

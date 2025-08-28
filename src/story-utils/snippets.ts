@@ -4,6 +4,8 @@ export function generateDropdownSnippet(a: any): string {
   const varBorderColor = resolveControlCssVar(a.borderColor) || 'rgb(var(--border-default))'
   const varBackgroundColor = resolveControlCssVar(a.backgroundColor) || 'rgb(var(--gray-50))'
   const varTextColor = resolveControlCssVar(a.textColor) || 'rgb(var(--text-primary))'
+  const varLabelTextColor = resolveControlCssVar(a.labelTextColor) || 'rgb(var(--text-primary))'
+  const varHeaderTextColor = resolveControlCssVar(a.headerTextColor) || 'rgb(var(--text-primary))'
   const varHoverBackgroundColor = resolveControlCssVar(a.hoverBackgroundColor) || 'rgb(var(--gray-100))'
   const varHoverBorderColor = resolveControlCssVar(a.hoverBorderColor) || 'rgb(var(--border-hover))'
   const varHoverTextColor = resolveControlCssVar(a.hoverTextColor) || 'rgb(var(--text-primary))'
@@ -15,6 +17,7 @@ export function generateDropdownSnippet(a: any): string {
   const sideOffset = a.sideOffset ?? 6
   const contentAlignment = a.contentAlignment || 'start'
   const triggerVariant = a.triggerVariant || 'default'
+  const labelSpacing = a.labelSpacing || 'space-y-1'
 
   return `import React, { useState } from 'react'
 // Make sure your app imports the DS theme and typography once (e.g. in your root):
@@ -23,13 +26,19 @@ export function generateDropdownSnippet(a: any): string {
 import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from 'equal-ds-ui'
 import { ChevronDown, Settings, User, LogOut } from 'lucide-react'
 
-export function ExampleDropdown({ label = 'User Menu', showLabel = true }: { label?: string; showLabel?: boolean }) {
+export function ExampleDropdown({ label = 'User Menu', showLabel = true }) {
   const [isHovered, setIsHovered] = useState(false)
   const [isClicked, setIsClicked] = useState(false)
 
   return (
-    <div className="space-y-2 w-full">
-      {showLabel ? (<label className="${a.labelTypography || 'text-ui-label'} text-foreground">{label}</label>) : null}
+    <div className="${labelSpacing} w-full">
+      {showLabel ? (
+        <label className="${a.labelTypography || 'text-ui-label'} ${a.labelKerning || ''}"
+          style={{ color: '${varLabelTextColor}' }}
+        >
+          {label}
+        </label>
+      ) : null}
       <Dropdown>
         <DropdownTrigger
           variant="${triggerVariant}"
@@ -53,7 +62,7 @@ export function ExampleDropdown({ label = 'User Menu', showLabel = true }: { lab
           onMouseDown={() => setIsClicked(true)}
           onMouseUp={() => setIsClicked(false)}
         >
-          <span className="flex-1 text-left">{label}</span>
+          <span className="flex-1 text-left ${a.dropdownTextKerning || ''}">{label}</span>
           <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
         </DropdownTrigger>
         <DropdownContent align="${contentAlignment}" sideOffset={${sideOffset}} style={{
@@ -88,6 +97,7 @@ export function ExampleDropdown({ label = 'User Menu', showLabel = true }: { lab
 
 export function generateFinProSnippet(a: any): string {
   const dropdownGap = a.dropdownGap || '16px'
+  const varHeaderTextColor = resolveControlCssVar(a.headerTextColor) || 'rgb(var(--text-primary))'
   const example = generateDropdownSnippet(a)
   return `${example}
 
@@ -96,7 +106,7 @@ export function FinProFilterSection() {
     <div className=\"min-h-screen bg-background p-6\">
       <div className=\"bg-background-secondary border border-border-light rounded-xl p-3 shadow-sm\" style={{ minHeight: '140px', boxSizing: 'border-box' }}>
         <div className=\"flex justify-between items-center mb-6\">
-          <h2 className=\"${a.headerTypography || 'text-h2'} text-foreground\">Filter By</h2>
+          <h2 className=\"${a.headerTypography || 'text-h2'} ${a.headerKerning || ''}\" style={{ color: '${varHeaderTextColor}' }}>Filter By</h2>
           <div className=\"w-4 h-4 bg-secondary rounded\" />
         </div>
         <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 w-full\" style={{ gap: '${dropdownGap}', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>

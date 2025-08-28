@@ -9,12 +9,12 @@ on:
       include_trends:
         description: 'Include historical trend analysis'
         required: false
-        default: 'true'
+        default: true
         type: boolean
       email_report:
         description: 'Send email report to team'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:

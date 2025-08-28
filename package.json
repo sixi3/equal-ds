@@ -1,6 +1,6 @@
 {
   "name": "equal-ds-ui",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
   "author": "Equal DS",
   "repository": {
@@ -36,13 +36,14 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./tokens.css": "./dist/tokens.css",
     "./shadcn-theme.css": "./dist/shadcn-theme.css",
     "./animations.css": "./dist/animations.css",
-    "./theme.css": "./dist/shadcn-theme.css",
+    "./theme.css": "./dist/tokens.css",
     "./typography.css": "./dist/typography.css",
     "./tailwind-preset": {
-      "import": "./dist/tailwind-preset.js",
-      "require": "./dist/tailwind-preset.cjs"
+      "import": "./dist/tokens.tailwind.preset.js",
+      "require": "./dist/tokens.tailwind.preset.cjs"
     },
     "./tokens": {
       "import": "./dist/tokens.js",
@@ -107,10 +108,8 @@
     "tokens:sync": "design-tokens-sync sync",
     "tokens:watch": "design-tokens-sync watch",
     "tokens:validate": "design-tokens-sync validate",
-    "generate:controls": "node scripts/generate-storybook-controls.js",
-    "auto:update": "node scripts/auto-update-storybook.js",
-    "full:update": "node scripts/full-auto-update.js",
-    "test:workflow": "node scripts/test-github-actions.js",
+
+
     "tokens:analytics": "design-tokens-sync analytics report",
     "prepublishOnly": "npm run tokens:sync && npm run build && npm run strip:publish"
   },

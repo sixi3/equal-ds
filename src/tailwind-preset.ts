@@ -7,12 +7,12 @@ const preset: Partial<Config> = {
         background: 'rgb(var(--background))',
         foreground: 'rgb(var(--foreground))',
         primary: {
-          DEFAULT: 'rgb(var(--primary))',
-          300: 'rgb(var(--primary-300))',
-          400: 'rgb(var(--primary-400))',
+          DEFAULT: 'rgb(var(--color-primary-500))',
+          300: 'rgb(var(--color-primary-300))',
+          400: 'rgb(var(--color-primary-400))',
         },
         'primary-foreground': 'rgb(var(--primary-foreground))',
-        secondary: 'rgb(var(--secondary))',
+        secondary: 'rgb(var(--color-text-secondary))',
         'secondary-foreground': 'rgb(var(--secondary-foreground))',
         muted: {
           DEFAULT: 'rgb(var(--muted))',
@@ -33,11 +33,11 @@ const preset: Partial<Config> = {
         
         /* Text Colors */
         text: {
-          primary: 'rgb(var(--text-primary))',
-          secondary: 'rgb(var(--text-secondary))',
-          tertiary: 'rgb(var(--text-tertiary))',
-          inverse: 'rgb(var(--text-inverse))',
-          muted: 'rgb(var(--text-muted))',
+          primary: 'rgb(var(--color-text-primary))',
+          secondary: 'rgb(var(--color-text-secondary))',
+          tertiary: 'rgb(var(--color-text-tertiary))',
+          inverse: 'rgb(var(--color-text-inverse))',
+          muted: 'rgb(var(--color-text-muted))',
         },
       },
       ringColor: {

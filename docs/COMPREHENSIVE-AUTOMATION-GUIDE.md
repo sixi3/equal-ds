@@ -1,4 +1,13 @@
-# 🚀 **The Complete Guide to Design System Automation**
+# ⚠️ **DEPRECATED - See CURRENT-SYSTEM.md**
+
+## 🔄 **Migration Notice**
+This comprehensive guide describes the **old complex system** that has been replaced with a much simpler, more robust architecture.
+
+**👉 See `CURRENT-SYSTEM.md` for the current implementation.**
+
+---
+
+# 🚀 **The Complete Guide to Design System Automation** (DEPRECATED)
 
 *How we built a zero-touch automation system that keeps your design system, Storybook controls, and component library perfectly synchronized*
 

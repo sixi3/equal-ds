@@ -19,12 +19,12 @@ on:
       force_sync:
         description: 'Force sync even if no changes detected'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       generate_analytics:
         description: 'Generate token usage analytics'
         required: false
-        default: 'true'
+        default: true
         type: boolean
 
 jobs:

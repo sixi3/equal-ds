@@ -1,6 +1,8 @@
 ## Equal DS UI
 
-Production-ready React sidebar components and Tailwind helpers for the Equal Design System, built with shadcn + Radix.
+Production-ready React sidebar components and Tailwind helpers for the Equal Design System, built with custom design tokens and optimized for performance.
+
+> **🚨 Version 1.0.0 Breaking Changes:** This major release includes a complete design system migration. Please read the [Migration Guide](#migration-guide) below.
 
 ### Installation
 
@@ -149,9 +151,71 @@ Behavior:
 - All groups auto-collapse while dragging; restored afterwards
 - Container-level drop eliminates dead zones between groups
 
+## 🚨 Migration Guide (v0.2.2 → v1.0.0)
+
+### Breaking Changes
+
+This major release includes a complete design system migration. Here's what you need to know:
+
+#### 1. Color System Overhaul
+All color classes have been renamed to use the new design token system:
+
+```tsx
+// ❌ OLD (v0.2.2)
+'text-foreground'
+'bg-background'
+'border-border'
+'focus-visible:ring-ring'
+
+// ✅ NEW (v1.0.0)
+'text-text-primary'
+'bg-background-secondary'
+'border-border-default'
+'focus-visible:ring-primary-400'
+```
+
+#### 2. Preset System Change
+The Tailwind preset has been completely updated:
+
+```js
+// ❌ OLD (v0.2.2)
+presets: [require('equal-ds-ui/tailwind-preset')]
+
+// ✅ NEW (v1.0.0)
+presets: [require('equal-ds-ui/tokens.tailwind.preset.js')]
+```
+
+#### 3. CSS Import Changes
+Update your CSS imports:
+
+```tsx
+// ❌ OLD (v0.2.2)
+import 'equal-ds-ui/theme.css'        // shadcn-theme.css
+
+// ✅ NEW (v1.0.0)
+import 'equal-ds-ui/tokens.css'       // New design tokens
+import 'equal-ds-ui/animations.css'   // Motion helpers
+```
+
+#### 4. Migration Steps
+1. **Update package version**: `npm install equal-ds-ui@^1.0.0`
+2. **Update CSS imports**: Replace `theme.css` with `tokens.css`
+3. **Update Tailwind config**: Use new preset path
+4. **Test thoroughly**: Verify all components render correctly
+5. **Update custom styles**: Replace any hardcoded old color references
+
+### What's New in v1.0.0
+
+- ✨ **Enhanced UX**: Smooth transitions, layout stability, improved tooltips
+- 🎨 **Design System**: Custom color tokens with auto-generated Tailwind preset
+- 🐛 **Bug Fixes**: Resolved text cutoff, color consistency, and layout shift issues
+- 🔧 **Performance**: Optimized animations and improved text rendering
+
+---
+
 ### Customization
 
-- Indicator color follows CSS variable `--primary-400` via inline style. Adjust via theme tokens in `shadcn-theme.css`.
+- Indicator color follows CSS variable `--color-primary-400` via inline style. Adjust via theme tokens in `tokens.css`.
 - Spacing uses padding (not margins) so indicators sit between padded edges.
 - Animations are defined in `animations.css`:
   - `.animate-sidebar-pop-in` for the moved tab

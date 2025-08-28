@@ -9,11 +9,11 @@ function SidebarFooterImpl({ className, ...props }: SidebarFooterProps): JSX.Ele
   const { open } = useSidebarOpenContext()
   
   return (
-    <div className={cn('mt-auto border-t border-border-light', className)} {...props}>
+            <div className={cn('mt-auto border-t border-border-default', className)} {...props}>
       <div className="p-3">
         <button
           className={cn(
-            'w-full inline-flex items-center gap-3 rounded-lg text-sm hover:bg-primary-300/20 border border-transparent hover:border-border transition-[padding,opacity] transition-colors duration-200 ease-out text-foreground',
+            'w-full inline-flex items-center gap-3 rounded-lg text-sm hover:bg-primary-300/20 border border-transparent hover:border-border-default transition-[padding,opacity] transition-colors duration-200 ease-out text-foreground',
             // Keep left alignment in both states to avoid reflow; adjust padding to visually center icon
             open ? 'px-3 py-2.5' : 'px-0 py-2.5'
           )}

@@ -147,9 +147,11 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
       visible: true,
     })
 
-    // Tooltip position (fixed next to sidebar)
-    const sidebarRight = cRect.right
-    setTooltip({ top: clientY, left: sidebarRight + 20, visible: true })
+    // Tooltip position (fixed next to sidebar, ensure pixel-perfect positioning)
+    const sidebarRight = Math.round(cRect.right)
+    const tooltipTop = Math.round(clientY)
+    const tooltipLeft = sidebarRight + 20
+    setTooltip({ top: tooltipTop, left: tooltipLeft, visible: true })
 
     if (label !== tooltipLabelRef.current) {
       setTextVisible(false)
@@ -208,13 +210,12 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
         <div
           aria-hidden
           className={cn(
-            'pointer-events-none fixed z-[9999] rounded-md border border-border bg-background px-2 py-1 text-sm shadow tooltip-follow transition-[width,opacity,transform] duration-150 ease-out',
+            'pointer-events-none fixed z-[9999] rounded-md border border-border-default bg-background-primary px-2 py-1 text-sm shadow tooltip-follow transition-[width,opacity] duration-150 ease-out antialiased',
             textVisible && !open && tooltip.visible ? 'opacity-100' : 'opacity-0',
           )}
           style={{
-            top: tooltip.top,
-            left: tooltip.left,
-            transform: 'translateY(-50%)',
+            top: Math.round(tooltip.top),
+            left: Math.round(tooltip.left),
             width: tooltipWidth ?? 'auto',
             // Keep mounted, only toggle visibility
             visibility: !open && tooltip.visible ? 'visible' : 'hidden',
@@ -223,16 +224,16 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
           {/* Arrow: border (outer) */}
           <span
             className="pointer-events-none absolute left-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-transparent"
-            style={{ borderRightColor: 'rgb(var(--border))' }}
+            style={{ borderRightColor: 'var(--color-border-hover)' }}
             aria-hidden
           />
           {/* Arrow: fill (inner) */}
           <span
             className="pointer-events-none absolute left-[-7px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-transparent"
-            style={{ borderRightColor: 'rgb(var(--background))' }}
+            style={{ borderRightColor: 'var(--color-background-secondary)' }}
             aria-hidden
           />
-          <span className={cn('block transition-opacity duration-150 whitespace-nowrap', textVisible ? 'opacity-100' : 'opacity-0')}>
+          <span className={cn('block transition-opacity duration-150 whitespace-nowrap antialiased', textVisible ? 'opacity-100' : 'opacity-0')}>
             {tooltipLabel}
           </span>
           {/* Hidden measurer for smooth width animation */}
@@ -395,7 +396,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
         >
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
+            className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border-default transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
             style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
           />
           {children}
@@ -403,7 +404,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
           <div
             aria-hidden
             className={cn('pointer-events-none absolute z-[100] h-[2px] transition-all duration-75 ease-out', dropIndicator.visible && reorderable ? 'opacity-100' : 'opacity-0')}
-            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--primary-400))' }}
+            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--color-primary-400))' }}
           />
         </ul>
       </ReorderContext.Provider>
@@ -490,16 +491,18 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
   }, [computedActive])
 
   const baseClass = cn(
-    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors transition-transform will-change-[transform]',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ease-out will-change-[transform]',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
     open ? 'justify-start' : 'justify-center',
+    // Base styles for all tabs (prevents layout shift)
+    'border border-transparent border-b-[3px]',
     computedActive
       ? cn(
-          'bg-gradient-to-b from-white to-primary-200 text-primary font-semibold border border-border shadow-[inset_0_-4px_0_0_rgb(var(--primary-400))] active:shadow-[inset_0_-3px_0_0_rgb(var(--primary-400))] active:from-white active:to-primary-300/30',
+          'bg-gradient-to-b from-white to-primary-50 text-text-primary font-medium tracking-wide border-border-hover border-b-primary-400',
           justActivated && 'animate-sidebar-pop-in',
         )
-      : cn('text-foreground'),
-    disabled && 'opacity-40 pointer-events-none text-muted-foreground',
+      : cn('text-text-secondary font-medium tracking-wide hover:text-text-primary hover:bg-primary-300/10'),
+    disabled && 'opacity-40 pointer-events-none text-text-muted',
     className,
   )
 
@@ -522,10 +525,10 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
     el.style.gap = '8px'
     el.style.padding = '6px 10px'
     el.style.borderRadius = '8px'
-    el.style.border = '1px solid rgb(var(--border))'
-    el.style.background = 'rgb(var(--background))'
+    el.style.border = '1px solid var(--color-border-default)'
+    el.style.background = 'var(--color-background-secondary)'
     el.style.boxShadow = 'var(--shadow-md)'
-    el.style.color = 'rgb(var(--foreground))'
+    el.style.color = 'rgb(var(--color-text-primary))'
 
     // Try to clone the handle SVG if present for fidelity
     const svg = current.querySelector('svg')?.cloneNode(true) as SVGElement | null
@@ -534,7 +537,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
       wrap.style.display = 'inline-flex'
       wrap.style.width = '20px'
       wrap.style.height = '20px'
-      wrap.style.color = 'rgb(var(--muted-foreground))'
+      wrap.style.color = 'rgb(var(--color-text-muted))'
       wrap.appendChild(svg)
       el.appendChild(wrap)
     }
@@ -559,7 +562,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
   const content = (
     <>
       {icon ? (
-        <span className="shrink-0 w-5 h-5 text-current relative group/icon" aria-hidden>
+        <span className="shrink-0 w-5 h-5 text-current transition-colors duration-200 ease-out relative group/icon" aria-hidden>
           {/* Original icon, hidden on hover when reordering is available */}
           <span className={cn('absolute inset-0 transition-opacity', (reorderCtx?.enabled && itemDrag?.draggable && itemDrag.dragId) ? 'opacity-100 group-hover/icon:opacity-0' : 'opacity-100')}>
             {icon}
@@ -584,8 +587,8 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
           ) : null}
         </span>
       ) : null}
-      {open ? <span className="flex-1 text-left truncate">{children}</span> : null}
-      {endAdornment && open ? <span className="shrink-0 ml-auto" aria-hidden>{endAdornment}</span> : null}
+      {open ? <span className="flex-1 text-left leading-normal break-words transition-colors duration-200 ease-out">{children}</span> : null}
+      {endAdornment && open ? <span className="shrink-0 ml-auto transition-colors duration-200 ease-out" aria-hidden>{endAdornment}</span> : null}
     </>
   )
 
@@ -640,8 +643,8 @@ export interface SidebarMenuBadgeProps extends React.HTMLAttributes<HTMLSpanElem
 const SidebarMenuBadgeImpl = ({ className, ...props }: SidebarMenuBadgeProps): JSX.Element => (
     <span
       className={cn(
-        'inline-flex items-center justify-center rounded-full border border-border px-1.5 text-2xs h-5',
-        'bg-muted text-foreground/80',
+        'inline-flex items-center justify-center rounded-full border border-border-default px-1.5 text-2xs h-5',
+        'bg-background-tertiary text-text-muted',
         className,
       )}
       {...props}
@@ -650,7 +653,7 @@ const SidebarMenuBadgeImpl = ({ className, ...props }: SidebarMenuBadgeProps): J
 
 export interface SidebarSeparatorProps extends React.HTMLAttributes<HTMLHRElement> {}
 const SidebarSeparatorImpl = ({ className, ...props }: SidebarSeparatorProps): JSX.Element => (
-  <hr className={cn('border-t border-border my-4', className)} {...props} />
+          <hr className={cn('border-t border-border-default my-4', className)} {...props} />
 )
 
 export const SidebarMenu = React.memo(SidebarMenuImpl)
