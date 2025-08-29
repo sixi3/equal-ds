@@ -8,20 +8,43 @@ Production-ready React sidebar components and Tailwind helpers for the Equal Des
 
 ```bash
 npm install equal-ds-ui
-# peer deps
-npm install react react-dom @radix-ui/react-collapsible @radix-ui/react-tooltip @radix-ui/react-visually-hidden lucide-react tailwindcss
+# Required peer dependencies
+npm install @radix-ui/react-collapsible @radix-ui/react-tooltip @radix-ui/react-visually-hidden lucide-react tailwindcss
+# Dev dependencies for build process
+npm install -D tailwindcss postcss autoprefixer
 ```
 
-### Styles
+### Setup
 
-Import the CSS once in your app root:
-
-```tsx
-import 'equal-ds-ui/theme.css';        // base theme (alias of shadcn-theme.css)
-import 'equal-ds-ui/animations.css';   // motion helpers
+#### 1. Initialize Tailwind CSS
+```bash
+npx tailwindcss init
 ```
 
-### Quick start
+#### 2. Configure Tailwind with our preset
+```javascript
+// tailwind.config.js or tailwind.config.cjs
+const preset = require('equal-ds-ui/tailwind-preset')
+
+module.exports = {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  presets: [preset],  // This provides all design token classes
+}
+```
+
+#### 3. Import CSS files
+```css
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import equal-ds-ui design system */
+@import 'equal-ds-ui/tokens.css';
+@import 'equal-ds-ui/animations.css';
+```
+
+### Quick Start
 
 ```tsx
 import {
@@ -42,40 +65,61 @@ import {
   SidebarTrigger,
   SidebarRail,
 } from 'equal-ds-ui'
-import 'equal-ds-ui/theme.css'
-import 'equal-ds-ui/animations.css'
 
 export default function App() {
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
+      <div className="flex h-screen bg-background-secondary">
         <Sidebar>
-          <SidebarHeader>My App</SidebarHeader>
+          <SidebarHeader className="border-b border-border-default">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">E</span>
+              </div>
+              <div>
+                <h1 className="font-semibold text-text-primary">Equal DS</h1>
+                <p className="text-xs text-text-secondary">Design System</p>
+              </div>
+            </div>
+          </SidebarHeader>
+          
           <SidebarContent>
-            <SidebarGroup>
+            <SidebarGroup defaultOpen>
               <SidebarGroupTrigger>
                 <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               </SidebarGroupTrigger>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton itemId="home" href="/">Home</SidebarMenuButton>
+                    <SidebarMenuButton itemId="home" href="/">
+                      Home
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
-          <SidebarFooter />
+          
+          <SidebarFooter className="border-t border-border-default">
+            <div className="p-4">
+              <p className="text-sm text-text-secondary">Footer content</p>
+            </div>
+          </SidebarFooter>
         </Sidebar>
+        
         <SidebarRail />
+        
         <main className="flex-1 p-6">
           <SidebarTrigger>☰</SidebarTrigger>
+          <h1 className="text-2xl font-bold text-text-primary">Welcome!</h1>
         </main>
       </div>
     </SidebarProvider>
   )
 }
 ```
+
+**Important:** Make sure you've followed the setup steps above to import the CSS and configure Tailwind with our preset!
 
 ### Reordering (tabs and groups)
 
@@ -175,14 +219,14 @@ All color classes have been renamed to use the new design token system:
 ```
 
 #### 2. Preset System Change
-The Tailwind preset has been completely updated:
+The Tailwind preset now exports the auto-generated preset with all design tokens:
 
 ```js
 // ❌ OLD (v0.2.2)
 presets: [require('equal-ds-ui/tailwind-preset')]
 
 // ✅ NEW (v1.0.0)
-presets: [require('equal-ds-ui/tokens.tailwind.preset.js')]
+presets: [require('equal-ds-ui/tailwind-preset')]  // Now points to auto-generated preset
 ```
 
 #### 3. CSS Import Changes
@@ -193,8 +237,8 @@ Update your CSS imports:
 import 'equal-ds-ui/theme.css'        // shadcn-theme.css
 
 // ✅ NEW (v1.0.0)
-import 'equal-ds-ui/tokens.css'       // New design tokens
-import 'equal-ds-ui/animations.css'   // Motion helpers
+@import 'equal-ds-ui/tokens.css';     // New design tokens
+@import 'equal-ds-ui/animations.css'; // Motion helpers
 ```
 
 #### 4. Migration Steps
@@ -221,14 +265,62 @@ import 'equal-ds-ui/animations.css'   // Motion helpers
   - `.animate-sidebar-pop-in` for the moved tab
   - `.animate-sidebar-reorder-slide` for groups that moved
 
-### Tailwind preset (optional)
+### Available Design Token Classes
 
-Add the preset to your Tailwind config:
+Our Tailwind preset provides these design token classes:
+
+#### Colors
+```tsx
+// Background colors
+'bg-background-primary'    // Primary background
+'bg-background-secondary'  // Secondary background  
+'bg-background-tertiary'   // Tertiary background
+'bg-primary-500'          // Primary brand color
+'bg-primary-100'          // Light primary
+'bg-white'                // Pure white
+
+// Text colors
+'text-text-primary'       // Primary text
+'text-text-secondary'     // Secondary text
+'text-text-muted'         // Muted text
+'text-text-inverse'       // Inverse text (white)
+
+// Border colors
+'border-border-default'    // Default border
+'border-border-hover'      // Hover border
+'border-border-focus'      // Focus border
+'border-border-light'      // Light border
+```
+
+#### Typography
+```tsx
+// Font weights
+'font-thin'               // 100
+'font-light'              // 300
+'font-normal'             // 400
+'font-medium'             // 500
+'font-semibold'           // 600
+'font-bold'               // 700
+
+// Letter spacing
+'tracking-tight'          // Tight
+'tracking-normal'         // Normal
+'tracking-wide'           // Wide
+'tracking-wider'          // Wider
+'tracking-widest'         // Widest
+```
+
+### Tailwind Preset
+
+Our preset automatically provides all design token classes:
 
 ```js
-// tailwind.config.js / tailwind.config.ts
+// tailwind.config.js or tailwind.config.cjs
+const preset = require('equal-ds-ui/tailwind-preset')
+
 module.exports = {
-  presets: [require('equal-ds-ui/tailwind-preset')],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  presets: [preset],  // This gives you all the classes above
 }
 ```
 
@@ -238,7 +330,43 @@ module.exports = {
 import tokens from 'equal-ds-ui/tokens'
 ```
 
-### Local testing
+### Troubleshooting
+
+#### Common Issues
+
+**1. Sidebar not styled / colors not working**
+- ✅ Ensure you've imported `equal-ds-ui/tokens.css` in your CSS
+- ✅ Ensure Tailwind is configured with our preset
+- ✅ Check that all peer dependencies are installed
+
+**2. Tailwind classes not found**
+- ✅ Verify your `tailwind.config.js` includes our preset
+- ✅ Ensure content paths are correct
+- ✅ Restart your dev server after config changes
+
+**3. CSS variables not defined**
+- ✅ Import `equal-ds-ui/tokens.css` before Tailwind directives
+- ✅ Check that the CSS file is being loaded in your build
+
+#### Complete Working Example
+
+```tsx
+// App.tsx
+import { Sidebar, SidebarProvider, /* ... */ } from 'equal-ds-ui'
+
+// index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'equal-ds-ui/tokens.css';
+@import 'equal-ds-ui/animations.css';
+
+// tailwind.config.js
+const preset = require('equal-ds-ui/tailwind-preset')
+module.exports = { presets: [preset] }
+```
+
+### Local Testing
 
 ```bash
 npm run build
