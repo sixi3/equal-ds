@@ -1,6 +1,6 @@
 {
   "name": "equal-ds-ui",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
   "author": "Equal DS",
   "repository": {
