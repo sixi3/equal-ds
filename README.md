@@ -2,7 +2,7 @@
 
 Production-ready React sidebar components and Tailwind helpers for the Equal Design System, built with custom design tokens and optimized for performance.
 
-> **🚨 Version 1.0.0 Breaking Changes:** This major release includes a complete design system migration. Please read the [Migration Guide](#migration-guide) below.
+> **🚨 Version 1.0.4 Breaking Changes:** This major release includes a complete design system migration and fixes export path issues. Please read the [Migration Guide](#migration-guide) below.
 
 ### Installation
 
@@ -195,7 +195,7 @@ Behavior:
 - All groups auto-collapse while dragging; restored afterwards
 - Container-level drop eliminates dead zones between groups
 
-## 🚨 Migration Guide (v0.2.2 → v1.0.0)
+## 🚨 Migration Guide (v0.2.2 → v1.0.4)
 
 ### Breaking Changes
 
@@ -211,7 +211,7 @@ All color classes have been renamed to use the new design token system:
 'border-border'
 'focus-visible:ring-ring'
 
-// ✅ NEW (v1.0.0)
+// ✅ NEW (v1.0.4)
 'text-text-primary'
 'bg-background-secondary'
 'border-border-default'
@@ -225,7 +225,7 @@ The Tailwind preset now exports the auto-generated preset with all design tokens
 // ❌ OLD (v0.2.2)
 presets: [require('equal-ds-ui/tailwind-preset')]
 
-// ✅ NEW (v1.0.0)
+// ✅ NEW (v1.0.4)
 presets: [require('equal-ds-ui/tailwind-preset')]  // Now points to auto-generated preset
 ```
 
@@ -236,24 +236,25 @@ Update your CSS imports:
 // ❌ OLD (v0.2.2)
 import 'equal-ds-ui/theme.css'        // shadcn-theme.css
 
-// ✅ NEW (v1.0.0)
+// ✅ NEW (v1.0.4)
 @import 'equal-ds-ui/tokens.css';     // New design tokens
 @import 'equal-ds-ui/animations.css'; // Motion helpers
 ```
 
 #### 4. Migration Steps
-1. **Update package version**: `npm install equal-ds-ui@^1.0.0`
+1. **Update package version**: `npm install equal-ds-ui@^1.0.4`
 2. **Update CSS imports**: Replace `theme.css` with `tokens.css`
 3. **Update Tailwind config**: Use new preset path
 4. **Test thoroughly**: Verify all components render correctly
 5. **Update custom styles**: Replace any hardcoded old color references
 
-### What's New in v1.0.0
+### What's New in v1.0.4
 
 - ✨ **Enhanced UX**: Smooth transitions, layout stability, improved tooltips
 - 🎨 **Design System**: Custom color tokens with auto-generated Tailwind preset
 - 🐛 **Bug Fixes**: Resolved text cutoff, color consistency, and layout shift issues
 - 🔧 **Performance**: Optimized animations and improved text rendering
+- 🚀 **Export Fix**: Fixed tailwind-preset export path to resolve installation issues
 
 ---
 
