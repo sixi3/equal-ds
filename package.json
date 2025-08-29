@@ -58,6 +58,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "equal-ds-ui": "^1.0.4",
     "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {

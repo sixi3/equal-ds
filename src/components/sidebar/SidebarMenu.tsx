@@ -498,7 +498,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
     'border border-transparent border-b-[3px]',
     computedActive
       ? cn(
-          'bg-gradient-to-b from-white to-primary-50 text-text-primary font-medium tracking-wide border-border-hover border-b-primary-400',
+          'bg-gradient-to-b from-background-primary to-primary-50 text-text-primary font-medium tracking-wide border-border-hover border-b-primary-400',
           justActivated && 'animate-sidebar-pop-in',
         )
       : cn('text-text-secondary font-medium tracking-wide hover:text-text-primary hover:bg-primary-300/10'),
