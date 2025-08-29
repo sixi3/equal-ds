@@ -39,7 +39,11 @@
     "./tokens.css": "./dist/tokens.css",
     "./animations.css": "./dist/animations.css",
     "./theme.css": "./dist/tokens.css",
-    "./tailwind-preset": "./tokens.tailwind.preset.js"
+    "./tailwind-preset": {
+      "types": "./dist/tokens.tailwind.preset.d.ts",
+      "import": "./dist/tokens.tailwind.preset.js",
+      "require": "./dist/tokens.tailwind.preset.cjs"
+    }
   },
   "peerDependencies": {
     "@radix-ui/react-collapsible": "^1.0.0",
