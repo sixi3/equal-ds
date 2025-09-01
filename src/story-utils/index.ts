@@ -8,6 +8,13 @@ export { DesignSystemControlGenerator } from './controlGenerators/designSystemCo
 export { StorybookControlMapper } from './storybookControlMapper'
 export { AutoControls, createAutoControls, createAutoStoryConfig, getCategoryControls } from './autoControls'
 
+// Copy code components
+export { CopyCodeButton } from './CopyCodeButton'
+export { SmartCopyCodeButton } from './SmartCopyCodeButton'
+
+// Snippet generation utilities
+export { generateExactStoryCode, generateFinProSnippet, generateDropdownSnippet } from './snippets'
+
 
 
 // Type exports
@@ -49,10 +56,10 @@ export const createTokenCategorizer = () => {
   return new TokenCategorizer()
 }
 
-export const parseDesignSystem = (projectRoot?: string) => {
+export const parseDesignSystem = async (projectRoot?: string) => {
   const parser = createDesignSystemParser(projectRoot)
   const categorizer = createTokenCategorizer()
-  const tokens = parser.parseAllTokens()
+  const tokens = await parser.parseAllTokens()
   const categorized = categorizer.categorizeTokens(tokens)
   return { tokens, categorized, parser, categorizer }
 }

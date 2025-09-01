@@ -6,7 +6,7 @@ export interface DropdownSeparatorProps extends React.ComponentPropsWithoutRef<t
 
 export const DropdownSeparator = React.forwardRef<HTMLDivElement, DropdownSeparatorProps>(
   ({ className, ...props }, ref) => (
-    <DropdownMenu.Separator ref={ref} className={cn('my-1 h-px bg-border', className)} {...props} />
+    <DropdownMenu.Separator ref={ref} className={cn('my-1 h-px bg-border-default', className)} {...props} />
   ),
 )
 

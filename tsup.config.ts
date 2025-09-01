@@ -1,10 +1,21 @@
 import { defineConfig } from 'tsup'
 
+// Allow selective format building via environment variable
+// BUILD_FORMAT=esm - builds only ESM
+// BUILD_FORMAT=cjs - builds only CommonJS
+// default - builds both formats
+const buildFormat = process.env.BUILD_FORMAT
+const formats = buildFormat === 'esm'
+  ? ['esm']
+  : buildFormat === 'cjs'
+  ? ['cjs']
+  : ['esm', 'cjs']
+
 export default defineConfig({
   entry: ['src/index.ts'],
   clean: true,
   dts: true,
-  format: ['esm', 'cjs'],
+  format: formats,
   sourcemap: true,
   minify: true,
   external: [

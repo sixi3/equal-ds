@@ -1,6 +1,6 @@
 {
   "name": "equal-ds-ui",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Equal Design System UI components based on shadcn + Radix + Tailwind",
   "author": "Equal DS",
   "repository": {
@@ -24,6 +24,9 @@
   "sideEffects": [
     "*.css"
   ],
+  "bin": {
+    "equal-ds-format": "./bin/equal-ds-format.js"
+  },
   "files": [
     "dist"
   ],
@@ -40,7 +43,6 @@
     "./animations.css": "./dist/animations.css",
     "./theme.css": "./dist/tokens.css",
     "./tailwind-preset": {
-      "types": "./dist/tokens.tailwind.preset.d.ts",
       "import": "./dist/tokens.tailwind.preset.js",
       "require": "./dist/tokens.tailwind.preset.cjs"
     }
@@ -90,8 +92,11 @@
     "vitest": "^2.0.5"
   },
   "scripts": {
-    "build": "tsup --config tsup.config.ts && npm run build:assets",
+    "build": "tsup --config tsup.config.ts && npm run build:assets && npm run update-exports",
+    "build:esm": "BUILD_FORMAT=esm npm run build",
+    "build:cjs": "BUILD_FORMAT=cjs npm run build",
     "build:assets": "mkdir -p dist && cp src/styles/animations.css dist/animations.css && cp src/styles/tokens.css dist/tokens.css && cp tokens.tailwind.preset.js dist/ && cp tokens.tailwind.preset.cjs dist/",
+    "update-exports": "node scripts/update-exports.js",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
@@ -104,7 +109,13 @@
     "tokens:watch": "design-tokens-sync watch",
     "tokens:validate": "design-tokens-sync validate",
     "tokens:analytics": "design-tokens-sync analytics report",
-    "prepublishOnly": "npm run tokens:sync && npm run build && npm run strip:publish"
+    "tokens:sync-storybook": "node scripts/sync-storybook-tokens.js",
+    "prepublishOnly": "npm run tokens:sync && npm run tokens:sync-storybook && npm run build && npm run strip:publish",
+    "prepublishOnly:esm": "npm run tokens:sync && npm run tokens:sync-storybook && npm run build:esm && npm run strip:publish",
+    "prepublishOnly:cjs": "npm run tokens:sync && npm run tokens:sync-storybook && npm run build:cjs && npm run strip:publish",
+    "format:esm": "echo 'ESM format selected' && node ./scripts/setup-esm.js",
+    "format:cjs": "echo 'CommonJS format selected' && node ./scripts/setup-cjs.js",
+    "format:auto": "echo 'Auto-detecting format...' && node ./scripts/auto-detect.js"
   },
   "publishConfig": {
     "access": "public"

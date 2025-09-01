@@ -1,5 +1,27 @@
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+// Conditionally import Node.js modules only in Node.js environment
+let readFileSync: any = null
+let existsSync: any = null
+let join: any = null
+
+// Lazy load Node.js modules only when needed
+async function loadNodeModules(): Promise<boolean> {
+  if (!readFileSync) {
+    try {
+      // Try to import Node.js modules - this will fail in browser
+      const fs = await import('fs' as any)
+      const path = await import('path' as any)
+      readFileSync = fs.readFileSync
+      existsSync = fs.existsSync
+      join = path.join
+      return true
+    } catch (error) {
+      // We're likely in a browser environment
+      console.warn('Node.js modules not available (browser environment):', error)
+      return false
+    }
+  }
+  return true
+}
 
 // Types for our design system tokens
 export interface DesignSystemTokens {
@@ -82,15 +104,37 @@ export class DesignSystemParser {
   private projectRoot: string
 
   constructor(projectRoot?: string) {
-    this.projectRoot = projectRoot || (typeof process !== 'undefined' ? process.cwd() : '.')
+    this.projectRoot = projectRoot || '.'
   }
 
   /**
    * Parse all CSS files and extract design system tokens
    */
-  parseAllTokens(): DesignSystemTokens {
+  async parseAllTokens(): Promise<DesignSystemTokens> {
     console.log('🎨 Starting design system parsing...')
-    
+
+    // Try to load Node.js modules
+    const nodeModulesLoaded = await loadNodeModules()
+
+    if (!nodeModulesLoaded) {
+      console.warn('⚠️  Node.js modules not available. Returning empty token set for browser compatibility.')
+      return {
+        colors: [],
+        typography: [],
+        spacing: [],
+        borders: [],
+        shadows: [],
+        transitions: [],
+        transforms: [],
+        metadata: {
+          totalTokens: 0,
+          parsedAt: new Date().toISOString(),
+          cssFiles: [],
+          version: '1.0.0'
+        }
+      }
+    }
+
     const allTokens: DesignSystemTokens = {
       colors: [],
       typography: [],
@@ -109,18 +153,18 @@ export class DesignSystemParser {
 
     // Parse each CSS file
     for (const cssFile of this.cssFiles) {
-      const fullPath = join(this.projectRoot, cssFile)
-      
-      if (!existsSync(fullPath)) {
+      const fullPath = join!(this.projectRoot, cssFile)
+
+      if (!existsSync!(fullPath)) {
         console.warn(`⚠️  CSS file not found: ${fullPath}`)
         continue
       }
 
       try {
         console.log(`📖 Parsing: ${cssFile}`)
-        const cssContent = readFileSync(fullPath, 'utf8')
+        const cssContent = readFileSync!(fullPath, 'utf8')
         const fileTokens = this.parseCSSTokens(cssContent, cssFile)
-        
+
         // Merge tokens from this file
         allTokens.colors.push(...(fileTokens.colors || []))
         allTokens.typography.push(...(fileTokens.typography || []))
@@ -129,9 +173,9 @@ export class DesignSystemParser {
         allTokens.shadows.push(...(fileTokens.shadows || []))
         allTokens.transitions.push(...(fileTokens.transitions || []))
         allTokens.transforms.push(...(fileTokens.transforms || []))
-        
+
         allTokens.metadata.cssFiles.push(cssFile)
-        
+
         console.log(`✅ Parsed ${cssFile}: ${(fileTokens.colors?.length || 0) + (fileTokens.typography?.length || 0) + (fileTokens.spacing?.length || 0) + (fileTokens.borders?.length || 0)} tokens`)
       } catch (error) {
         console.error(`❌ Error parsing ${cssFile}:`, error)

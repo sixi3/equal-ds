@@ -49,18 +49,12 @@ export function SmartCopyCodeButton({
           console.log('Component detection result:', componentConfig)
         
         if (componentConfig) {
-          console.log('Using smart component generator for:', componentConfig.name)
-          
           // Capture full state
           const stateCapture = new ComponentStateCapture()
           const fullState = stateCapture.captureFullState(storyContext, componentConfig)
-          
-          console.log('Captured state:', fullState)
-          
+
           // Generate code
           const code = componentConfig.snippetGenerator(fullState)
-          
-          console.log('Generated code length:', code.length)
           
           // Copy to clipboard
           await navigator.clipboard.writeText(code)

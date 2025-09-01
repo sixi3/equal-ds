@@ -7,19 +7,19 @@ export interface ComponentConfig {
   requiredImports?: string[]
 }
 
-import { DropdownSnippetGenerator } from './snippets/dropdownSnippetGenerator'
+import { generateFinProSnippet } from './snippets'
 
 export const COMPONENT_REGISTRY: Record<string, ComponentConfig> = {
   'Dropdown': {
     name: 'Dropdown',
-    snippetGenerator: new DropdownSnippetGenerator().generate.bind(new DropdownSnippetGenerator()),
+    snippetGenerator: generateFinProSnippet,
     importPattern: /Dropdown/,
     storyPattern: /dropdown/i,
     requiredImports: ['Dropdown', 'DropdownTrigger', 'DropdownContent', 'DropdownItem', 'DropdownSeparator'],
     defaultArgs: {
       label: 'User Menu',
       showLabel: true,
-      triggerVariant: 'default'
+      variant: 'default'
     }
   },
   'Sidebar': {

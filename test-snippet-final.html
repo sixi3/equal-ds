@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Updated Snippet Generation</title>
+</head>
+<body>
+    <h1>Testing Updated Snippet Generation</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        // Simulate the extractDefinedProps function
+        function extractDefinedProps(args) {
+            const definedProps = {
+                showLabel: true,
+                variant: "default",
+                disabled: false
+            }
+
+            const styleProps = [
+                'backgroundColor', 'textColor', 'borderColor', 'hoverBackgroundColor',
+                'hoverTextColor', 'hoverBorderColor', 'fontSize', 'fontWeight',
+                'lineHeight', 'letterSpacing', 'padding', 'borderRadius',
+                'borderWidth', 'borderStyle', 'borderBottomWidth', 'hoverBorderBottomWidth',
+                'boxShadow', 'hoverBoxShadow', 'labelFontSize', 'labelFontWeight',
+                'labelLetterSpacing', 'labelTextColor'
+            ]
+
+            styleProps.forEach(prop => {
+                if (args[prop] !== undefined && args[prop] !== null && args[prop] !== '') {
+                    const value = args[prop]
+                    if (typeof value === 'boolean') {
+                        definedProps[prop] = value
+                    } else {
+                        definedProps[prop] = `${value}`
+                    }
+                }
+            })
+
+            return definedProps
+        }
+
+        // Test with FinPro story args
+        const finProArgs = {
+            backgroundColor: '--color-background-secondary',
+            textColor: '--color-text-primary',
+            borderColor: '--color-border-hover',
+            fontSize: '--typography-fontSize-base',
+            fontWeight: '--typography-fontWeight-medium',
+            letterSpacing: '0.025em',
+            padding: '--spacing-2',
+            borderRadius: '--border-radius-lg',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderBottomWidth: '4px',
+            hoverBorderBottomWidth: '3px',
+            showLabel: true,
+            hoverBackgroundColor: '--color-background-primary',
+            hoverTextColor: '--color-text-primary',
+            hoverBorderColor: '--color-border-hover',
+            hoverBoxShadow: '--shadow-md',
+            labelFontSize: '--typography-fontSize-sm',
+            labelFontWeight: '--typography-fontWeight-medium',
+            labelLetterSpacing: '0.05em',
+            labelTextColor: '--color-text-secondary',
+            boxShadow: '--component-card-shadow'
+        }
+
+        const definedProps = extractDefinedProps(finProArgs)
+
+        // Format dropdown props correctly
+        const dropdownProps = Object.entries(definedProps)
+            .filter(([key]) => key !== 'label' && key !== 'showLabel')
+            .map(([key, value]) => {
+                if (typeof value === 'boolean') {
+                    return `      ${key}={${value}}`
+                } else if (typeof value === 'string' && value.startsWith('--')) {
+                    return `      ${key}="${value}"`
+                } else if (typeof value === 'string' && (value === 'default' || value === 'outline' || value === 'ghost' || value === 'primary' || value === 'destructive')) {
+                    return `      ${key}="${value}"`
+                } else {
+                    return `      ${key}="${value}"`
+                }
+            })
+            .join('\n')
+
+        const generatedCode = `import React, { useState } from 'react'
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from 'equal-ds-ui'
+import { ChevronDown, Settings, User, LogOut } from 'lucide-react'
+
+export function ExampleDropdown({...}) {
+  // Component implementation here
+}
+
+export function FinProFilterSection() {
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-[24px] w-full">
+          <ExampleDropdown
+            label="Consent Template"
+            showLabel={true}
+${dropdownProps}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}`
+
+        document.getElementById('output').innerHTML = `
+            <h2>Defined Props:</h2>
+            <pre>${JSON.stringify(definedProps, null, 2)}</pre>
+
+            <h2>Formatted Dropdown Props:</h2>
+            <pre>${dropdownProps}</pre>
+
+            <h2>Generated Code Preview:</h2>
+            <pre style="white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 5px;">${generatedCode}</pre>
+        `
+    </script>
+</body>
+</html>

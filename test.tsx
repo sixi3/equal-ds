@@ -1,57 +1,8 @@
-import './tailwind.css'
-import React from 'react'
-import type { StoryObj } from '@storybook/react'
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from '../src'
+import React, { useState } from 'react'
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from 'equal-ds-ui'
 import { ChevronDown, Settings, User, LogOut } from 'lucide-react'
-import { cn } from '../src/lib/cn'
-import { useState } from 'react'
 
-
-
-// Import controls
-import { generateAllControls } from '../src/story-utils/simpleControls'
-
-// Import copy code components
-import { CopyCodeButton, SmartCopyCodeButton } from '../src/story-utils'
-
-// Import snippet generators
-import { generateDropdownSnippet, generateFinProSnippet } from '../src/story-utils/snippets'
-
-// Generate controls for dropdown
-const { argTypes, args } = generateAllControls('dropdown')
-
-// Storybook meta configuration
-const meta = {
-  title: 'Actions/Dropdown',
-  argTypes: {
-    ...argTypes,
-    // Add layout controls
-    headerGap: {
-      control: 'select',
-      options: ['mb-0', 'mb-1', 'mb-2', 'mb-3', 'mb-4', 'mb-6', 'mb-8'],
-      description: 'Gap between header and dropdown components',
-      table: { category: 'Layout' }
-    },
-    dropdownGap: {
-      control: 'select',
-      options: ['gap-0', 'gap-1', 'gap-2', 'gap-3', 'gap-4', 'gap-6', 'gap-8', 'gap-10', 'gap-12'],
-      description: 'Gap between dropdown components',
-      table: { category: 'Layout' }
-    }
-  },
-  args,
-  parameters: {
-    controls: {
-      expanded: true,
-      sort: 'requiredFirst'
-    }
-  }
-}
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-function ExampleDropdown({
+export function ExampleDropdown({
   label,
   showLabel = true,
   variant = 'default',
@@ -210,119 +161,171 @@ function ExampleDropdown({
   )
 }
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex flex-col gap-4 p-8">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-900">Example usage</h3>
-      </div>
-      <div className="flex flex-wrap gap-4">
-        <ExampleDropdown label="User Menu" {...args} />
-      </div>
-    </div>
-  ),
-}
-
-export const Variants: Story = {
-  render: (args) => (
-    <div className="flex flex-wrap gap-4 p-8">
-      <ExampleDropdown label="Default" variant="default" {...args} />
-      <ExampleDropdown label="Outline" variant="outline" {...args} />
-      <ExampleDropdown label="Ghost" variant="ghost" {...args} />
-      <ExampleDropdown label="Primary" variant="primary" {...args} />
-      <ExampleDropdown label="Destructive" variant="destructive" {...args} />
-    </div>
-  ),
-}
-
-// Simplified controls - everything is handled by the simple controls system
-
-export const FinPro: Story = {
-  render: (args: any) => (
+export function FinProFilterSection() {
+  return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
-        <div className="flex gap-2">
-          <SmartCopyCodeButton fallbackGenerator={generateFinProSnippet} fallbackArgs={args} currentArgs={args} />
-          <CopyCodeButton generator={generateFinProSnippet} args={args} />
-        </div>
-      </div>
       <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
-        <div className={`flex justify-between items-center ${args.headerGap || 'mb-4'}`}>
-          <h2 className="text-xl font-medium text-text-primary tracking-wider">
-            Filter By
-          </h2>
-          <ChevronDown className="w-4 h-4 text-tex  t-primary" />
+        <div className={"flex justify-between items-center " + (a.headerGap || 'mb-4')}>
+          <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded-md font-medium transition-colors duration-200 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
+              Copy Code
+            </button>
+          </div>
         </div>
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 ${args.dropdownGap || 'gap-6'} w-full`}>
+        <div className={"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 " + (a.dropdownGap || 'gap-6') + " w-full"}>
           <ExampleDropdown
             label="Consent Template"
             showLabel={true}
-            {...args}
+      variant="default"
+      disabled={false}
+      headerGap="mb-3"
+      dropdownGap="gap-4"
+      backgroundColor="--color-background-secondary"
+      textColor="--color-text-primary"
+      borderColor="--color-border-hover"
+      hoverBackgroundColor="--color-background-tertiary"
+      hoverTextColor="--color-text-primary"
+      hoverBorderColor="--color-border-hover"
+      fontSize="--typography-fontSize-sm"
+      fontWeight="--typography-fontWeight-medium"
+      lineHeight="--typography-lineHeight-normal"
+      letterSpacing="0.025em"
+      padding="--spacing-2"
+      borderRadius="--border-radius-lg"
+      borderWidth="1px"
+      borderStyle="solid"
+      borderBottomWidth="4px"
+      hoverBorderBottomWidth="3px"
+      boxShadow="--component-card-shadow"
+      hoverBoxShadow="--shadow-md"
+      labelFontSize="--typography-fontSize-xs"
+      labelFontWeight="--typography-fontWeight-normal"
+      labelLetterSpacing="0.1em"
+      labelTextColor="--color-text-secondary"
           />
           <ExampleDropdown
             label="Purpose Code"
             showLabel={true}
-            {...args}
+      variant="default"
+      disabled={false}
+      headerGap="mb-3"
+      dropdownGap="gap-4"
+      backgroundColor="--color-background-secondary"
+      textColor="--color-text-primary"
+      borderColor="--color-border-hover"
+      hoverBackgroundColor="--color-background-tertiary"
+      hoverTextColor="--color-text-primary"
+      hoverBorderColor="--color-border-hover"
+      fontSize="--typography-fontSize-sm"
+      fontWeight="--typography-fontWeight-medium"
+      lineHeight="--typography-lineHeight-normal"
+      letterSpacing="0.025em"
+      padding="--spacing-2"
+      borderRadius="--border-radius-lg"
+      borderWidth="1px"
+      borderStyle="solid"
+      borderBottomWidth="4px"
+      hoverBorderBottomWidth="3px"
+      boxShadow="--component-card-shadow"
+      hoverBoxShadow="--shadow-md"
+      labelFontSize="--typography-fontSize-xs"
+      labelFontWeight="--typography-fontWeight-normal"
+      labelLetterSpacing="0.1em"
+      labelTextColor="--color-text-secondary"
           />
           <ExampleDropdown
             label="Consent Status"
             showLabel={true}
-            {...args}
+      variant="default"
+      disabled={false}
+      headerGap="mb-3"
+      dropdownGap="gap-4"
+      backgroundColor="--color-background-secondary"
+      textColor="--color-text-primary"
+      borderColor="--color-border-hover"
+      hoverBackgroundColor="--color-background-tertiary"
+      hoverTextColor="--color-text-primary"
+      hoverBorderColor="--color-border-hover"
+      fontSize="--typography-fontSize-sm"
+      fontWeight="--typography-fontWeight-medium"
+      lineHeight="--typography-lineHeight-normal"
+      letterSpacing="0.025em"
+      padding="--spacing-2"
+      borderRadius="--border-radius-lg"
+      borderWidth="1px"
+      borderStyle="solid"
+      borderBottomWidth="4px"
+      hoverBorderBottomWidth="3px"
+      boxShadow="--component-card-shadow"
+      hoverBoxShadow="--shadow-md"
+      labelFontSize="--typography-fontSize-xs"
+      labelFontWeight="--typography-fontWeight-normal"
+      labelLetterSpacing="0.1em"
+      labelTextColor="--color-text-secondary"
           />
           <ExampleDropdown
             label="Account Aggregator"
             showLabel={true}
-            {...args}
+      variant="default"
+      disabled={false}
+      headerGap="mb-3"
+      dropdownGap="gap-4"
+      backgroundColor="--color-background-secondary"
+      textColor="--color-text-primary"
+      borderColor="--color-border-hover"
+      hoverBackgroundColor="--color-background-tertiary"
+      hoverTextColor="--color-text-primary"
+      hoverBorderColor="--color-border-hover"
+      fontSize="--typography-fontSize-sm"
+      fontWeight="--typography-fontWeight-medium"
+      lineHeight="--typography-lineHeight-normal"
+      letterSpacing="0.025em"
+      padding="--spacing-2"
+      borderRadius="--border-radius-lg"
+      borderWidth="1px"
+      borderStyle="solid"
+      borderBottomWidth="4px"
+      hoverBorderBottomWidth="3px"
+      boxShadow="--component-card-shadow"
+      hoverBoxShadow="--shadow-md"
+      labelFontSize="--typography-fontSize-xs"
+      labelFontWeight="--typography-fontWeight-normal"
+      labelLetterSpacing="0.1em"
+      labelTextColor="--color-text-secondary"
           />
           <ExampleDropdown
             label="Consent Created On"
             showLabel={true}
-            {...args}
+      variant="default"
+      disabled={false}
+      headerGap="mb-3"
+      dropdownGap="gap-4"
+      backgroundColor="--color-background-secondary"
+      textColor="--color-text-primary"
+      borderColor="--color-border-hover"
+      hoverBackgroundColor="--color-background-tertiary"
+      hoverTextColor="--color-text-primary"
+      hoverBorderColor="--color-border-hover"
+      fontSize="--typography-fontSize-sm"
+      fontWeight="--typography-fontWeight-medium"
+      lineHeight="--typography-lineHeight-normal"
+      letterSpacing="0.025em"
+      padding="--spacing-2"
+      borderRadius="--border-radius-lg"
+      borderWidth="1px"
+      borderStyle="solid"
+      borderBottomWidth="4px"
+      hoverBorderBottomWidth="3px"
+      boxShadow="--component-card-shadow"
+      hoverBoxShadow="--shadow-md"
+      labelFontSize="--typography-fontSize-xs"
+      labelFontWeight="--typography-fontWeight-normal"
+      labelLetterSpacing="0.1em"
+      labelTextColor="--color-text-secondary"
           />
         </div>
       </div>
     </div>
-  ),
-  args: {
-    // Layout controls
-    headerGap: "mb-3", // Gap between header and dropdowns
-    dropdownGap: "gap-4", // Gap between dropdown components
-
-    // Use design system defaults
-    backgroundColor: '--color-background-secondary',
-
-    textColor: '--color-text-primary',
-    borderColor: "--color-border-hover",
-    fontSize: "--typography-fontSize-sm",
-    fontWeight: "--typography-fontWeight-medium",
-    letterSpacing: "0.025em",
-    padding: '--spacing-2',
-    borderRadius: "--border-radius-lg",
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderBottomWidth: "4px",
-    hoverBorderBottomWidth: '3px',
-    showLabel: true,
-    hoverBackgroundColor: "--color-background-tertiary",
-    hoverTextColor: "--color-text-primary",
-    hoverBorderColor: "--color-border-hover",
-    hoverBoxShadow: "--shadow-md",
-
-    // Label typography controls
-    labelFontSize: "--typography-fontSize-xs",
-
-    labelFontWeight: "--typography-fontWeight-normal",
-    labelLetterSpacing: "0.1em",
-    labelTextColor: "--color-text-secondary",
-    boxShadow: "--component-card-shadow"
-  },
+  )
 }
-
-
-
-
-
-
-
-

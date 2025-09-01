@@ -1,58 +1,118 @@
-is this the ## Equal DS UI
+# 🎨 Equal DS UI
 
-Production-ready React sidebar components and Tailwind helpers for the Equal Design System, built with custom design tokens and optimized for performance.
+[![npm version](https://badge.fury.io/js/equal-ds-ui.svg)](https://badge.fury.io/js/equal-ds-ui)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **🚨 Version 1.0.4 Breaking Changes:** This major release includes a complete design system migration and fixes export path issues. Please read the [Migration Guide](#migration-guide) below.
+**Production-ready React sidebar components and Tailwind helpers** for the Equal Design System. Built with custom design tokens, optimized for performance, and featuring **selective ESM/CJS format installation** for maximum bundle efficiency.
 
-### Installation
+## ✨ What's New in v1.0.7
+
+- 🚀 **Selective Format Installation**: Choose ESM or CommonJS during installation for ~50% smaller bundles
+- 🎯 **Smart Auto-Detection**: Automatically detects your project's bundler and format preferences
+- ⚡ **CLI Tools**: `npx equal-ds-format` for easy format selection and optimization
+
+## 📦 Installation
 
 ```bash
 npm install equal-ds-ui
+
 # Required peer dependencies
 npm install @radix-ui/react-collapsible @radix-ui/react-tooltip @radix-ui/react-visually-hidden lucide-react tailwindcss
-# Dev dependencies for build process
+
+# Development dependencies (for custom setup)
 npm install -D tailwindcss postcss autoprefixer
 ```
 
-### Setup
 
-#### 1. Initialize Tailwind CSS
+## 🎯 Selective Format Installation
+
+**Choose your preferred module format** for optimal bundle sizes and compatibility. This package supports both ESM and CommonJS with automatic format detection.
+
+### Quick Format Selection
+
 ```bash
-npx tailwindcss init
+# Install the package
+npm install equal-ds-ui
+
+# Choose your format (choose one):
+npx equal-ds-format esm    # ESM format (~34KB) - Modern bundlers
+npx equal-ds-format cjs    # CommonJS format (~36KB) - Legacy bundlers
+npx equal-ds-format auto   # Auto-detect based on your project
 ```
 
-#### 2. Configure Tailwind with our preset
-```javascript
-// tailwind.config.js or tailwind.config.cjs
-const preset = require('equal-ds-ui/tailwind-preset')
+### 📊 Format Comparison
 
-module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  presets: [preset],  // This provides all design token classes
+| Format | Bundle Size | Best For | Command |
+|--------|-------------|----------|---------|
+| **ESM Only** | ~34KB | Vite, Next.js, esbuild | `npx equal-ds-format esm` |
+| **CommonJS Only** | ~36KB | Webpack, CRA, legacy | `npx equal-ds-format cjs` |
+| **Auto-Detect** | Optimized | Any project | `npx equal-ds-format auto` |
+| **Both Formats** | ~70KB | Maximum compatibility | Default |
+
+### 🔧 For Package Publishers
+
+```bash
+# Build format-specific versions
+npm run build:esm          # ESM-only build
+npm run build:cjs          # CommonJS-only build
+npm run build              # Both formats (default)
+
+# Publish selective versions
+npm run prepublishOnly:esm # Publish ESM-only
+npm run prepublishOnly:cjs # Publish CommonJS-only
+npm run prepublishOnly     # Publish both formats
+```
+
+> **💡 Pro Tip:** The CLI automatically detects your project's bundler (Vite, Webpack, Next.js, etc.) and recommends the optimal format!
+
+## ⚙️ Quick Setup
+
+Get started with Equal DS UI in just 3 simple steps:
+
+### 1. Initialize Tailwind CSS
+```bash
+npx tailwindcss init -p  # Creates tailwind.config.js and postcss.config.js
+```
+
+### 2. Configure with our Design System
+```javascript
+// tailwind.config.js
+import preset from 'equal-ds-ui/tailwind-preset'
+
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './node_modules/equal-ds-ui/dist/**/*.{js,jsx,ts,tsx}', // Important!
+  ],
+  presets: [preset], // Our complete design system
 }
 ```
 
-#### 3. Import CSS files
+### 3. Import Design System Styles
 ```css
 /* src/index.css */
+
+/* Import Equal DS UI design system FIRST */
+@import 'equal-ds-ui/tokens.css';
+@import 'equal-ds-ui/animations.css';
+
+/* Then Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import equal-ds-ui design system */
-@import 'equal-ds-ui/tokens.css';
-@import 'equal-ds-ui/animations.css';
 ```
 
-### Quick Start
+## 🚀 Quick Start
+
+Here's a complete example to get you started:
 
 ```tsx
 import {
-  Sidebar,
   SidebarProvider,
+  Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupTrigger,
   SidebarGroupLabel,
@@ -60,58 +120,45 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuBadge,
-  SidebarSeparator,
   SidebarTrigger,
-  SidebarRail,
 } from 'equal-ds-ui'
 
 export default function App() {
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-background-secondary">
+        {/* Sidebar */}
         <Sidebar>
           <SidebarHeader className="border-b border-border-default">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
-              </div>
-              <div>
-                <h1 className="font-semibold text-text-primary">Equal DS</h1>
-                <p className="text-xs text-text-secondary">Design System</p>
-              </div>
+            <div className="px-4 py-3">
+              <h1 className="font-semibold text-text-primary">My App</h1>
             </div>
           </SidebarHeader>
-          
+
           <SidebarContent>
             <SidebarGroup defaultOpen>
               <SidebarGroupTrigger>
-                <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+                <SidebarGroupLabel>Menu</SidebarGroupLabel>
               </SidebarGroupTrigger>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton itemId="home" href="/">
-                      Home
-                    </SidebarMenuButton>
+                    <SidebarMenuButton itemId="home">Home</SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton itemId="settings">Settings</SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
-          
-          <SidebarFooter className="border-t border-border-default">
-            <div className="p-4">
-              <p className="text-sm text-text-secondary">Footer content</p>
-            </div>
-          </SidebarFooter>
         </Sidebar>
-        
-        <SidebarRail />
-        
+
+        {/* Main Content */}
         <main className="flex-1 p-6">
-          <SidebarTrigger>☰</SidebarTrigger>
-          <h1 className="text-2xl font-bold text-text-primary">Welcome!</h1>
+          <SidebarTrigger className="mb-4">☰ Toggle Sidebar</SidebarTrigger>
+          <h1 className="text-2xl font-bold text-text-primary">Welcome to Equal DS UI!</h1>
+          <p className="text-text-secondary mt-2">Your sidebar is ready to use.</p>
         </main>
       </div>
     </SidebarProvider>
@@ -119,320 +166,255 @@ export default function App() {
 }
 ```
 
-**Important:** Make sure you've followed the setup steps above to import the CSS and configure Tailwind with our preset!
+> **💡 Ready to go!** This example uses our design tokens for consistent styling. Make sure you've completed the setup steps above.
 
-### Reordering (tabs and groups)
+## 🧪 Testing & Development
 
-- Drag handles appear on hover over the icon (tabs) and next to group labels (groups). Dragging is handle-only to prevent accidental drags.
-- Reordering is disabled automatically when the sidebar is collapsed.
-- Container-level drop: you can drop anywhere in the column (no dead zones between items).
-- Drop indicators use your theme primary color and appear slightly offset from edges for clarity.
-- Smooth, lightweight animations:
-  - Tabs: pop-in on the moved tab
-  - Groups: subtle slide-in for groups whose vertical position changed
+### Quick Test with Vite
+```bash
+# Create and setup a test project
+mkdir test-equal-ds && cd test-equal-ds
+npm create vite@latest . -- --template react
+npm install equal-ds-ui @radix-ui/react-collapsible @radix-ui/react-tooltip @radix-ui/react-visually-hidden lucide-react
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
 
-#### Reorder tabs (items)
+### Essential Configuration
+```javascript
+// tailwind.config.js
+import preset from 'equal-ds-ui/tailwind-preset'
 
-```tsx
-const [order, setOrder] = React.useState([ 'home', 'billing', 'settings' ])
-const byId = {
-  home: { icon: <HomeIcon/>, label: 'Home' },
-  billing: { icon: <CreditCard/>, label: 'Billing' },
-  settings: { icon: <Cog/>, label: 'Settings' },
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './node_modules/equal-ds-ui/dist/**/*.{js,jsx,ts,tsx}', // Required!
+  ],
+  presets: [preset],
 }
+```
 
-<SidebarMenu reorderable onReorder={setOrder}>
-  {order.map((id) => (
+```css
+/* src/index.css */
+@import 'equal-ds-ui/tokens.css';
+@import 'equal-ds-ui/animations.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+### ⚠️ Common Issues
+
+| Problem | Solution |
+|---------|----------|
+| **Unstyled sidebar** | Add `node_modules/equal-ds-ui/dist/**/*` to Tailwind content |
+| **CSS variables not working** | Import design system CSS before Tailwind |
+| **Module resolution errors** | Check your bundler configuration |
+| **Format compatibility** | Run `npx equal-ds-format auto` after installation |
+
+## 🎨 Custom Design Tokens
+
+Extend Equal DS UI with your own design tokens using our `design-tokens-sync` tool.
+
+### Quick Setup
+```bash
+# Install the sync tool
+npm install -D design-tokens-sync
+
+# Create your tokens file
+echo '{
+  "color": {
+    "primary": {"500": "#your-color"},
+    "text": {"primary": "#your-text"}
+  }
+}' > design-tokens.json
+
+# Generate CSS and Tailwind preset
+npx design-tokens-sync sync
+```
+
+### Integration
+```javascript
+// tailwind.config.js
+import equalDSPreset from 'equal-ds-ui/tailwind-preset'
+import customPreset from './tokens.tailwind.preset.js'
+
+export default {
+  presets: [equalDSPreset, customPreset], // Custom overrides Equal DS
+  content: ['./src/**/*.{js,jsx,ts,tsx}']
+}
+```
+
+```css
+/* src/index.css */
+@import './tokens.css';           /* Your tokens first */
+@import 'equal-ds-ui/tokens.css'; /* Equal DS base */
+@import 'equal-ds-ui/animations.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+### 🎯 Token Priority
+1. **Your custom tokens** (highest)
+2. **Equal DS UI tokens** (medium)
+3. **Tailwind defaults** (lowest)
+
+Your tokens override ours, giving you full customization control!
+
+## 🔀 Drag & Drop Reordering
+
+Equal DS UI supports intuitive drag-and-drop for both menu items and groups.
+
+### Menu Items Reordering
+```tsx
+const [itemOrder, setItemOrder] = useState(['home', 'settings', 'profile'])
+
+<SidebarMenu reorderable onReorder={setItemOrder}>
+  {itemOrder.map(id => (
     <SidebarMenuItem key={id} draggable dragId={id}>
-      <SidebarMenuButton itemId={id} icon={byId[id].icon}>
-        {byId[id].label}
+      <SidebarMenuButton itemId={id}>
+        {menuItems[id].label}
       </SidebarMenuButton>
     </SidebarMenuItem>
   ))}
 </SidebarMenu>
 ```
 
-Props involved:
-- `SidebarMenu`
-  - `reorderable?: boolean`
-  - `onReorder?: (nextOrder: string[]) => void`
-- `SidebarMenuItem`
-  - `draggable?: boolean` (enable handle-only dragging)
-  - `dragId?: string` (stable id used for ordering)
-
-Notes:
-- Only the icon area shows the `GripVertical` handle on hover. Dragging starts from the handle.
-- The drop indicator is hidden when hovering the dragged item itself (no-op move).
-
-#### Reorder groups
-
+### Group Reordering
 ```tsx
-const [groupOrder, setGroupOrder] = React.useState([ 'analytics', 'admin', 'docs' ])
+const [groupOrder, setGroupOrder] = useState(['main', 'admin', 'tools'])
 
 <SidebarContent reorderableGroups onGroupReorder={setGroupOrder}>
-  {groupOrder.map((gid) => (
-    <SidebarGroup key={gid} groupId={gid} defaultOpen>
-      <SidebarGroupTrigger>
-        <SidebarGroupLabel>{gid.toUpperCase()}</SidebarGroupLabel>
-      </SidebarGroupTrigger>
-      <SidebarGroupContent>
-        {/* ...SidebarMenu... */}
-      </SidebarGroupContent>
+  {groupOrder.map(id => (
+    <SidebarGroup key={id} groupId={id}>
+      {/* Group content */}
     </SidebarGroup>
   ))}
 </SidebarContent>
 ```
 
-Props involved:
-- `SidebarContent`
-  - `reorderableGroups?: boolean`
-  - `onGroupReorder?: (nextOrder: string[]) => void`
-- `SidebarGroup`
-  - `groupId?: string` (required for reordering)
+### ✨ Features
+- **Handle-only dragging** - Prevents accidental moves
+- **Smooth animations** - Visual feedback during reordering
+- **Auto-collapse** - Groups collapse during drag for clarity
+- **Container drops** - Drop anywhere in the column
+- **Theme integration** - Uses your design tokens for indicators
 
-Behavior:
-- Handle-only drag next to the group label
-- All groups auto-collapse while dragging; restored afterwards
-- Container-level drop eliminates dead zones between groups
+## 🚀 What's New in v1.0.7
 
-## 🚨 Migration Guide (v0.2.2 → v1.0.4)
+- 🎯 **Selective Format Installation**: Choose ESM or CommonJS for ~50% smaller bundles
+- ⚡ **Smart CLI Tools**: `npx equal-ds-format` for easy format selection
+- 🔍 **Auto-Detection**: Automatically detects your project's bundler preferences
+- 🎨 **Enhanced Design System**: Improved token system and customization options
 
-### Breaking Changes
+## 🚨 Migration Guide (v1.0.6 → v1.0.7)
 
-This major release includes a complete design system migration. Here's what you need to know:
+### ✨ New Features (Non-Breaking)
+- **Format Selection**: Choose ESM or CommonJS during installation
+- **CLI Tools**: New `equal-ds-format` command for format optimization
+- **Auto-Detection**: Smart bundler detection for optimal format selection
 
-#### 1. Color System Overhaul
-All color classes have been renamed to use the new design token system:
+### Migration Steps
+```bash
+# Update to latest version
+npm install equal-ds-ui@latest
+
+# Optional: Optimize format for your project
+npx equal-ds-format auto
+```
+
+### Breaking Changes from v0.2.2 → v1.0.4
+If upgrading from older versions, update your color classes:
 
 ```tsx
-// ❌ OLD (v0.2.2)
-'text-foreground'
-'bg-background'
-'border-border'
-'focus-visible:ring-ring'
-
-// ✅ NEW (v1.0.4)
-'text-text-primary'
-'bg-background-secondary'
-'border-border-default'
-'focus-visible:ring-primary-400'
+// OLD → NEW
+'text-foreground' → 'text-text-primary'
+'bg-background' → 'bg-background-secondary'
+'border-border' → 'border-border-default'
+'focus:ring-ring' → 'focus:ring-primary-400'
 ```
 
-#### 2. Preset System Change
-The Tailwind preset now exports the auto-generated preset with all design tokens:
+## 📚 Component API
 
-```js
-// ❌ OLD (v0.2.2)
-presets: [require('equal-ds-ui/tailwind-preset')]
+### Core Components
 
-// ✅ NEW (v1.0.4)
-presets: [require('equal-ds-ui/tailwind-preset')]  // Now points to auto-generated preset
-```
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `SidebarProvider` | Context provider | `defaultOpen`, `onOpenChange` |
+| `Sidebar` | Main sidebar container | `className`, `aria-label` |
+| `SidebarHeader` | Top section | `children` |
+| `SidebarContent` | Main content area | `reorderableGroups`, `onGroupReorder` |
+| `SidebarFooter` | Bottom section | `children` |
+| `SidebarGroup` | Logical grouping | `groupId`, `defaultOpen` |
+| `SidebarMenu` | Menu container | `reorderable`, `onReorder` |
+| `SidebarMenuItem` | Individual menu item | `draggable`, `dragId` |
+| `SidebarTrigger` | Toggle button | `srLabel`, `children` |
 
-#### 3. CSS Import Changes
-Update your CSS imports:
+### 🎨 Design Tokens
+
+Our Tailwind preset includes comprehensive design tokens:
 
 ```tsx
-// ❌ OLD (v0.2.2)
-import 'equal-ds-ui/theme.css'        // shadcn-theme.css
+// Colors
+'bg-background-primary/secondary/tertiary'
+'text-text-primary/secondary/muted/inverse'
+'border-border-default/hover/focus/light'
+'bg-primary-50/100/200/.../900'
 
-// ✅ NEW (v1.0.4)
-@import 'equal-ds-ui/tokens.css';     // New design tokens
-@import 'equal-ds-ui/animations.css'; // Motion helpers
+// Typography
+'font-thin/light/normal/medium/semibold/bold'
+'tracking-tight/normal/wide/wider/widest'
+
+// Animations (via animations.css)
+'animate-sidebar-pop-in'
+'animate-sidebar-reorder-slide'
 ```
 
-#### 4. Migration Steps
-1. **Update package version**: `npm install equal-ds-ui@^1.0.4`
-2. **Update CSS imports**: Replace `theme.css` with `tokens.css`
-3. **Update Tailwind config**: Use new preset path
-4. **Test thoroughly**: Verify all components render correctly
-5. **Update custom styles**: Replace any hardcoded old color references
+## 🔧 Development
 
-### What's New in v1.0.4
+```bash
+# Install dependencies
+npm install
 
-- ✨ **Enhanced UX**: Smooth transitions, layout stability, improved tooltips
-- 🎨 **Design System**: Custom color tokens with auto-generated Tailwind preset
-- 🐛 **Bug Fixes**: Resolved text cutoff, color consistency, and layout shift issues
-- 🔧 **Performance**: Optimized animations and improved text rendering
-- 🚀 **Export Fix**: Fixed tailwind-preset export path to resolve installation issues
+# Start development
+npm run storybook    # Storybook development
+npm run dev          # Vite development
+npm test            # Run tests
+
+# Build for publishing
+npm run build:esm    # ESM only
+npm run build:cjs    # CommonJS only
+npm run build        # Both formats
+
+# Publish
+npm run prepublishOnly  # Prepares for publishing
+npm publish
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+**MIT** © Equal DS
 
 ---
 
-### Customization
-
-- Indicator color follows CSS variable `--color-primary-400` via inline style. Adjust via theme tokens in `tokens.css`.
-- Spacing uses padding (not margins) so indicators sit between padded edges.
-- Animations are defined in `animations.css`:
-  - `.animate-sidebar-pop-in` for the moved tab
-  - `.animate-sidebar-reorder-slide` for groups that moved
-
-### Available Design Token Classes
-
-Our Tailwind preset provides these design token classes:
-
-#### Colors
-```tsx
-// Background colors
-'bg-background-primary'    // Primary background
-'bg-background-secondary'  // Secondary background  
-'bg-background-tertiary'   // Tertiary background
-'bg-primary-500'          // Primary brand color
-'bg-primary-100'          // Light primary
-'bg-white'                // Pure white
-
-// Text colors
-'text-text-primary'       // Primary text
-'text-text-secondary'     // Secondary text
-'text-text-muted'         // Muted text
-'text-text-inverse'       // Inverse text (white)
-
-// Border colors
-'border-border-default'    // Default border
-'border-border-hover'      // Hover border
-'border-border-focus'      // Focus border
-'border-border-light'      // Light border
-```
-
-#### Typography
-```tsx
-// Font weights
-'font-thin'               // 100
-'font-light'              // 300
-'font-normal'             // 400
-'font-medium'             // 500
-'font-semibold'           // 600
-'font-bold'               // 700
-
-// Letter spacing
-'tracking-tight'          // Tight
-'tracking-normal'         // Normal
-'tracking-wide'           // Wide
-'tracking-wider'          // Wider
-'tracking-widest'         // Widest
-```
-
-### Tailwind Preset
-
-Our preset automatically provides all design token classes:
-
-```js
-// tailwind.config.js or tailwind.config.cjs
-const preset = require('equal-ds-ui/tailwind-preset')
-
-module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  presets: [preset],  // This gives you all the classes above
-}
-```
-
-### Design tokens (optional)
-
-```ts
-import tokens from 'equal-ds-ui/tokens'
-```
-
-### Troubleshooting
-
-#### Common Issues
-
-**1. Sidebar not styled / colors not working**
-- ✅ Ensure you've imported `equal-ds-ui/tokens.css` in your CSS
-- ✅ Ensure Tailwind is configured with our preset
-- ✅ Check that all peer dependencies are installed
-
-**2. Tailwind classes not found**
-- ✅ Verify your `tailwind.config.js` includes our preset
-- ✅ Ensure content paths are correct
-- ✅ Restart your dev server after config changes
-
-**3. CSS variables not defined**
-- ✅ Import `equal-ds-ui/tokens.css` before Tailwind directives
-- ✅ Check that the CSS file is being loaded in your build
-
-#### Complete Working Example
-
-```tsx
-// App.tsx
-import { Sidebar, SidebarProvider, /* ... */ } from 'equal-ds-ui'
-
-// index.css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import 'equal-ds-ui/tokens.css';
-@import 'equal-ds-ui/animations.css';
-
-// tailwind.config.js
-const preset = require('equal-ds-ui/tailwind-preset')
-module.exports = { presets: [preset] }
-```
-
-### Local Testing
-
-```bash
-npm run build
-npm pack                           # creates equal-ds-ui-x.y.z.tgz
-mkdir -p ~/test-equal-ds && cd ~/test-equal-ds && npm init -y
-npm install /absolute/path/to/equal-ds-ui-*.tgz
-```
-
-### Development
-
-```bash
-npm install
-npm run storybook
-npm test
-```
-
-### 🎨 Design System Automation
-
-This design system includes **zero-touch automation** for keeping everything in sync:
-
-- **🔄 Auto-Sync**: Design tokens automatically sync from Figma
-- **⚙️ Auto-Generate**: Storybook controls automatically generated
-- **📝 Auto-Update**: Stories automatically updated with new tokens
-- **🤖 GitHub Actions**: Everything syncs automatically on git push
-
-**Quick Start:**
-```bash
-# Full automation (recommended)
-npm run full:update
-
-# Test GitHub Actions workflow
-npm run test:workflow
-
-# Start Storybook
-npm run storybook
-```
-
-**For complete automation setup, see:**
-- [Design Controls Guide](docs/DESIGN-CONTROLS.md)
-- [GitHub Actions Setup](docs/GITHUB-ACTIONS-SETUP.md)
-- [Automation Summary](docs/AUTOMATION-SUMMARY.md)
-
-### Release & publish
-
-1) Ensure you are logged in to npm and have 2FA set up.
-
-```bash
-npm login
-```
-
-2) Bump version and publish:
-
-```bash
-npm version minor   # or patch / major
-npm publish --access public
-git push --follow-tags
-```
-
-### Compatibility
-
-- React 18 or 19
-- Tailwind CSS 3.4+
-
-### License
-
-MIT © Equal DS
+<div align="center">
+  <p><strong>Built with ❤️ for modern React applications</strong></p>
+  <p>
+    <a href="#installation">Installation</a> •
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#selective-format-installation">Format Selection</a> •
+    <a href="#custom-design-tokens">Custom Tokens</a>
+  </p>
+</div>
 
 

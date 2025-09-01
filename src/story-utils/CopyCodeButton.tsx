@@ -15,7 +15,7 @@ export function CopyCodeButton({ code, generator, args, label = 'Copy Code' }: {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch (e) {
-      // noop
+      console.error('CopyCodeButton: Failed to copy:', e)
     }
   }
 
