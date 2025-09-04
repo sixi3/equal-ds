@@ -8,12 +8,7 @@ export { DesignSystemControlGenerator } from './controlGenerators/designSystemCo
 export { StorybookControlMapper } from './storybookControlMapper'
 export { AutoControls, createAutoControls, createAutoStoryConfig, getCategoryControls } from './autoControls'
 
-// Copy code components
-export { CopyCodeButton } from './CopyCodeButton'
-export { SmartCopyCodeButton } from './SmartCopyCodeButton'
-
-// Snippet generation utilities
-export { generateExactStoryCode, generateFinProSnippet, generateDropdownSnippet } from './snippets'
+// Control generation and design system utilities
 
 
 

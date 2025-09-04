@@ -7,8 +7,6 @@ export * from './components/dropdown'
 
 // Typography utilities
 export * from './story-utils/designTokens'
-export * from './story-utils/CopyCodeButton'
-export * from './story-utils/snippets'
 
 
 

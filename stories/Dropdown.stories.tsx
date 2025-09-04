@@ -11,12 +11,6 @@ import { useState } from 'react'
 // Import controls
 import { generateAllControls } from '../src/story-utils/simpleControls'
 
-// Import copy code components
-import { CopyCodeButton, SmartCopyCodeButton } from '../src/story-utils'
-
-// Import snippet generators
-import { generateDropdownSnippet, generateFinProSnippet } from '../src/story-utils/snippets'
-
 // Generate controls for dropdown
 const { argTypes, args } = generateAllControls('dropdown')
 
@@ -240,12 +234,8 @@ export const Variants: Story = {
 export const FinPro: Story = {
   render: (args: any) => (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
-        <div className="flex gap-2">
-          <SmartCopyCodeButton fallbackGenerator={generateFinProSnippet} fallbackArgs={args} currentArgs={args} />
-          <CopyCodeButton generator={generateFinProSnippet} args={args} />
-        </div>
       </div>
       <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
         <div className={`flex justify-between items-center ${args.headerGap || 'mb-4'}`}>
@@ -301,7 +291,7 @@ export const FinPro: Story = {
     borderRadius: "--border-radius-lg",
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderBottomWidth: "4px",
+    borderBottomWidth: "3px",
     hoverBorderBottomWidth: '3px',
     showLabel: true,
     hoverBackgroundColor: "--color-background-tertiary",
