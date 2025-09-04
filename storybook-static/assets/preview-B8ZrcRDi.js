@@ -1,1 +1,0 @@
-/* empty css                 */const r={parameters:{layout:"fullscreen",controls:{matchers:{color:/(background|color|border|text)$/i,date:/Date$/},expanded:!0,sort:"requiredFirst"}}};export{r as default};

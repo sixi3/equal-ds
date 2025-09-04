@@ -4,14 +4,21 @@ import { cn } from '../../lib/cn'
 
 export interface DropdownItemProps extends React.ComponentPropsWithoutRef<typeof DropdownMenu.Item> {
   inset?: boolean
+  /**
+   * Enable hover background color (may interfere with hover animation)
+   * @default false
+   */
+  enableHoverBackground?: boolean
 }
 
 export const DropdownItem = React.forwardRef<HTMLDivElement, DropdownItemProps>(
-  ({ className, inset, children, ...props }, ref) => (
+  ({ className, inset, enableHoverBackground = false, children, ...props }, ref) => (
     <DropdownMenu.Item
       ref={ref}
+      data-dropdown-item
       className={cn(
-        'relative flex cursor-default select-none items-center rounded-md px-2 py-2 text-sm text-text-primary outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-primary-300/30',
+        'relative flex cursor-default select-none items-center rounded-md px-2 py-2 text-sm text-text-primary outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        enableHoverBackground && 'hover:bg-primary-300/30',
         inset && 'pl-8',
         className,
       )}

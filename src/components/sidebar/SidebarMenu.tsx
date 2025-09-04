@@ -3,6 +3,8 @@ import { GripVertical } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
 import { useSidebarOpenContext, useSidebarActiveItemContext } from './SidebarProvider'
+import { useHoverAnimation } from '../../lib/useHoverAnimation'
+import { HoverIndicator } from '../ui/HoverIndicator'
 
 export interface SidebarMenuProps extends React.HTMLAttributes<HTMLUListElement> {
   /**
@@ -82,18 +84,20 @@ const ItemDragContext = React.createContext<{ draggable: boolean; dragId?: strin
 
 function SidebarMenuImpl({ className, children, reorderable = false, onReorder, ...props }: SidebarMenuProps): JSX.Element {
   const { open } = useSidebarOpenContext()
-  const containerRef = React.useRef<HTMLUListElement | null>(null)
-  const [indicator, setIndicator] = React.useState<{ top: number; left: number; width: number; height: number; visible: boolean }>({ top: 0, left: 0, width: 0, height: 0, visible: false })
+  
+  // Use reusable hover animation hook
+  const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
+    itemSelector: '[data-sidebar-menu-button]',
+    enabled: true
+  })
 
+  // Tooltip state (keeping this for collapsed sidebar tooltips)
   const [tooltip, setTooltip] = React.useState<{ top: number; left: number; visible: boolean }>({ top: 0, left: 0, visible: false })
   const [tooltipLabel, setTooltipLabel] = React.useState<string>('')
   const tooltipLabelRef = React.useRef<string>('')
   const [textVisible, setTextVisible] = React.useState<boolean>(false)
   const [tooltipWidth, setTooltipWidth] = React.useState<number | null>(null)
   const textFadeTimeout = React.useRef<number | null>(null)
-  const rafPendingRef = React.useRef<boolean>(false)
-  const pendingDataRef = React.useRef<{ clientY: number; label: string; tRect: DOMRect; cRect: DOMRect } | null>(null)
-
   const measureRef = React.useRef<HTMLSpanElement | null>(null)
 
   // Drag/reorder state
@@ -107,7 +111,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
   const [portalMounted, setPortalMounted] = React.useState(false)
   React.useEffect(() => {
     if (typeof document === 'undefined') return
-    const doc = containerRef.current?.ownerDocument || document
+    const doc = document
     const root = getTooltipRoot(doc)
     if (!root) return
     const el = doc.createElement('div')
@@ -131,25 +135,21 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
     }
   }, [])
 
-  const flushPointerFrame = React.useCallback(() => {
-    rafPendingRef.current = false
-    const data = pendingDataRef.current
-    if (!data) return
+  // Custom mouse move handler that combines hover animation and tooltip logic
+  const handlePointerMove = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const container = e.currentTarget
+    if (!container) return
 
-    const { clientY, label, tRect, cRect } = data
+    const targetButton = (e.target as HTMLElement).closest('[data-sidebar-menu-button]') as HTMLElement | null
+    if (!targetButton) return
 
-    // Update hover indicator
-    setIndicator({
-      top: tRect.top - cRect.top + (containerRef.current?.scrollTop ?? 0),
-      left: tRect.left - cRect.left + (containerRef.current?.scrollLeft ?? 0),
-      width: tRect.width,
-      height: tRect.height,
-      visible: true,
-    })
+    const cRect = container.getBoundingClientRect()
+    const tRect = targetButton.getBoundingClientRect()
+    const label = targetButton.getAttribute('aria-label') || targetButton.textContent?.trim() || ''
 
-    // Tooltip position (fixed next to sidebar, ensure pixel-perfect positioning)
+    // Update tooltip position (fixed next to sidebar, ensure pixel-perfect positioning)
     const sidebarRight = Math.round(cRect.right)
-    const tooltipTop = Math.round(clientY)
+    const tooltipTop = Math.round(e.clientY)
     const tooltipLeft = sidebarRight + 20
     setTooltip({ top: tooltipTop, left: tooltipLeft, visible: true })
 
@@ -172,36 +172,16 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
     } else {
       setTextVisible(true)
     }
-  }, [])
 
-  const handlePointerMove = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const container = containerRef.current
-    if (!container) return
-
-    const targetButton = (e.target as HTMLElement).closest('[data-sidebar-menu-button]') as HTMLElement | null
-    if (!targetButton) return
-
-    const cRect = container.getBoundingClientRect()
-    const tRect = targetButton.getBoundingClientRect()
-
-    pendingDataRef.current = {
-      clientY: e.clientY,
-      label: targetButton.getAttribute('aria-label') || targetButton.textContent?.trim() || '',
-      tRect,
-      cRect,
-    }
-
-    if (!rafPendingRef.current) {
-      rafPendingRef.current = true
-      requestAnimationFrame(flushPointerFrame)
-    }
-  }, [flushPointerFrame])
+    // Call the hover animation handler
+    handleMouseMove(e)
+  }, [handleMouseMove, setContainerRef])
 
   const handleLeave = React.useCallback(() => {
-    setIndicator((prev) => ({ ...prev, visible: false }))
+    handleMouseLeave()
     setTooltip((prev) => ({ ...prev, visible: false }))
     setTextVisible(false)
-  }, [])
+  }, [handleMouseLeave])
 
   React.useEffect(() => () => { if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current) }, [])
 
@@ -249,7 +229,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
   }, [])
 
   const updateDropIndicator = React.useCallback((targetEl: HTMLElement, atEnd?: boolean) => {
-    const container = containerRef.current
+    const container = document.querySelector('[data-sidebar-menu]') as HTMLElement
     if (!container) return
     const cRect = container.getBoundingClientRect()
     const tRect = targetEl.getBoundingClientRect()
@@ -277,7 +257,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
     const draggingId = draggingIdRef.current
     if (!draggingId) return
     e.preventDefault()
-    const list = containerRef.current
+    const list = e.currentTarget
     if (!list) return
     const items = Array.from(list.querySelectorAll('li[data-drag-id]')) as HTMLElement[]
     if (items.length === 0) return
@@ -308,11 +288,13 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
   }, [reorderable, updateDropIndicator])
 
   const computeNextOrder = React.useCallback((): string[] | null => {
-    const container = containerRef.current
     const draggingId = draggingIdRef.current
     const overId = overIdRef.current
     const atEnd = atEndRef.current
-    if (!container || !draggingId || !overId) return null
+    if (!draggingId || !overId) return null
+    // We need to get the container from the current drag context
+    const container = document.querySelector('[data-sidebar-menu]') as HTMLElement
+    if (!container) return null
     const ids = Array.from(container.querySelectorAll('li[data-drag-id]')).map((el) => (el as HTMLElement).dataset.dragId!).filter(Boolean)
     const fromIndex = ids.indexOf(draggingId)
     const toIndex = ids.indexOf(overId)
@@ -351,7 +333,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
       onReorder(next)
       if (draggedId) {
         requestAnimationFrame(() => {
-          const l = containerRef.current
+          const l = e.currentTarget
           if (!l) return
           const el = l.querySelector(`li[data-drag-id="${draggedId}"]`) as HTMLElement | null
           if (!el) return
@@ -383,7 +365,8 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
       {tooltipElement}
       <ReorderContext.Provider value={reorderContextValue}>
         <ul
-          ref={containerRef}
+          ref={setContainerRef}
+          data-sidebar-menu
           onDragOver={handleListDragOver}
           onDrop={handleListDrop}
           onMouseMove={handlePointerMove}
@@ -394,11 +377,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
           className={cn('relative px-1 py-2', className)}
           {...props}
         >
-          <div
-            aria-hidden
-            className={cn('pointer-events-none absolute z-0 rounded-lg bg-primary-300/20 border border-border-default transition-all duration-200 ease-out', indicator.visible ? 'opacity-100' : 'opacity-0')}
-            style={{ top: indicator.top, left: indicator.left, width: indicator.width, height: indicator.height }}
-          />
+          <HoverIndicator indicator={indicator} variant="default" zIndex={0} />
           {children}
           {/* Drop indicator bar for reordering (on top of items) */}
           <div
@@ -501,7 +480,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
           'bg-gradient-to-b from-background-primary to-primary-50 text-text-primary font-medium tracking-wide border-border-hover border-b-primary-400',
           justActivated && 'animate-sidebar-pop-in',
         )
-      : cn('text-text-secondary font-medium tracking-wide hover:text-text-primary hover:bg-primary-300/10'),
+      : cn('text-text-secondary font-medium tracking-wide hover:text-text-primary'),
     disabled && 'opacity-40 pointer-events-none text-text-muted',
     className,
   )

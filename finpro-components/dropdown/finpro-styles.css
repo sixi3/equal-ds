@@ -1,0 +1,124 @@
+/* FinPro Dropdown Styles - CSS Classes */
+
+/* Base FinPro dropdown trigger styles */
+.finpro-dropdown-trigger {
+  /* Core styling */
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+  font-size: var(--typography-fontSize-sm);
+  font-weight: var(--typography-fontWeight-medium);
+  letter-spacing: 0.025em;
+  padding: var(--spacing-2);
+  border-radius: var(--border-radius-lg);
+  border-width: 1px;
+  border-style: solid;
+  border-bottom-width: 3px;
+  box-shadow: var(--component-card-shadow);
+
+  /* Layout */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* Transitions */
+  transition: all 0.2s ease-in-out;
+
+  /* Hover effects */
+  cursor: pointer;
+}
+
+.finpro-dropdown-trigger:hover {
+  background-color: var(--color-background-tertiary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.finpro-dropdown-trigger:active {
+  transform: translateY(0);
+}
+
+/* FinPro dropdown content styles */
+.finpro-dropdown-content {
+  background-color: var(--color-background-secondary);
+  border-color: var(--color-border-hover);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--component-card-shadow);
+}
+
+/* FinPro label styles */
+.finpro-dropdown-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: var(--typography-fontSize-xs);
+  font-weight: var(--typography-fontWeight-normal);
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+}
+
+/* FinPro container styles */
+.finpro-dropdown-container {
+  width: 100%;
+}
+
+/* FinPro filter section styles */
+.finpro-filter-section {
+  background-color: white;
+  border: 1px solid var(--color-border-default);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.finpro-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.finpro-filter-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: 0.05em;
+}
+
+.finpro-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Responsive grid adjustments */
+@media (min-width: 768px) {
+  .finpro-filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .finpro-filter-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Focus states for accessibility */
+.finpro-dropdown-trigger:focus {
+  outline: 2px solid var(--color-border-hover);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.finpro-dropdown-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.finpro-dropdown-trigger:disabled:hover {
+  transform: none;
+  background-color: var(--color-background-secondary);
+}

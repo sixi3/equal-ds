@@ -1,8 +1,10 @@
 import './tailwind.css'
+import '../finpro-components/dropdown/finpro-styles.css'
 import React from 'react'
 import type { StoryObj } from '@storybook/react'
 import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from '../src'
-import { ChevronDown, Settings, User, LogOut } from 'lucide-react'
+import { FinProDropdown } from '../finpro-components/dropdown/FinProDropdown'
+import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart, Star } from 'lucide-react'
 import { cn } from '../src/lib/cn'
 import { useState } from 'react'
 
@@ -198,6 +200,30 @@ function ExampleDropdown({
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownItem>
+          <DropdownItem>
+            <Hammer className="mr-2 h-4 w-4" />
+            <span>Hammer</span>
+          </DropdownItem>
+          <DropdownItem>
+            <Wrench className="mr-2 h-4 w-4" />
+            <span>Wrench</span>
+          </DropdownItem>
+          <DropdownItem>
+            <Bell className="mr-2 h-4 w-4" />
+            <span>Notifications</span>
+          </DropdownItem>
+          <DropdownItem>
+            <Mail className="mr-2 h-4 w-4" />
+            <span>Messages</span>
+          </DropdownItem>
+          <DropdownItem>
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Favorites</span>
+          </DropdownItem>
+          <DropdownItem>
+            <Star className="mr-2 h-4 w-4" />
+            <span>Starred</span>
+          </DropdownItem>
         </DropdownContent>
       </Dropdown>
     </div>
@@ -307,6 +333,154 @@ export const FinPro: Story = {
     labelTextColor: "--color-text-secondary",
     boxShadow: "--component-card-shadow"
   },
+}
+
+export const FinProExported: Story = {
+  render: () => (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="mb-4">
+        <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section (Using Exported Component)</h3>
+        <p className="text-sm text-gray-600 mt-1">This demonstrates the reusable FinProDropdown component with all styling and interactions.</p>
+      </div>
+      <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-xl font-medium text-text-primary tracking-wider">
+            Filter By
+          </h2>
+          <ChevronDown className="w-4 h-4 text-text-primary" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
+          <FinProDropdown label="Consent Template" />
+          <FinProDropdown label="Purpose Code" />
+          <FinProDropdown label="Consent Status" />
+          <FinProDropdown label="Account Aggregator" />
+          <FinProDropdown label="Consent Created On" />
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+export const FinProStylesShowcase: Story = {
+  render: () => (
+    <div className="min-h-screen bg-gray-50 p-4 space-y-8">
+      <div className="mb-4">
+        <h3 className="text-lg font-medium text-gray-900">FinPro Styles & Interactions Showcase</h3>
+        <p className="text-sm text-gray-600 mt-1">Demonstrates all exported styling approaches and hover interactions.</p>
+      </div>
+
+      {/* Ready-to-Use Component */}
+      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
+        <h4 className="text-md font-medium text-gray-900 mb-3">1. Ready-to-Use Component</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FinProDropdown label="Component A" />
+          <FinProDropdown label="Component B" />
+          <FinProDropdown label="Component C" />
+        </div>
+      </div>
+
+      {/* CSS Classes Approach */}
+      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
+        <h4 className="text-md font-medium text-gray-900 mb-3">2. CSS Classes Approach</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="finpro-dropdown-container">
+            <label className="finpro-dropdown-label">CSS Classes A</label>
+            <Dropdown>
+              <DropdownTrigger className="finpro-dropdown-trigger">
+                <span>CSS Classes A</span>
+                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
+              </DropdownTrigger>
+              <DropdownContent className="finpro-dropdown-content">
+                <DropdownItem><User className="mr-2 h-4 w-4" /><span>Profile</span></DropdownItem>
+                <DropdownItem><Settings className="mr-2 h-4 w-4" /><span>Settings</span></DropdownItem>
+              </DropdownContent>
+            </Dropdown>
+          </div>
+          <div className="finpro-dropdown-container">
+            <label className="finpro-dropdown-label">CSS Classes B</label>
+            <Dropdown>
+              <DropdownTrigger className="finpro-dropdown-trigger">
+                <span>CSS Classes B</span>
+                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
+              </DropdownTrigger>
+              <DropdownContent className="finpro-dropdown-content">
+                <DropdownItem><User className="mr-2 h-4 w-4" /><span>Profile</span></DropdownItem>
+              </DropdownContent>
+            </Dropdown>
+          </div>
+        </div>
+      </div>
+
+      {/* Inline Styles Approach */}
+      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
+        <h4 className="text-md font-medium text-gray-900 mb-3">3. Inline Styles Approach</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="w-full">
+            <label
+              className="mb-1 block"
+              style={{
+                fontSize: 'var(--typography-fontSize-xs)',
+                fontWeight: 'var(--typography-fontWeight-normal)',
+                letterSpacing: '0.1em',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              Inline Styles A
+            </label>
+            <Dropdown>
+              <DropdownTrigger
+                className="w-full flex items-center justify-between"
+                style={{
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  borderColor: 'var(--color-border-hover)',
+                  fontSize: 'var(--typography-fontSize-sm)',
+                  fontWeight: 'var(--typography-fontWeight-medium)',
+                  letterSpacing: '0.025em',
+                  padding: 'var(--spacing-2)',
+                  borderRadius: 'var(--border-radius-lg)',
+                  borderWidth: '1px',
+                  borderBottomWidth: '3px',
+                  boxShadow: 'var(--component-card-shadow)',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <span>Inline Styles A</span>
+                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
+              </DropdownTrigger>
+              <DropdownContent
+                style={{
+                  backgroundColor: 'var(--color-background-secondary)',
+                  borderColor: 'var(--color-border-hover)',
+                  borderRadius: 'var(--border-radius-lg)',
+                }}
+              >
+                <DropdownItem><Settings className="mr-2 h-4 w-4" /><span>Settings</span></DropdownItem>
+              </DropdownContent>
+            </Dropdown>
+          </div>
+        </div>
+      </div>
+
+      {/* Complete Filter Section */}
+      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
+        <h4 className="text-md font-medium text-gray-900 mb-3">4. Complete Filter Section</h4>
+        <div className="finpro-filter-section">
+          <div className="finpro-filter-header">
+            <h2 className="finpro-filter-title">Filter By</h2>
+            <ChevronDown className="w-4 h-4 text-text-primary" />
+          </div>
+          <div className="finpro-filter-grid">
+            <FinProDropdown label="Consent Template" />
+            <FinProDropdown label="Purpose Code" />
+            <FinProDropdown label="Consent Status" />
+            <FinProDropdown label="Account Aggregator" />
+            <FinProDropdown label="Consent Created On" />
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
 }
 
 
