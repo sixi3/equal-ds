@@ -382,8 +382,12 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
           {/* Drop indicator bar for reordering (on top of items) */}
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute z-[100] h-[2px] transition-all duration-75 ease-out', dropIndicator.visible && reorderable ? 'opacity-100' : 'opacity-0')}
-            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--color-primary-400))' }}
+            className={cn('pointer-events-none absolute z-[100] h-[2px] transition-all duration-75 ease-out bg-primary-400', dropIndicator.visible && reorderable ? 'opacity-100' : 'opacity-0')}
+            style={{ 
+              top: dropIndicator.top, 
+              left: dropIndicator.left, 
+              width: dropIndicator.width
+            }}
           />
         </ul>
       </ReorderContext.Provider>

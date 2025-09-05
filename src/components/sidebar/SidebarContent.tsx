@@ -278,8 +278,8 @@ function SidebarContentImpl({ className, children, reorderableGroups = false, on
           {/* Group drop indicator (render after children to avoid space-y top gap) */}
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute z-20 h-[2px] transition-all duration-75 ease-out shadow-sm', dropIndicator.visible && reorderableGroups && open ? 'opacity-100' : 'opacity-0')}
-            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width, backgroundColor: 'rgb(var(--color-primary-400))' }}
+            className={cn('pointer-events-none absolute z-20 h-[2px] transition-all duration-75 ease-out shadow-sm bg-primary-400', dropIndicator.visible && reorderableGroups && open ? 'opacity-100' : 'opacity-0')}
+            style={{ top: dropIndicator.top, left: dropIndicator.left, width: dropIndicator.width }}
           />
         </div>
         <div

@@ -79,7 +79,7 @@ export const Default: Story = {
         >
           <Sidebar aria-label="Primary" className="shrink-0">
             <SidebarHeader className="flex items-center justify-between h-16">
-              <div className="font-semibold">FinPro</div>
+              <div className="font-light text-text-secondary italic">/*workasaur 🦖</div>
               <SidebarTrigger srLabel="Collapse sidebar" className="h-8 w-8">
                 <ArrowLeftCircle className="h-5 w-5" />
               </SidebarTrigger>

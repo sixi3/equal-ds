@@ -7,6 +7,4 @@ export * from './SidebarGroup'
 export * from './SidebarMenu'
 export * from './SidebarTrigger'
 export * from './SidebarRail'
-export * from './SidebarMigrationExample'
-
 

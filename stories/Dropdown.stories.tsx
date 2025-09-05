@@ -2,7 +2,7 @@ import './tailwind.css'
 import '../finpro-components/dropdown/finpro-styles.css'
 import React from 'react'
 import type { StoryObj } from '@storybook/react'
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from '../src'
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownContentMultiselect, DropdownItem, DropdownItemMultiselect, DropdownSeparator } from '../src'
 import { FinProDropdown } from '../finpro-components/dropdown/FinProDropdown'
 import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart, Star } from 'lucide-react'
 import { cn } from '../src/lib/cn'
@@ -258,55 +258,152 @@ export const Variants: Story = {
 // Simplified controls - everything is handled by the simple controls system
 
 export const FinPro: Story = {
-  render: (args: any) => (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
-      </div>
-      <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
-        <div className={`flex justify-between items-center ${args.headerGap || 'mb-4'}`}>
-          <h2 className="text-xl font-medium text-text-primary tracking-wider">
-            Filter By
-          </h2>
-          <ChevronDown className="w-4 h-4 text-tex  t-primary" />
+  render: (args: any) => {
+    const [selectedTemplates, setSelectedTemplates] = useState<string[]>([])
+    const [isHovered, setIsHovered] = useState(false)
+    const [isClicked, setIsClicked] = useState(false)
+    
+    const templateOptions = [
+      { value: 'template-1', label: 'Template One' },
+      { value: 'template-2', label: 'Template Two' },
+      { value: 'template-3', label: 'Template Three' },
+      { value: 'template-4', label: 'Template Four' },
+      { value: 'template-5', label: 'Template Five' },
+    ]
+
+    // Hover effect styles for the multiselect dropdown
+    const getMultiselectTriggerStyles = () => {
+      const baseStyles: any = {
+        backgroundColor: 'var(--color-background-secondary)',
+        color: 'var(--color-text-primary)',
+        borderColor: 'var(--color-border-hover)',
+        fontSize: 'var(--typography-fontSize-sm)',
+        fontWeight: 'var(--typography-fontWeight-medium)',
+        letterSpacing: '0.025em',
+        padding: 'var(--spacing-2)',
+        borderRadius: 'var(--border-radius-lg)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderBottomWidth: '3px',
+        boxShadow: 'var(--component-card-shadow)',
+        transform: isHovered ? 'translateY(-2px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
+        transition: 'all 0.2s ease-in-out',
+      }
+
+      // Apply hover styles
+      if (isHovered) {
+        baseStyles.backgroundColor = 'var(--color-background-tertiary)'
+        baseStyles.boxShadow = 'var(--shadow-md)'
+      }
+
+      return baseStyles
+    }
+
+    const handleMouseEnter = () => setIsHovered(true)
+    const handleMouseLeave = () => setIsHovered(false)
+    const handleMouseDown = () => setIsClicked(true)
+    const handleMouseUp = () => setIsClicked(false)
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="mb-4">
+          <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
+          <p className="text-sm text-gray-600 mt-1">First dropdown now uses multiselect functionality</p>
         </div>
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 ${args.dropdownGap || 'gap-6'} w-full`}>
-          <ExampleDropdown
-            label="Consent Template"
-            showLabel={true}
-            {...args}
-          />
-          <ExampleDropdown
-            label="Purpose Code"
-            showLabel={true}
-            {...args}
-          />
-          <ExampleDropdown
-            label="Consent Status"
-            showLabel={true}
-            {...args}
-          />
-          <ExampleDropdown
-            label="Account Aggregator"
-            showLabel={true}
-            {...args}
-          />
-          <ExampleDropdown
-            label="Consent Created On"
-            showLabel={true}
-            {...args}
-          />
+        <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
+          <div className={`flex justify-between items-center ${args.headerGap || 'mb-4'}`}>
+            <h2 className="text-xl font-medium text-text-primary tracking-wider">
+              Filter By
+            </h2>
+            <ChevronDown className="w-4 h-4 text-text-primary" />
+          </div>
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 ${args.dropdownGap || 'gap-6'} w-full`}>
+            {/* Multiselect Consent Template Dropdown */}
+            {/* <div className="w-full">
+              <label className="block text-xs font-normal text-text-secondary tracking-widest mb-1">
+                Consent Template
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getMultiselectTriggerStyles()}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                >
+                  <span className="flex-1 text-left">
+                    {selectedTemplates.length === 0 
+                      ? 'All Templates' 
+                      : `${selectedTemplates.length} selected`
+                    }
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={templateOptions}
+                  selectedValues={selectedTemplates}
+                  onSelectionChange={setSelectedTemplates}
+                  enableSelectAll={true}
+                  selectAllLabel="All Templates"
+                  maxHeight="200px"
+                />
+              </Dropdown>
+            </div> */}
+            
+            <ExampleDropdown
+              label="Purpose Code"
+              showLabel={true}
+              {...args}
+            />
+            <ExampleDropdown
+              label="Consent Status"
+              showLabel={true}
+              {...args}
+            />
+            <ExampleDropdown
+              label="Account Aggregator"
+              showLabel={true}
+              {...args}
+            />
+            <ExampleDropdown
+              label="Consent Created On"
+              showLabel={true}
+              {...args}
+            />
+          </div>
+          
+          {/* Show selected templates */}
+          {/* {selectedTemplates.length > 0 && (
+            <div className="mt-4 p-3 bg-background-tertiary rounded-md">
+              <p className="text-sm font-medium text-text-primary mb-2">Selected Templates:</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedTemplates.map(value => {
+                  const option = templateOptions.find(opt => opt.value === value)
+                  return (
+                    <span
+                      key={value}
+                      className="inline-flex items-center px-2 py-1 rounded-md bg-primary-100 text-primary-800 text-xs font-medium"
+                    >
+                      {option?.label}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )} */}
         </div>
       </div>
-    </div>
-  ),
+    )
+  },
   args: {
     // Layout controls
     headerGap: "mb-3", // Gap between header and dropdowns
     dropdownGap: "gap-4", // Gap between dropdown components
 
     // Use design system defaults
-    backgroundColor: '--color-background-secondary',
+    backgroundColor: "--color-background-secondary",
 
     textColor: '--color-text-primary',
     borderColor: "--color-border-hover",
@@ -481,6 +578,189 @@ export const FinProStylesShowcase: Story = {
       </div>
     </div>
   ),
+}
+
+// Multiselect Dropdown Stories
+export const MultiselectBasic: Story = {
+  render: () => {
+    const [selectedValues, setSelectedValues] = useState<string[]>([])
+    
+    const options = [
+      { value: 'template-1', label: 'Template One' },
+      { value: 'template-2', label: 'Template Two' },
+      { value: 'template-3', label: 'Template Three' },
+      { value: 'template-4', label: 'Template Four' },
+      { value: 'template-5', label: 'Template Five' },
+    ]
+
+    return (
+      <div className="p-8">
+        <div className="max-w-md">
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            Consent Templates
+          </label>
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
+                {selectedValues.length === 0 
+                  ? 'Select templates...' 
+                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
+                }
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownTrigger>
+            <DropdownContentMultiselect
+              options={options}
+              selectedValues={selectedValues}
+              onSelectionChange={setSelectedValues}
+              enableSelectAll={true}
+              selectAllLabel="All Templates"
+            />
+          </Dropdown>
+          
+          {selectedValues.length > 0 && (
+            <div className="mt-4 p-3 bg-background-tertiary rounded-md">
+              <p className="text-sm font-medium text-text-primary mb-2">Selected:</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedValues.map(value => {
+                  const option = options.find(opt => opt.value === value)
+                  return (
+                    <span
+                      key={value}
+                      className="inline-flex items-center px-2 py-1 rounded-md bg-primary-100 text-primary-800 text-xs font-medium"
+                    >
+                      {option?.label}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  },
+}
+
+export const MultiselectWithSearch: Story = {
+  render: () => {
+    const [selectedValues, setSelectedValues] = useState<string[]>(['template-1', 'template-3'])
+    
+    const options = [
+      { value: 'template-1', label: 'Template One' },
+      { value: 'template-2', label: 'Template Two' },
+      { value: 'template-3', label: 'Template Three' },
+      { value: 'template-4', label: 'Template Four' },
+      { value: 'template-5', label: 'Template Five' },
+      { value: 'template-6', label: 'Advanced Template' },
+      { value: 'template-7', label: 'Basic Template' },
+      { value: 'template-8', label: 'Custom Template' },
+    ]
+
+    return (
+      <div className="p-8">
+        <div className="max-w-md">
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            Search Templates
+          </label>
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
+                {selectedValues.length === 0 
+                  ? 'Search templates...' 
+                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
+                }
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownTrigger>
+            <DropdownContentMultiselect
+              options={options}
+              selectedValues={selectedValues}
+              onSelectionChange={setSelectedValues}
+              enableSelectAll={true}
+              selectAllLabel="All Templates"
+              enableSearch={true}
+              searchPlaceholder="Search templates..."
+              maxHeight="250px"
+            />
+          </Dropdown>
+        </div>
+      </div>
+    )
+  },
+}
+
+export const MultiselectDisabled: Story = {
+  render: () => {
+    const [selectedValues, setSelectedValues] = useState<string[]>(['template-1'])
+    
+    const options = [
+      { value: 'template-1', label: 'Template One' },
+      { value: 'template-2', label: 'Template Two', disabled: true },
+      { value: 'template-3', label: 'Template Three' },
+      { value: 'template-4', label: 'Template Four', disabled: true },
+      { value: 'template-5', label: 'Template Five' },
+    ]
+
+    return (
+      <div className="p-8">
+        <div className="max-w-md">
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            Templates (Some Disabled)
+          </label>
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
+                {selectedValues.length === 0 
+                  ? 'Select templates...' 
+                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
+                }
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownTrigger>
+            <DropdownContentMultiselect
+              options={options}
+              selectedValues={selectedValues}
+              onSelectionChange={setSelectedValues}
+              enableSelectAll={true}
+              selectAllLabel="All Templates"
+            />
+          </Dropdown>
+        </div>
+      </div>
+    )
+  },
+}
+
+export const MultiselectEmpty: Story = {
+  render: () => {
+    const [selectedValues, setSelectedValues] = useState<string[]>([])
+    
+    return (
+      <div className="p-8">
+        <div className="max-w-md">
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            Empty Templates
+          </label>
+          <Dropdown>
+            <DropdownTrigger>
+              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
+                Select templates...
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownTrigger>
+            <DropdownContentMultiselect
+              options={[]}
+              selectedValues={selectedValues}
+              onSelectionChange={setSelectedValues}
+              enableSelectAll={false}
+              placeholder="No templates available"
+            />
+          </Dropdown>
+        </div>
+      </div>
+    )
+  },
 }
 
 
