@@ -89,4 +89,26 @@
   backface-visibility: hidden;
 }
 
+/* Reusable bezier curve animations */
+@keyframes animate-bezier-in {
+  0% { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes animate-bezier-out {
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.95) translateY(-4px); }
+}
+.animate-bezier-in {
+  animation: animate-bezier-in 200ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+.animate-bezier-out {
+  animation: animate-bezier-out 150ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+
 

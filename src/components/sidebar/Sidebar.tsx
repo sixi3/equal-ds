@@ -17,7 +17,7 @@ function SidebarImpl({ className, variant = 'inset', ...props }: SidebarProps): 
       className={cn(
         'bg-background-secondary text-text-primary border-border-default',
         side === 'left' ? 'border-r' : 'border-l',
-        'transition-[width] duration-200 ease-out',
+        'transition-[width] duration-200 cubic-bezier(0.68, -0.55, 0.265, 1.55)',
         'w-[255px] data-[state=closed]:w-[70px] overflow-x-hidden overflow-y-hidden',
         'flex flex-col h-full min-h-0',
         className,
