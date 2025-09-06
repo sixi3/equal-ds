@@ -6,6 +6,7 @@ export type SidebarSide = 'left' | 'right'
 
 export interface SidebarOpenContextValue {
   open: boolean
+  fullyOpen: boolean
   setOpen?: (open: boolean) => void
   toggle?: () => void
   isControlled: boolean
@@ -70,8 +71,22 @@ export function SidebarProvider(props: SidebarProviderProps): JSX.Element {
 
   const isControlled = typeof open === 'boolean'
   const [internalOpen, setInternalOpen] = useState<boolean>(Boolean(defaultOpen))
+  const [fullyOpen, setFullyOpen] = useState<boolean>(Boolean(defaultOpen))
   const isActiveControlled = typeof activeItem !== 'undefined'
   const [internalActiveItem, setInternalActiveItem] = useState<string | null>(defaultActiveItem)
+
+  // Manage fullyOpen state based on open state and animation timing
+  React.useEffect(() => {
+    const currentOpen = isControlled ? Boolean(open) : internalOpen
+    if (currentOpen) {
+      // When opening, set fullyOpen after animation completes (5 seconds)
+      const timer = setTimeout(() => setFullyOpen(true), 200)
+      return () => clearTimeout(timer)
+    } else {
+      // When closing, immediately set fullyOpen to false
+      setFullyOpen(false)
+    }
+  }, [isControlled, open, internalOpen])
 
   const set = useCallback(
     (next: boolean) => {
@@ -102,13 +117,14 @@ export function SidebarProvider(props: SidebarProviderProps): JSX.Element {
   const openValue: SidebarOpenContextValue = useMemo(
     () => ({
       open: isControlled ? Boolean(open) : internalOpen,
+      fullyOpen,
       setOpen: set,
       toggle,
       isControlled,
       breakpoint,
       side,
     }),
-    [isControlled, open, internalOpen, set, toggle, breakpoint, side],
+    [isControlled, open, internalOpen, fullyOpen, set, toggle, breakpoint, side],
   )
 
   const activeValue: SidebarActiveItemContextValue = useMemo(

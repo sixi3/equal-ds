@@ -83,7 +83,7 @@ const ReorderContext = React.createContext<ReorderContextValue | null>(null)
 const ItemDragContext = React.createContext<{ draggable: boolean; dragId?: string } | null>(null)
 
 function SidebarMenuImpl({ className, children, reorderable = false, onReorder, ...props }: SidebarMenuProps): JSX.Element {
-  const { open } = useSidebarOpenContext()
+  const { open, fullyOpen } = useSidebarOpenContext()
   
   // Use reusable hover animation hook
   const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
@@ -229,7 +229,8 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
   }, [])
 
   const updateDropIndicator = React.useCallback((targetEl: HTMLElement, atEnd?: boolean) => {
-    const container = document.querySelector('[data-sidebar-menu]') as HTMLElement
+    // Find the specific menu container that contains the target element
+    const container = targetEl.closest('[data-sidebar-menu]') as HTMLElement
     if (!container) return
     const cRect = container.getBoundingClientRect()
     const tRect = targetEl.getBoundingClientRect()
@@ -292,9 +293,13 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
     const overId = overIdRef.current
     const atEnd = atEndRef.current
     if (!draggingId || !overId) return null
-    // We need to get the container from the current drag context
-    const container = document.querySelector('[data-sidebar-menu]') as HTMLElement
+    
+    // Find the specific menu container that contains the dragged item
+    const draggedElement = document.querySelector(`li[data-drag-id="${draggingId}"]`) as HTMLElement
+    if (!draggedElement) return null
+    const container = draggedElement.closest('[data-sidebar-menu]') as HTMLElement
     if (!container) return null
+    
     const ids = Array.from(container.querySelectorAll('li[data-drag-id]')).map((el) => (el as HTMLElement).dataset.dragId!).filter(Boolean)
     const fromIndex = ids.indexOf(draggingId)
     const toIndex = ids.indexOf(overId)
@@ -455,7 +460,7 @@ export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLB
 }
 
 function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, active, disabled, itemId, children, ...props }: SidebarMenuButtonProps): JSX.Element {
-  const { open } = useSidebarOpenContext()
+  const { open, fullyOpen } = useSidebarOpenContext()
   const { activeItem, setActiveItem } = useSidebarActiveItemContext()
   const reorderCtx = React.useContext(ReorderContext)
   const itemDrag = React.useContext(ItemDragContext)
@@ -474,17 +479,17 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
   }, [computedActive])
 
   const baseClass = cn(
-    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ease-out will-change-[transform]',
+    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ease-out will-change-[transform] h-10',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
     open ? 'justify-start' : 'justify-center',
     // Base styles for all tabs (prevents layout shift)
-    'border border-transparent border-b-[3px]',
+    'border border-transparent border-b-[2px]',
     computedActive
       ? cn(
           'bg-gradient-to-b from-background-primary to-primary-50 text-text-primary font-medium tracking-wide border-border-hover border-b-primary-400',
           justActivated && 'animate-sidebar-pop-in',
         )
-      : cn('text-text-secondary font-medium tracking-wide hover:text-text-primary'),
+      : cn('text-text-secondary font-normal tracking-wide hover:text-text-primary'),
     disabled && 'opacity-40 pointer-events-none text-text-muted',
     className,
   )
@@ -570,8 +575,8 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
           ) : null}
         </span>
       ) : null}
-      {open ? <span className="flex-1 text-left leading-normal break-words transition-colors duration-200 ease-out">{children}</span> : null}
-      {endAdornment && open ? <span className="shrink-0 ml-auto transition-colors duration-200 ease-out" aria-hidden>{endAdornment}</span> : null}
+      {fullyOpen ? <span className="flex-1 text-left leading-normal break-words transition-colors duration-200 ease-out animate-sidebar-text-fade-in">{children}</span> : null}
+      {endAdornment && fullyOpen ? <span className="shrink-0 ml-auto transition-colors duration-200 ease-out animate-sidebar-text-fade-in" aria-hidden>{endAdornment}</span> : null}
     </>
   )
 

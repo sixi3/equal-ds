@@ -3,6 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cn } from '../../lib/cn'
 import { DropdownItemMultiselect } from './DropdownItemMultiselect'
 import { useHoverAnimation } from '../../lib/useHoverAnimation'
+import { HoverIndicator } from '../ui/HoverIndicator'
 
 export interface DropdownContentMultiselectProps extends Omit<React.ComponentPropsWithoutRef<typeof DropdownMenu.Content>, 'children'> {
   /**
@@ -51,6 +52,16 @@ export interface DropdownContentMultiselectProps extends Omit<React.ComponentPro
    */
   open?: boolean
   /**
+   * Enable hover animation for dropdown items
+   * @default true
+   */
+  enableHoverAnimation?: boolean
+  /**
+   * Hover animation variant
+   * @default 'default'
+   */
+  hoverVariant?: 'default' | 'subtle' | 'primary' | 'accent'
+  /**
    * Custom CSS classes
    */
   className?: string
@@ -71,6 +82,8 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
     enableSearch = false,
     searchPlaceholder = 'Search...',
     open,
+    enableHoverAnimation = true,
+    hoverVariant = 'default',
     ...props 
   }, ref) => {
     const [searchTerm, setSearchTerm] = React.useState('')
@@ -79,9 +92,9 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
     // Hover animation hook
     const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
       itemSelector: '[data-multiselect-item]',
-      duration: 200,
-      enabled: true
+      enabled: enableHoverAnimation
     })
+
 
     // Filter options based on search term
     const filteredOptions = React.useMemo(() => {
@@ -152,54 +165,46 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
           sideOffset={sideOffset}
           collisionPadding={collisionPadding}
           className={cn(
-            'z-50 w-[var(--radix-popper-anchor-width)] max-w-[var(--radix-popper-available-width)]',
-            'rounded-lg border border-border-default bg-background-secondary shadow-lg',
-            'will-change-[opacity,transform] focus:outline-none',
+            'dropdown-content z-50 w-[var(--radix-popper-anchor-width)] max-w-[var(--radix-popper-available-width)] rounded-lg border border-border-default bg-background-secondary p-1 shadow-lg will-change-[opacity,transform] focus:outline-none relative',
             'data-[side=top]:origin-bottom data-[side=bottom]:origin-top',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             className,
           )}
           {...props}
         >
-          <div className="p-1">
-            {/* Search Input */}
-            {enableSearch && (
-              <div className="px-3 py-2 border-b border-border-default mb-1">
-                <input
-                  ref={searchRef}
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-full px-2 py-1 text-sm bg-background-secondary border border-border-default rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-            )}
-
-            {/* Content Container */}
-            <div 
-              ref={setContainerRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              className="relative overflow-y-auto scrollbar-hide [&::-webkit-scrollbar]:hidden"
-              style={{ 
-                maxHeight,
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none'
-              }}
-            >
-              {/* Hover Indicator */}
-              <div
-                className="absolute pointer-events-none bg-primary-50 border border-primary-200 rounded-md transition-all duration-200 ease-out"
-                style={{
-                  top: indicator.top,
-                  left: indicator.left,
-                  width: indicator.width,
-                  height: indicator.height,
-                  opacity: indicator.visible ? 1 : 0,
-                  transform: indicator.visible ? 'scale(1)' : 'scale(0.95)',
-                }}
+          {/* Search Input */}
+          {enableSearch && (
+            <div className="px-3 py-2 border-b border-border-default mb-1">
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full px-2 py-1 text-sm bg-background-secondary border border-border-default rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
+            </div>
+          )}
+
+          {/* Content Container */}
+          <div 
+            ref={setContainerRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="relative overflow-y-auto scrollbar-hide [&::-webkit-scrollbar]:hidden"
+            style={{ 
+              maxHeight,
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
+            {enableHoverAnimation && (
+              <HoverIndicator 
+                indicator={indicator} 
+                variant={hoverVariant}
+                zIndex={0}
+              />
+            )}
               {/* Select All Option */}
               {enableSelectAll && filteredOptions.length > 0 && (
                 <DropdownItemMultiselect
@@ -226,7 +231,6 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
                   {searchTerm ? 'No matching options found' : placeholder}
                 </div>
               )}
-            </div>
           </div>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

@@ -111,7 +111,7 @@ function ExampleDropdown({
   // Simple style generation
   const getTriggerStyles = () => {
     const baseStyles: any = {
-      transform: isHovered ? 'translateY(-2px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
+      transform: isHovered ? 'translateY(-1px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
       transition: 'all 0.2s ease-in-out',
     }
 
@@ -274,27 +274,33 @@ export const FinPro: Story = {
     // Hover effect styles for the multiselect dropdown
     const getMultiselectTriggerStyles = () => {
       const baseStyles: any = {
-        backgroundColor: 'var(--color-background-secondary)',
-        color: 'var(--color-text-primary)',
-        borderColor: 'var(--color-border-hover)',
-        fontSize: 'var(--typography-fontSize-sm)',
-        fontWeight: 'var(--typography-fontWeight-medium)',
-        letterSpacing: '0.025em',
-        padding: 'var(--spacing-2)',
-        borderRadius: 'var(--border-radius-lg)',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderBottomWidth: '3px',
-        boxShadow: 'var(--component-card-shadow)',
-        transform: isHovered ? 'translateY(-2px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
+        transform: isHovered ? 'translateY(-1px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
         transition: 'all 0.2s ease-in-out',
       }
 
-      // Apply hover styles
-      if (isHovered) {
-        baseStyles.backgroundColor = 'var(--color-background-tertiary)'
-        baseStyles.boxShadow = 'var(--shadow-md)'
+      // Apply base styles or hover styles based on hover state
+      const bgColor = isHovered && args.hoverBackgroundColor ? args.hoverBackgroundColor : args.backgroundColor
+      const txtColor = isHovered && args.hoverTextColor ? args.hoverTextColor : args.textColor
+      const brdColor = isHovered && args.hoverBorderColor ? args.hoverBorderColor : args.borderColor
+      const shadow = isHovered && args.hoverBoxShadow ? args.hoverBoxShadow : args.boxShadow
+      const borderBottomWidthValue = isHovered && args.hoverBorderBottomWidth ? args.hoverBorderBottomWidth : args.borderBottomWidth || '3px'
+
+      // Apply CSS variables directly (they'll be resolved by CSS)
+      if (bgColor) baseStyles.backgroundColor = `var(${bgColor})`
+      if (txtColor) baseStyles.color = `var(${txtColor})`
+      if (brdColor) baseStyles.borderColor = `var(${brdColor})`
+      if (args.fontSize) baseStyles.fontSize = `var(${args.fontSize})`
+      if (args.fontWeight) baseStyles.fontWeight = `var(${args.fontWeight})`
+      if (args.lineHeight) baseStyles.lineHeight = `var(${args.lineHeight})`
+      if (args.letterSpacing) {
+        baseStyles.letterSpacing = args.letterSpacing.startsWith('--') ? `var(${args.letterSpacing})` : args.letterSpacing
       }
+      if (args.padding) baseStyles.padding = `var(${args.padding})`
+      if (args.borderRadius) baseStyles.borderRadius = `var(${args.borderRadius})`
+      if (args.borderWidth) baseStyles.borderWidth = args.borderWidth
+      if (args.borderStyle) baseStyles.borderStyle = args.borderStyle
+      if (borderBottomWidthValue) baseStyles.borderBottomWidth = borderBottomWidthValue
+      if (shadow) baseStyles.boxShadow = `var(${shadow})`
 
       return baseStyles
     }
@@ -317,10 +323,20 @@ export const FinPro: Story = {
             </h2>
             <ChevronDown className="w-4 h-4 text-text-primary" />
           </div>
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 ${args.dropdownGap || 'gap-6'} w-full`}>
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 ${args.dropdownGap || 'gap-6'} w-full`}>
             {/* Multiselect Consent Template Dropdown */}
-            {/* <div className="w-full">
-              <label className="block text-xs font-normal text-text-secondary tracking-widest mb-1">
+            <div className="w-full">
+              <label 
+                className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
+                style={{
+                  fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
+                  fontWeight: args.labelFontWeight ? `var(${args.labelFontWeight})` : undefined,
+                  letterSpacing: args.labelLetterSpacing
+                    ? (args.labelLetterSpacing.startsWith('--') ? `var(${args.labelLetterSpacing})` : args.labelLetterSpacing)
+                    : undefined,
+                  color: args.labelTextColor ? `var(${args.labelTextColor})` : undefined,
+                }}
+              >
                 Consent Template
               </label>
               <Dropdown>
@@ -348,9 +364,14 @@ export const FinPro: Story = {
                   enableSelectAll={true}
                   selectAllLabel="All Templates"
                   maxHeight="200px"
+                  style={{
+                    borderColor: args.borderColor ? `var(${args.borderColor})` : undefined,
+                    backgroundColor: args.backgroundColor ? `var(${args.backgroundColor})` : undefined,
+                    borderRadius: args.borderRadius ? `var(${args.borderRadius})` : undefined,
+                  }}
                 />
               </Dropdown>
-            </div> */}
+            </div>
             
             <ExampleDropdown
               label="Purpose Code"
@@ -375,7 +396,7 @@ export const FinPro: Story = {
           </div>
           
           {/* Show selected templates */}
-          {/* {selectedTemplates.length > 0 && (
+          {selectedTemplates.length > 0 && (
             <div className="mt-4 p-3 bg-background-tertiary rounded-md">
               <p className="text-sm font-medium text-text-primary mb-2">Selected Templates:</p>
               <div className="flex flex-wrap gap-2">
@@ -392,7 +413,7 @@ export const FinPro: Story = {
                 })}
               </div>
             </div>
-          )} */}
+          )}
         </div>
       </div>
     )
@@ -403,19 +424,19 @@ export const FinPro: Story = {
     dropdownGap: "gap-4", // Gap between dropdown components
 
     // Use design system defaults
-    backgroundColor: "--color-background-secondary",
+    backgroundColor: '--color-background-secondary',
 
     textColor: '--color-text-primary',
-    borderColor: "--color-border-hover",
+    borderColor: "--color-border-default",
     fontSize: "--typography-fontSize-sm",
     fontWeight: "--typography-fontWeight-medium",
-    letterSpacing: "0.025em",
+    letterSpacing: "0.05em",
     padding: '--spacing-2',
     borderRadius: "--border-radius-lg",
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderBottomWidth: "3px",
-    hoverBorderBottomWidth: '3px',
+    borderBottomWidth: "2px",
+    hoverBorderBottomWidth: "2px",
     showLabel: true,
     hoverBackgroundColor: "--color-background-tertiary",
     hoverTextColor: "--color-text-primary",
@@ -425,10 +446,10 @@ export const FinPro: Story = {
     // Label typography controls
     labelFontSize: "--typography-fontSize-xs",
 
-    labelFontWeight: "--typography-fontWeight-normal",
+    labelFontWeight: "--typography-fontWeight-medium",
     labelLetterSpacing: "0.1em",
     labelTextColor: "--color-text-secondary",
-    boxShadow: "--component-card-shadow"
+    boxShadow: "--core-shadows-sm"
   },
 }
 

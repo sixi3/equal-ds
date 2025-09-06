@@ -56,7 +56,7 @@ const SidebarGroupContentImpl = ({ className, ...props }: SidebarGroupContentPro
 export interface SidebarGroupTriggerProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Trigger> {}
 
 function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroupTriggerProps): JSX.Element {
-  const { open } = useSidebarOpenContext()
+  const { open, fullyOpen } = useSidebarOpenContext()
   const reorderCtx = React.useContext(GroupReorderContext)
   const handleRef = React.useRef<HTMLSpanElement | null>(null)
   const labelRef = React.useRef<HTMLDivElement | null>(null)
@@ -162,8 +162,8 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
           </span>
         ) : null}
         {/* Label text */}
-        {open && (
-          <div ref={labelRef} className="min-w-0 break-words">{children}</div>
+        {fullyOpen && (
+          <div ref={labelRef} className="min-w-0 break-words animate-sidebar-text-fade-in">{children}</div>
         )}
         <div className={cn(
           'h-px bg-border-default',
