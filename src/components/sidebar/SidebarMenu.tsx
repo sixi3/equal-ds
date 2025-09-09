@@ -480,7 +480,6 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
 
   const baseClass = cn(
     'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ease-out will-change-[transform] h-10',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400',
     // Base styles for all tabs (prevents layout shift)
     'border border-transparent border-b-[2px]',
     computedActive

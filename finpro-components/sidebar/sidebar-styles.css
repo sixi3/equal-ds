@@ -1,0 +1,87 @@
+/* Sidebar-specific component styles */
+
+/* Sidebar-specific filter section styling */
+.finpro-sidebar-filter-section {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3);
+  box-shadow: var(--shadow-md);
+}
+
+.finpro-sidebar-filter-header {
+  cursor: pointer;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2);
+  margin: calc(var(--spacing-2) * -1);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.finpro-sidebar-filter-header:hover {
+  background-color: var(--color-background-primary);
+}
+
+.finpro-sidebar-filter-icon-container {
+  background: var(--color-background-tertiary);
+  padding: var(--spacing-1-5);
+  border-radius: var(--border-radius-lg);
+}
+
+.finpro-sidebar-filter-title {
+  font-size: var(--typography-fontSize-xl);
+  font-weight: var(--typography-fontWeight-medium);
+  color: var(--color-text-primary);
+  letter-spacing: 0.025em;
+}
+
+.finpro-sidebar-filter-toggle {
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease-in-out;
+}
+
+.finpro-sidebar-filter-toggle:hover {
+  background-color: var(--color-background-primary);
+  transform: translateY(-1px);
+}
+
+/* Sidebar-specific layout adjustments */
+.finpro-sidebar-container {
+  display: flex;
+  height: 100vh;
+}
+
+.finpro-sidebar-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background-primary);
+}
+
+.finpro-sidebar-filters-section {
+  padding: var(--spacing-3);
+}
+
+.finpro-sidebar-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+/* Sidebar-specific responsive adjustments */
+@media (max-width: 768px) {
+  .finpro-sidebar-filters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .finpro-sidebar-filters-section {
+    padding: var(--spacing-2);
+  }
+
+  .finpro-sidebar-filter-section {
+    padding: var(--spacing-2);
+  }
+}

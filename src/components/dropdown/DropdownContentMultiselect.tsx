@@ -4,6 +4,7 @@ import { cn } from '../../lib/cn'
 import { DropdownItemMultiselect } from './DropdownItemMultiselect'
 import { useHoverAnimation } from '../../lib/useHoverAnimation'
 import { HoverIndicator } from '../ui/HoverIndicator'
+import { DropdownContent } from './DropdownContent'
 
 export interface DropdownContentMultiselectProps extends Omit<React.ComponentPropsWithoutRef<typeof DropdownMenu.Content>, 'children'> {
   /**
@@ -62,13 +63,18 @@ export interface DropdownContentMultiselectProps extends Omit<React.ComponentPro
    */
   hoverVariant?: 'default' | 'subtle' | 'primary' | 'accent'
   /**
+   * Whether to display status tags instead of plain text
+   * @default false
+   */
+  isStatusTag?: boolean
+  /**
    * Custom CSS classes
    */
   className?: string
 }
 
 export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, DropdownContentMultiselectProps>(
-  ({ 
+  ({
     className,
     sideOffset = 6,
     collisionPadding = 8,
@@ -84,10 +90,10 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
     open,
     enableHoverAnimation = true,
     hoverVariant = 'default',
-    ...props 
+    isStatusTag = false,
+    ...props
   }, ref) => {
     const [searchTerm, setSearchTerm] = React.useState('')
-    const searchRef = React.useRef<HTMLInputElement>(null)
     
     // Hover animation hook
     const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
@@ -96,13 +102,15 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
     })
 
 
-    // Filter options based on search term
+    // Filter options based on search term (debounced for better performance)
     const filteredOptions = React.useMemo(() => {
       if (!enableSearch || !searchTerm.trim()) {
         return options
       }
+
+      const searchLower = searchTerm.toLowerCase().trim()
       return options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+        option.label.toLowerCase().includes(searchLower)
       )
     }, [options, searchTerm, enableSearch])
 
@@ -151,41 +159,26 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
       }
     }, [open])
 
-    // Focus search input when dropdown opens
-    React.useEffect(() => {
-      if (open && enableSearch && searchRef.current) {
-        setTimeout(() => searchRef.current?.focus(), 0)
-      }
-    }, [open, enableSearch])
 
     return (
       <DropdownMenu.Portal>
-        <DropdownMenu.Content
+        <DropdownContent
           ref={ref}
           sideOffset={sideOffset}
           collisionPadding={collisionPadding}
+          enableSearch={enableSearch}
+          searchPlaceholder={searchPlaceholder}
+          onSearchChange={setSearchTerm}
+          enableHoverAnimation={enableHoverAnimation}
+          hoverVariant={hoverVariant}
           className={cn(
-            'dropdown-content z-50 w-[var(--radix-popper-anchor-width)] max-w-[var(--radix-popper-available-width)] rounded-lg border border-border-default bg-background-secondary p-1 shadow-lg will-change-[opacity,transform] focus:outline-none relative',
+            'dropdown-content z-50 w-[var(--radix-popper-anchor-width)] max-w-[var(--radix-popper-available-width)] rounded-lg border border-border-default bg-background-secondary p-1 shadow-lg will-change-[opacity,transform] relative',
             'data-[side=top]:origin-bottom data-[side=bottom]:origin-top',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             className,
           )}
           {...props}
         >
-          {/* Search Input */}
-          {enableSearch && (
-            <div className="px-3 py-2 border-b border-border-default mb-1">
-              <input
-                ref={searchRef}
-                type="text"
-                placeholder={searchPlaceholder}
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full px-2 py-1 text-sm bg-background-secondary border border-border-default rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          )}
-
           {/* Content Container */}
           <div 
             ref={setContainerRef}
@@ -212,6 +205,7 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
                   indeterminate={isIndeterminate}
                   onToggle={handleSelectAll}
                   label={selectAllLabel}
+                  isStatusTag={false}
                 />
               )}
 
@@ -224,15 +218,16 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
                     onToggle={() => handleOptionToggle(option.value)}
                     label={option.label}
                     disabled={option.disabled}
+                    isStatusTag={isStatusTag}
                   />
                 ))
               ) : (
-                <div className="px-3 py-2 text-sm text-text-secondary text-center">
-                  {searchTerm ? 'No matching options found' : placeholder}
+                <div className="px-3 py-2 text-sm text-text-secondary tracking-wide text-center">
+                  {searchTerm ? 'No match found!' : placeholder}
                 </div>
               )}
           </div>
-        </DropdownMenu.Content>
+        </DropdownContent>
       </DropdownMenu.Portal>
     )
   },

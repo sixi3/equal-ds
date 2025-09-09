@@ -2,6 +2,167 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-01-XX
+
+### 🎉 New Components
+
+#### Date Picker Suite
+- **DatePicker** - Complete date picker with calendar and time selection
+- **DatePickerContent** - Calendar content with month/year navigation
+- **DatePickerTrigger** - Trigger button for date picker
+- **DatePickerItem** - Individual date selection items
+- **CalendarGrid** - Calendar grid component with accessibility
+- **CalendarContent** - Core calendar implementation
+- **TimePickerContent** - Time selection with hour/minute picker
+- **DateRangePickerContent** - Date range selection with start/end dates
+
+#### Enhanced Component Suite
+- **Complete TypeScript support** - Full type definitions for all date picker components
+- **Accessibility compliance** - ARIA labels, keyboard navigation, screen reader support
+- **Responsive design** - Mobile-friendly date picker interfaces
+- **Internationalization ready** - Locale-aware date formatting and parsing
+
+### ✨ New Features
+
+#### Date Picker Experience
+- **Seamless integration** - Works with existing Equal DS UI design system
+- **Smooth animations** - Consistent 300ms ease-out transitions
+- **Customizable styling** - Uses design tokens for consistent theming
+- **Flexible date formats** - Support for various date display formats
+- **Time selection** - Combined date and time picker functionality
+- **Range selection** - Select date ranges with visual feedback
+
+#### Developer Experience
+- **Zero-config setup** - Drop-in components with sensible defaults
+- **Comprehensive documentation** - Updated README with quick start examples
+- **Storybook integration** - Interactive component demos and controls
+- **Type-safe APIs** - Full TypeScript support with proper type definitions
+
+### 🔧 Technical Improvements
+
+#### Component Architecture
+- **Modular design** - Separate components for different use cases
+- **Context-based state management** - Clean separation of concerns
+- **Performance optimized** - Efficient re-rendering and state updates
+- **Bundle size conscious** - Tree-shakable imports for optimal bundle sizes
+
+---
+
+## [1.2.0] - 2025-01-XX
+
+### 🚨 BREAKING CHANGES
+
+#### Dropdown Component Overhaul
+- **Automatic rotating chevron** - DropdownTrigger now shows rotating chevron by default
+- **New props added** - `showChevron`, `chevronIcons` for customization
+- **Context-based state management** - Internal state management for seamless UX
+
+#### Behavior Changes
+- **Default chevron behavior** - All dropdowns now automatically show rotating chevron
+- **Animation timing** - Optimized to 300ms ease-out for smooth transitions
+- **State management** - Automatic open/close state handling via React Context
+
+### ✨ New Features
+
+#### Enhanced Dropdown Experience
+- **Smooth animations** - 300ms ease-out transitions for chevron rotation
+- **Automatic state management** - No manual state handling required
+- **Customizable chevrons** - Support for custom open/closed icons
+- **Context-based architecture** - Clean separation of concerns
+
+#### Developer Experience
+- **Zero-config setup** - Works out of the box with sensible defaults
+- **Type-safe props** - Full TypeScript support for all new features
+- **Backward compatibility** - Existing code continues to work with new behavior
+
+### 🐛 Bug Fixes
+
+#### Dropdown Components
+- **State synchronization** - Fixed timing issues with manual state management
+- **Animation performance** - Optimized CSS transitions for better performance
+- **Context cleanup** - Proper cleanup of React Context on unmount
+
+### 🔧 Technical Improvements
+
+#### Architecture Changes
+- **React Context integration** - Clean state management across component tree
+- **Performance optimization** - Reduced re-renders with optimized context usage
+- **Type safety** - Enhanced TypeScript definitions for new props
+
+### 📚 Migration Guide
+
+#### For Existing Dropdown Users
+
+##### ✅ Automatic Migration (Recommended)
+```tsx
+// Before (manual state management)
+const [isOpen, setIsOpen] = useState(false)
+
+<Dropdown onOpenChange={setIsOpen}>
+  <DropdownTrigger>
+    Select Option
+    {isOpen ? <ChevronUp /> : <ChevronDown />}
+  </DropdownTrigger>
+</Dropdown>
+
+// After (automatic - just works!)
+<Dropdown>
+  <DropdownTrigger>
+    Select Option
+  </DropdownTrigger>
+</Dropdown>
+```
+
+##### 🎨 Customization Options
+```tsx
+// Disable chevron
+<Dropdown>
+  <DropdownTrigger showChevron={false}>
+    Select Option
+  </DropdownTrigger>
+</Dropdown>
+
+// Custom chevron icons
+<Dropdown>
+  <DropdownTrigger
+    chevronIcons={{
+      open: <CustomUpIcon />,
+      closed: <CustomDownIcon />
+    }}
+  >
+    Select Option
+  </DropdownTrigger>
+</Dropdown>
+```
+
+##### 🔧 Advanced Usage
+```tsx
+// Still works with manual control
+const [isOpen, setIsOpen] = useState(false)
+
+<Dropdown onOpenChange={setIsOpen}>
+  <DropdownTrigger>
+    Select Option
+    {/* Your custom chevron logic */}
+  </DropdownTrigger>
+</Dropdown>
+```
+
+#### Migration Checklist
+- [ ] Remove manual `onOpenChange` state management (automatic now)
+- [ ] Remove manual chevron rendering (automatic now)
+- [ ] Test dropdown animations (300ms smooth transitions)
+- [ ] Verify custom chevron icons still work with new API
+- [ ] Update any custom dropdown implementations
+
+#### Breaking Changes Summary
+- Dropdown chevrons now appear automatically by default
+- Manual state management for chevrons no longer required
+- Animation timing changed from 200ms to 300ms for better UX
+- New props available for customization without breaking existing usage
+
+---
+
 ## [1.0.0] - 2025-01-XX
 
 ### 🚨 BREAKING CHANGES

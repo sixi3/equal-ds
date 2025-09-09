@@ -15,7 +15,7 @@ function SidebarTriggerImpl({ className, srLabel = 'Toggle sidebar', children, .
       onClick={toggle}
       className={cn(
         'grid place-items-center h-8 w-8 rounded-md border border-transparent text-text-primary leading-none',
-        ' hover:bg-primary-300/20 hover:border-border-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 transition-all duration-200 ease-out',
+        ' hover:bg-primary-300/20 hover:border-border-default transition-all duration-200 ease-out',
         className,
       )}
       {...props}

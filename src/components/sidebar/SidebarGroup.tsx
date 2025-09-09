@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Collapsible from '@radix-ui/react-collapsible'
-import { cn } from '../../lib/cn'
-import { ChevronDown, GripVertical } from 'lucide-react'
+import { cn, ChevronIcon } from '../../lib'
+import { GripVertical } from 'lucide-react'
 import { useSidebarOpenContext } from './SidebarProvider'
 import { GroupReorderContext } from './SidebarContent'
 
@@ -139,7 +139,7 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
   return (
     <Collapsible.Trigger
       className={cn(
-        'group/trigger w-full flex flex-col rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'group/trigger w-full flex flex-col rounded-md',
         'px-1 py-3',
         className,
       )}
@@ -170,12 +170,11 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
           open ? 'flex-1' : 'w-3'
         )} />
         <span className="inline-flex items-center justify-center h-6 w-6 rounded-full transition-colors group-hover/trigger:bg-primary-300/20">
-          <ChevronDown
+          <ChevronIcon
             aria-hidden
-            className={cn(
-              'h-3 w-3 shrink-0 transition-transform duration-200 ease-out text-secondary',
-              'group-data-[state=open]:rotate-180',
-            )}
+            isOpen={open}
+            size="sm"
+            className="text-secondary"
           />
         </span>
       </div>

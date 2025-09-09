@@ -1,0 +1,186 @@
+/* FinPro Sidebar Component Styles */
+
+/* Custom hover animations for filter triggers */
+.finpro-sidebar-trigger-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.finpro-sidebar-trigger-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Filter section styling */
+.finpro-sidebar-filter-section {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3);
+  box-shadow: var(--shadow-md);
+}
+
+.finpro-sidebar-filter-header {
+  cursor: pointer;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2);
+  margin: calc(var(--spacing-2) * -1);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.finpro-sidebar-filter-header:hover {
+  background-color: var(--color-background-primary);
+}
+
+.finpro-sidebar-filter-icon-container {
+  background: var(--color-background-tertiary);
+  padding: var(--spacing-1-5);
+  border-radius: var(--border-radius-lg);
+}
+
+.finpro-sidebar-filter-title {
+  font-size: var(--typography-fontSize-xl);
+  font-weight: var(--typography-fontWeight-medium);
+  color: var(--color-text-primary);
+  letter-spacing: 0.025em;
+}
+
+.finpro-sidebar-filter-toggle {
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease-in-out;
+}
+
+.finpro-sidebar-filter-toggle:hover {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-default);
+}
+
+/* Filter grid layout */
+.finpro-sidebar-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+  width: 100%;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-out, margin-top 0.5s ease-out;
+}
+
+@media (min-width: 768px) {
+  .finpro-sidebar-filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .finpro-sidebar-filter-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Filter item labels */
+.finpro-sidebar-filter-label {
+  display: block;
+  font-size: var(--typography-fontSize-xs);
+  font-weight: var(--typography-fontWeight-medium);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-1);
+  text-transform: uppercase;
+}
+
+/* Status badge styles for single selection */
+.finpro-sidebar-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-md);
+  font-size: var(--typography-fontSize-xs);
+  font-weight: var(--typography-fontWeight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Expanded state styles */
+.finpro-sidebar-expanded {
+  max-height: 384px;
+  opacity: 1;
+  margin-top: var(--spacing-4);
+}
+
+.finpro-sidebar-collapsed {
+  max-height: 0px;
+  opacity: 0;
+  margin-top: 0px;
+  overflow: hidden;
+}
+
+/* Sidebar content area */
+.finpro-sidebar-content {
+  flex: 1;
+  background: var(--color-background-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content area */
+.finpro-sidebar-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .finpro-sidebar-filter-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .finpro-sidebar-filter-section {
+    padding: var(--spacing-2);
+  }
+}
+
+/* Dark mode adjustments (if needed) */
+@media (prefers-color-scheme: dark) {
+  .finpro-sidebar-filter-header:hover {
+    background-color: var(--color-background-secondary);
+  }
+
+  .finpro-sidebar-filter-toggle:hover {
+    background: var(--color-background-tertiary);
+  }
+}
+
+/* Focus states for accessibility */
+.finpro-sidebar-trigger-hover:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Animation keyframes for smooth transitions */
+@keyframes finpro-sidebar-slide-down {
+  from {
+    max-height: 0px;
+    opacity: 0;
+    margin-top: 0px;
+  }
+  to {
+    max-height: 384px;
+    opacity: 1;
+    margin-top: 16px;
+  }
+}
+
+@keyframes finpro-sidebar-slide-up {
+  from {
+    max-height: 384px;
+    opacity: 1;
+    margin-top: 16px;
+  }
+  to {
+    max-height: 0px;
+    opacity: 0;
+    margin-top: 0px;
+  }
+}

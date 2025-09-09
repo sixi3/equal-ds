@@ -1,11 +1,10 @@
 import './tailwind.css'
-import '../finpro-components/dropdown/finpro-styles.css'
 import React from 'react'
 import type { StoryObj } from '@storybook/react'
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownContentMultiselect, DropdownItem, DropdownItemMultiselect, DropdownSeparator } from '../src'
-import { FinProDropdown } from '../finpro-components/dropdown/FinProDropdown'
-import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart, Star } from 'lucide-react'
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownContentMultiselect, DropdownItem, DropdownItemMultiselect, DropdownSeparator, DatePicker, DateRangePickerContent, DateRangeValue } from '../src'
+import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart, Star, ChevronUp, Filter } from 'lucide-react'
 import { cn } from '../src/lib/cn'
+import { ChevronIcon } from '../src/lib/ChevronIcon'
 import { useState } from 'react'
 
 
@@ -43,6 +42,7 @@ const meta = {
     }
   }
 }
+
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -178,7 +178,6 @@ function ExampleDropdown({
           <span className="flex-1 text-left">
             {label}
           </span>
-          <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
         </DropdownTrigger>
         <DropdownContent
           style={{
@@ -243,26 +242,12 @@ export const Default: Story = {
   ),
 }
 
-export const Variants: Story = {
-  render: (args) => (
-    <div className="flex flex-wrap gap-4 p-8">
-      <ExampleDropdown label="Default" variant="default" {...args} />
-      <ExampleDropdown label="Outline" variant="outline" {...args} />
-      <ExampleDropdown label="Ghost" variant="ghost" {...args} />
-      <ExampleDropdown label="Primary" variant="primary" {...args} />
-      <ExampleDropdown label="Destructive" variant="destructive" {...args} />
-    </div>
-  ),
-}
-
-// Simplified controls - everything is handled by the simple controls system
-
-export const FinPro: Story = {
+export const MultiselectFilter: Story = {
   render: (args: any) => {
-    const [selectedTemplates, setSelectedTemplates] = useState<string[]>([])
-    const [isHovered, setIsHovered] = useState(false)
     const [isClicked, setIsClicked] = useState(false)
-    
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    // Define options arrays first
     const templateOptions = [
       { value: 'template-1', label: 'Template One' },
       { value: 'template-2', label: 'Template Two' },
@@ -271,8 +256,62 @@ export const FinPro: Story = {
       { value: 'template-5', label: 'Template Five' },
     ]
 
-    // Hover effect styles for the multiselect dropdown
-    const getMultiselectTriggerStyles = () => {
+    const purposeCodeOptions = [
+      { value: 'purpose-101', label: 'Purpose 101' },
+      { value: 'purpose-102', label: 'Purpose 102' },
+      { value: 'purpose-103', label: 'Purpose 103' },
+      { value: 'purpose-104', label: 'Purpose 104' },
+      { value: 'purpose-105', label: 'Purpose 105' },
+    ]
+
+    const statusOptions = [
+      { value: 'pending', label: 'PENDING' },
+      { value: 'active', label: 'ACTIVE' },
+      { value: 'rejected', label: 'REJECTED' },
+      { value: 'revoked', label: 'REVOKED' },
+      { value: 'paused', label: 'PAUSED' },
+      { value: 'failed', label: 'FAILED' },
+    ]
+
+    const aggregatorOptions = [
+      { value: 'agg-1', label: 'Aggregator One' },
+      { value: 'agg-2', label: 'Aggregator Two' },
+      { value: 'agg-3', label: 'Aggregator Three' },
+      { value: 'agg-4', label: 'Aggregator Four' },
+      { value: 'agg-5', label: 'Aggregator Five' },
+    ]
+
+    // Initialize with all options selected by default
+    const [selectedTemplates, setSelectedTemplates] = useState<string[]>(
+      templateOptions.map(option => option.value)
+    )
+    const [selectedPurposeCodes, setSelectedPurposeCodes] = useState<string[]>(
+      purposeCodeOptions.map(option => option.value)
+    )
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
+      statusOptions.map(option => option.value)
+    )
+    const [selectedAggregators, setSelectedAggregators] = useState<string[]>(
+      aggregatorOptions.map(option => option.value)
+    )
+
+    // Individual hover states for each dropdown
+    const [isTemplateHovered, setIsTemplateHovered] = useState(false)
+    const [isPurposeHovered, setIsPurposeHovered] = useState(false)
+    const [isStatusHovered, setIsStatusHovered] = useState(false)
+    const [isAggregatorHovered, setIsAggregatorHovered] = useState(false)
+    const [isDatePickerHovered, setIsDatePickerHovered] = useState(false)
+
+    // Date range picker state
+    const [selectedRange, setSelectedRange] = useState<DateRangeValue>({
+      startDate: new Date('2025-01-15'),
+      startTime: { hours: 9, minutes: 30, period: 'AM' },
+      endDate: new Date('2025-01-16'),
+      endTime: { hours: 5, minutes: 45, period: 'PM' }
+    })
+
+    // Helper function to create trigger styles
+    const createTriggerStyles = (isHovered: boolean) => {
       const baseStyles: any = {
         transform: isHovered ? 'translateY(-1px)' : isClicked ? 'translateY(0)' : 'translateY(0)',
         transition: 'all 0.2s ease-in-out',
@@ -305,28 +344,65 @@ export const FinPro: Story = {
       return baseStyles
     }
 
-    const handleMouseEnter = () => setIsHovered(true)
-    const handleMouseLeave = () => setIsHovered(false)
+    // Individual trigger styles for each dropdown
+    const getTemplateTriggerStyles = () => createTriggerStyles(isTemplateHovered)
+    const getPurposeTriggerStyles = () => createTriggerStyles(isPurposeHovered)
+    const getStatusTriggerStyles = () => createTriggerStyles(isStatusHovered)
+    const getAggregatorTriggerStyles = () => createTriggerStyles(isAggregatorHovered)
+    const getDatePickerTriggerStyles = () => createTriggerStyles(isDatePickerHovered)
+
+    // Individual hover handlers
+    const handleTemplateMouseEnter = () => setIsTemplateHovered(true)
+    const handleTemplateMouseLeave = () => setIsTemplateHovered(false)
+    const handlePurposeMouseEnter = () => setIsPurposeHovered(true)
+    const handlePurposeMouseLeave = () => setIsPurposeHovered(false)
+    const handleStatusMouseEnter = () => setIsStatusHovered(true)
+    const handleStatusMouseLeave = () => setIsStatusHovered(false)
+    const handleAggregatorMouseEnter = () => setIsAggregatorHovered(true)
+    const handleAggregatorMouseLeave = () => setIsAggregatorHovered(false)
+    const handleDatePickerMouseEnter = () => setIsDatePickerHovered(true)
+    const handleDatePickerMouseLeave = () => setIsDatePickerHovered(false)
+
     const handleMouseDown = () => setIsClicked(true)
     const handleMouseUp = () => setIsClicked(false)
 
     return (
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="mb-4">
-          <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section</h3>
-          <p className="text-sm text-gray-600 mt-1">First dropdown now uses multiselect functionality</p>
-        </div>
         <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
-          <div className={`flex justify-between items-center ${args.headerGap || 'mb-4'}`}>
-            <h2 className="text-xl font-medium text-text-primary tracking-wider">
-              Filter By
-            </h2>
-            <ChevronDown className="w-4 h-4 text-text-primary" />
+          <div
+            className="flex justify-between items-center cursor-pointer rounded-lg p-2 -m-2 transition-colors duration-200"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-background-tertiary p-1.5 rounded-lg">
+                <Filter className="w-4 h-4 text-text-primary" />
+              </div>
+              <h2 className="text-xl font-medium text-text-primary tracking-wider">
+                Filter Table
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded hover:bg-background-primary hover:border hover:border-border-default transition-colors duration-200">
+                <ChevronIcon
+                  isOpen={isExpanded}
+                  className="text-text-primary"
+                  duration={200}
+                />
+              </div>
+            </div>
           </div>
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 ${args.dropdownGap || 'gap-6'} w-full`}>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 ${args.dropdownGap || 'gap-6'} w-full`}
+            style={{
+              transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-out, margin-top 0.5s ease-out',
+              maxHeight: isExpanded ? '384px' : '0px',
+              opacity: isExpanded ? 1 : 0,
+              marginTop: isExpanded ? '16px' : '0px'
+            }}
+          >
             {/* Multiselect Consent Template Dropdown */}
             <div className="w-full">
-              <label 
+              <label
                 className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
                 style={{
                   fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
@@ -343,19 +419,20 @@ export const FinPro: Story = {
                 <DropdownTrigger
                   variant="default"
                   className="w-full"
-                  style={getMultiselectTriggerStyles()}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
+                  style={getTemplateTriggerStyles()}
+                  onMouseEnter={handleTemplateMouseEnter}
+                  onMouseLeave={handleTemplateMouseLeave}
                   onMouseDown={handleMouseDown}
                   onMouseUp={handleMouseUp}
                 >
-                  <span className="flex-1 text-left">
-                    {selectedTemplates.length === 0 
-                      ? 'All Templates' 
+                  <span className={`flex-1 text-left ${selectedTemplates.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedTemplates.length === templateOptions.length
+                      ? 'All Templates'
+                      : selectedTemplates.length === 0
+                      ? 'None Selected'
                       : `${selectedTemplates.length} selected`
                     }
                   </span>
-                  <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
                 </DropdownTrigger>
                 <DropdownContentMultiselect
                   options={templateOptions}
@@ -363,6 +440,8 @@ export const FinPro: Story = {
                   onSelectionChange={setSelectedTemplates}
                   enableSelectAll={true}
                   selectAllLabel="All Templates"
+                  enableSearch={true}
+                  searchPlaceholder="Search for templates"
                   maxHeight="200px"
                   style={{
                     borderColor: args.borderColor ? `var(${args.borderColor})` : undefined,
@@ -372,55 +451,226 @@ export const FinPro: Story = {
                 />
               </Dropdown>
             </div>
-            
-            <ExampleDropdown
-              label="Purpose Code"
-              showLabel={true}
-              {...args}
-            />
-            <ExampleDropdown
-              label="Consent Status"
-              showLabel={true}
-              {...args}
-            />
-            <ExampleDropdown
-              label="Account Aggregator"
-              showLabel={true}
-              {...args}
-            />
-            <ExampleDropdown
-              label="Consent Created On"
-              showLabel={true}
-              {...args}
-            />
-          </div>
-          
-          {/* Show selected templates */}
-          {selectedTemplates.length > 0 && (
-            <div className="mt-4 p-3 bg-background-tertiary rounded-md">
-              <p className="text-sm font-medium text-text-primary mb-2">Selected Templates:</p>
-              <div className="flex flex-wrap gap-2">
-                {selectedTemplates.map(value => {
-                  const option = templateOptions.find(opt => opt.value === value)
-                  return (
-                    <span
-                      key={value}
-                      className="inline-flex items-center px-2 py-1 rounded-md bg-primary-100 text-primary-800 text-xs font-medium"
-                    >
-                      {option?.label}
-                    </span>
-                  )
-                })}
-              </div>
+
+            {/* Multiselect Purpose Code Dropdown */}
+            <div className="w-full">
+              <label
+                className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
+                style={{
+                  fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
+                  fontWeight: args.labelFontWeight ? `var(${args.labelFontWeight})` : undefined,
+                  letterSpacing: args.labelLetterSpacing
+                    ? (args.labelLetterSpacing.startsWith('--') ? `var(${args.labelLetterSpacing})` : args.labelLetterSpacing)
+                    : undefined,
+                  color: args.labelTextColor ? `var(${args.labelTextColor})` : undefined,
+                }}
+              >
+                Purpose Code
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getPurposeTriggerStyles()}
+                  onMouseEnter={handlePurposeMouseEnter}
+                  onMouseLeave={handlePurposeMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                >
+                  <span className={`flex-1 text-left ${selectedPurposeCodes.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedPurposeCodes.length === purposeCodeOptions.length
+                      ? 'All Purpose Codes'
+                      : selectedPurposeCodes.length === 0
+                      ? 'None Selected'
+                      : `${selectedPurposeCodes.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={purposeCodeOptions}
+                  selectedValues={selectedPurposeCodes}
+                  onSelectionChange={setSelectedPurposeCodes}
+                  enableSelectAll={true}
+                  selectAllLabel="All Purpose Codes"
+                  enableSearch={true}
+                  searchPlaceholder="Search purpose codes"
+                  maxHeight="200px"
+                  style={{
+                    borderColor: args.borderColor ? `var(${args.borderColor})` : undefined,
+                    backgroundColor: args.backgroundColor ? `var(${args.backgroundColor})` : undefined,
+                    borderRadius: args.borderRadius ? `var(${args.borderRadius})` : undefined,
+                  }}
+                />
+              </Dropdown>
             </div>
-          )}
+
+            {/* Multiselect Consent Status Dropdown */}
+            <div className="w-full">
+              <label
+                className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
+                style={{
+                  fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
+                  fontWeight: args.labelFontWeight ? `var(${args.labelFontWeight})` : undefined,
+                  letterSpacing: args.labelLetterSpacing
+                    ? (args.labelLetterSpacing.startsWith('--') ? `var(${args.labelLetterSpacing})` : args.labelLetterSpacing)
+                    : undefined,
+                  color: args.labelTextColor ? `var(${args.labelTextColor})` : undefined,
+                }}
+              >
+                Consent Status
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getStatusTriggerStyles()}
+                  onMouseEnter={handleStatusMouseEnter}
+                  onMouseLeave={handleStatusMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                >
+                  <span className={`flex-1 text-left ${selectedStatuses.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedStatuses.length === statusOptions.length
+                      ? 'All Statuses'
+                      : selectedStatuses.length === 0
+                      ? 'None Selected'
+                      : selectedStatuses.length === 1
+                      ? (() => {
+                          const option = statusOptions.find(opt => opt.value === selectedStatuses[0])
+                        return (
+                          <span                             className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium uppercase tracking-wider ${
+                              option?.label.toLowerCase() === 'active'
+                                ? 'bg-status-active-bg text-status-active-text'
+                                : option?.label.toLowerCase() === 'pending'
+                                ? 'bg-status-pending-bg text-status-pending-text'
+                                : option?.label.toLowerCase() === 'rejected'
+                                ? 'bg-status-rejected-bg text-status-rejected-text'
+                                : option?.label.toLowerCase() === 'revoked'
+                                ? 'bg-status-revoked-bg text-status-revoked-text'
+                                : option?.label.toLowerCase() === 'paused'
+                                ? 'bg-status-paused-bg text-status-paused-text'
+                                : option?.label.toLowerCase() === 'failed'
+                                ? 'bg-status-failed-bg text-status-failed-text'
+                                : 'bg-[#F3F4F6] text-[#374151]'
+                            }`}>
+                            {option?.label}
+                          </span>
+                        )
+                        })()
+                      : `${selectedStatuses.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={statusOptions}
+                  selectedValues={selectedStatuses}
+                  onSelectionChange={setSelectedStatuses}
+                  enableSelectAll={true}
+                  selectAllLabel="All Statuses"
+                  enableSearch={true}
+                  searchPlaceholder="Search statuses"
+                  maxHeight="200px"
+                  isStatusTag={true}
+                  style={{
+                    borderColor: args.borderColor ? `var(${args.borderColor})` : undefined,
+                    backgroundColor: args.backgroundColor ? `var(${args.backgroundColor})` : undefined,
+                    borderRadius: args.borderRadius ? `var(${args.borderRadius})` : undefined,
+                  }}
+                />
+              </Dropdown>
+            </div>
+
+            {/* Multiselect Account Aggregator Dropdown */}
+            <div className="w-full">
+              <label
+                className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
+                style={{
+                  fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
+                  fontWeight: args.labelFontWeight ? `var(${args.labelFontWeight})` : undefined,
+                  letterSpacing: args.labelLetterSpacing
+                    ? (args.labelLetterSpacing.startsWith('--') ? `var(${args.labelLetterSpacing})` : args.labelLetterSpacing)
+                    : undefined,
+                  color: args.labelTextColor ? `var(${args.labelTextColor})` : undefined,
+                }}
+              >
+                Account Aggregator
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getAggregatorTriggerStyles()}
+                  onMouseEnter={handleAggregatorMouseEnter}
+                  onMouseLeave={handleAggregatorMouseLeave}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                >
+                  <span className={`flex-1 text-left ${selectedAggregators.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedAggregators.length === aggregatorOptions.length
+                      ? 'All Account Aggregators'
+                      : selectedAggregators.length === 0
+                      ? 'None Selected'
+                      : `${selectedAggregators.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={aggregatorOptions}
+                  selectedValues={selectedAggregators}
+                  onSelectionChange={setSelectedAggregators}
+                  enableSelectAll={true}
+                  selectAllLabel="All Aggregators"
+                  enableSearch={true}
+                  searchPlaceholder="Search aggregators"
+                  maxHeight="200px"
+                  style={{
+                    borderColor: args.borderColor ? `var(${args.borderColor})` : undefined,
+                    backgroundColor: args.backgroundColor ? `var(${args.backgroundColor})` : undefined,
+                    borderRadius: args.borderRadius ? `var(${args.borderRadius})` : undefined,
+                  }}
+                />
+              </Dropdown>
+            </div>
+
+            <div className="w-full">
+              <label
+                className="block text-xs font-normal text-text-secondary tracking-widest mb-1"
+                style={{
+                  fontSize: args.labelFontSize ? `var(${args.labelFontSize})` : undefined,
+                  fontWeight: args.labelFontWeight ? `var(${args.labelFontWeight})` : undefined,
+                  letterSpacing: args.labelLetterSpacing
+                    ? (args.labelLetterSpacing.startsWith('--') ? `var(${args.labelLetterSpacing})` : args.labelLetterSpacing)
+                    : undefined,
+                  color: args.labelTextColor ? `var(${args.labelTextColor})` : undefined,
+                }}
+              >
+                Consent Created On
+              </label>
+              <DatePicker
+                selectedRange={selectedRange}
+                rangeMode={true}
+                onRangeChange={setSelectedRange}
+                placeholder="Select date range"
+                dateFormat="medium"
+                variant="default"
+                showCalendarIcon={true}
+                triggerClassName="w-full"
+                triggerStyle={getDatePickerTriggerStyles()}
+                onTriggerMouseEnter={handleDatePickerMouseEnter}
+                onTriggerMouseLeave={handleDatePickerMouseLeave}
+                onTriggerMouseDown={handleMouseDown}
+                onTriggerMouseUp={handleMouseUp}
+              />
+            </div>
+          </div>
+
         </div>
       </div>
     )
   },
   args: {
     // Layout controls
-    headerGap: "mb-3", // Gap between header and dropdowns
+    headerGap: "mb-4", // Gap between header and dropdowns
     dropdownGap: "gap-4", // Gap between dropdown components
 
     // Use design system defaults
@@ -435,354 +685,30 @@ export const FinPro: Story = {
     borderRadius: "--border-radius-lg",
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderBottomWidth: "2px",
-    hoverBorderBottomWidth: "2px",
+    borderBottomWidth: "3px",
+    hoverBorderBottomWidth: "3px",
     showLabel: true,
     hoverBackgroundColor: "--color-background-tertiary",
     hoverTextColor: "--color-text-primary",
-    hoverBorderColor: "--color-border-hover",
+    hoverBorderColor: "--color-border-focus",
     hoverBoxShadow: "--shadow-md",
 
     // Label typography controls
     labelFontSize: "--typography-fontSize-xs",
 
     labelFontWeight: "--typography-fontWeight-medium",
-    labelLetterSpacing: "0.1em",
+    labelLetterSpacing: "0.05em",
     labelTextColor: "--color-text-secondary",
     boxShadow: "--core-shadows-sm"
   },
 }
 
-export const FinProExported: Story = {
-  render: () => (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">FinPro Filter Section (Using Exported Component)</h3>
-        <p className="text-sm text-gray-600 mt-1">This demonstrates the reusable FinProDropdown component with all styling and interactions.</p>
-      </div>
-      <div className="bg-white border border-border-default rounded-xl p-3 shadow-md">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl font-medium text-text-primary tracking-wider">
-            Filter By
-          </h2>
-          <ChevronDown className="w-4 h-4 text-text-primary" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
-          <FinProDropdown label="Consent Template" />
-          <FinProDropdown label="Purpose Code" />
-          <FinProDropdown label="Consent Status" />
-          <FinProDropdown label="Account Aggregator" />
-          <FinProDropdown label="Consent Created On" />
-        </div>
-      </div>
-    </div>
-  ),
-}
 
-export const FinProStylesShowcase: Story = {
-  render: () => (
-    <div className="min-h-screen bg-gray-50 p-4 space-y-8">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">FinPro Styles & Interactions Showcase</h3>
-        <p className="text-sm text-gray-600 mt-1">Demonstrates all exported styling approaches and hover interactions.</p>
-      </div>
 
-      {/* Ready-to-Use Component */}
-      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
-        <h4 className="text-md font-medium text-gray-900 mb-3">1. Ready-to-Use Component</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FinProDropdown label="Component A" />
-          <FinProDropdown label="Component B" />
-          <FinProDropdown label="Component C" />
-        </div>
-      </div>
 
-      {/* CSS Classes Approach */}
-      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
-        <h4 className="text-md font-medium text-gray-900 mb-3">2. CSS Classes Approach</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="finpro-dropdown-container">
-            <label className="finpro-dropdown-label">CSS Classes A</label>
-            <Dropdown>
-              <DropdownTrigger className="finpro-dropdown-trigger">
-                <span>CSS Classes A</span>
-                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
-              </DropdownTrigger>
-              <DropdownContent className="finpro-dropdown-content">
-                <DropdownItem><User className="mr-2 h-4 w-4" /><span>Profile</span></DropdownItem>
-                <DropdownItem><Settings className="mr-2 h-4 w-4" /><span>Settings</span></DropdownItem>
-              </DropdownContent>
-            </Dropdown>
-          </div>
-          <div className="finpro-dropdown-container">
-            <label className="finpro-dropdown-label">CSS Classes B</label>
-            <Dropdown>
-              <DropdownTrigger className="finpro-dropdown-trigger">
-                <span>CSS Classes B</span>
-                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
-              </DropdownTrigger>
-              <DropdownContent className="finpro-dropdown-content">
-                <DropdownItem><User className="mr-2 h-4 w-4" /><span>Profile</span></DropdownItem>
-              </DropdownContent>
-            </Dropdown>
-          </div>
-        </div>
-      </div>
 
-      {/* Inline Styles Approach */}
-      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
-        <h4 className="text-md font-medium text-gray-900 mb-3">3. Inline Styles Approach</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="w-full">
-            <label
-              className="mb-1 block"
-              style={{
-                fontSize: 'var(--typography-fontSize-xs)',
-                fontWeight: 'var(--typography-fontWeight-normal)',
-                letterSpacing: '0.1em',
-                color: 'var(--color-text-secondary)',
-              }}
-            >
-              Inline Styles A
-            </label>
-            <Dropdown>
-              <DropdownTrigger
-                className="w-full flex items-center justify-between"
-                style={{
-                  backgroundColor: 'var(--color-background-secondary)',
-                  color: 'var(--color-text-primary)',
-                  borderColor: 'var(--color-border-hover)',
-                  fontSize: 'var(--typography-fontSize-sm)',
-                  fontWeight: 'var(--typography-fontWeight-medium)',
-                  letterSpacing: '0.025em',
-                  padding: 'var(--spacing-2)',
-                  borderRadius: 'var(--border-radius-lg)',
-                  borderWidth: '1px',
-                  borderBottomWidth: '3px',
-                  boxShadow: 'var(--component-card-shadow)',
-                  transition: 'all 0.2s ease-in-out',
-                }}
-              >
-                <span>Inline Styles A</span>
-                <ChevronDown className="h-4 w-4 opacity-70 flex-shrink-0" />
-              </DropdownTrigger>
-              <DropdownContent
-                style={{
-                  backgroundColor: 'var(--color-background-secondary)',
-                  borderColor: 'var(--color-border-hover)',
-                  borderRadius: 'var(--border-radius-lg)',
-                }}
-              >
-                <DropdownItem><Settings className="mr-2 h-4 w-4" /><span>Settings</span></DropdownItem>
-              </DropdownContent>
-            </Dropdown>
-          </div>
-        </div>
-      </div>
 
-      {/* Complete Filter Section */}
-      <div className="bg-white border border-border-default rounded-xl p-4 shadow-md">
-        <h4 className="text-md font-medium text-gray-900 mb-3">4. Complete Filter Section</h4>
-        <div className="finpro-filter-section">
-          <div className="finpro-filter-header">
-            <h2 className="finpro-filter-title">Filter By</h2>
-            <ChevronDown className="w-4 h-4 text-text-primary" />
-          </div>
-          <div className="finpro-filter-grid">
-            <FinProDropdown label="Consent Template" />
-            <FinProDropdown label="Purpose Code" />
-            <FinProDropdown label="Consent Status" />
-            <FinProDropdown label="Account Aggregator" />
-            <FinProDropdown label="Consent Created On" />
-          </div>
-        </div>
-      </div>
-    </div>
-  ),
-}
 
-// Multiselect Dropdown Stories
-export const MultiselectBasic: Story = {
-  render: () => {
-    const [selectedValues, setSelectedValues] = useState<string[]>([])
-    
-    const options = [
-      { value: 'template-1', label: 'Template One' },
-      { value: 'template-2', label: 'Template Two' },
-      { value: 'template-3', label: 'Template Three' },
-      { value: 'template-4', label: 'Template Four' },
-      { value: 'template-5', label: 'Template Five' },
-    ]
-
-    return (
-      <div className="p-8">
-        <div className="max-w-md">
-          <label className="block text-sm font-medium text-text-primary mb-2">
-            Consent Templates
-          </label>
-          <Dropdown>
-            <DropdownTrigger>
-              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
-                {selectedValues.length === 0 
-                  ? 'Select templates...' 
-                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
-                }
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownTrigger>
-            <DropdownContentMultiselect
-              options={options}
-              selectedValues={selectedValues}
-              onSelectionChange={setSelectedValues}
-              enableSelectAll={true}
-              selectAllLabel="All Templates"
-            />
-          </Dropdown>
-          
-          {selectedValues.length > 0 && (
-            <div className="mt-4 p-3 bg-background-tertiary rounded-md">
-              <p className="text-sm font-medium text-text-primary mb-2">Selected:</p>
-              <div className="flex flex-wrap gap-2">
-                {selectedValues.map(value => {
-                  const option = options.find(opt => opt.value === value)
-                  return (
-                    <span
-                      key={value}
-                      className="inline-flex items-center px-2 py-1 rounded-md bg-primary-100 text-primary-800 text-xs font-medium"
-                    >
-                      {option?.label}
-                    </span>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  },
-}
-
-export const MultiselectWithSearch: Story = {
-  render: () => {
-    const [selectedValues, setSelectedValues] = useState<string[]>(['template-1', 'template-3'])
-    
-    const options = [
-      { value: 'template-1', label: 'Template One' },
-      { value: 'template-2', label: 'Template Two' },
-      { value: 'template-3', label: 'Template Three' },
-      { value: 'template-4', label: 'Template Four' },
-      { value: 'template-5', label: 'Template Five' },
-      { value: 'template-6', label: 'Advanced Template' },
-      { value: 'template-7', label: 'Basic Template' },
-      { value: 'template-8', label: 'Custom Template' },
-    ]
-
-    return (
-      <div className="p-8">
-        <div className="max-w-md">
-          <label className="block text-sm font-medium text-text-primary mb-2">
-            Search Templates
-          </label>
-          <Dropdown>
-            <DropdownTrigger>
-              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
-                {selectedValues.length === 0 
-                  ? 'Search templates...' 
-                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
-                }
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownTrigger>
-            <DropdownContentMultiselect
-              options={options}
-              selectedValues={selectedValues}
-              onSelectionChange={setSelectedValues}
-              enableSelectAll={true}
-              selectAllLabel="All Templates"
-              enableSearch={true}
-              searchPlaceholder="Search templates..."
-              maxHeight="250px"
-            />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  },
-}
-
-export const MultiselectDisabled: Story = {
-  render: () => {
-    const [selectedValues, setSelectedValues] = useState<string[]>(['template-1'])
-    
-    const options = [
-      { value: 'template-1', label: 'Template One' },
-      { value: 'template-2', label: 'Template Two', disabled: true },
-      { value: 'template-3', label: 'Template Three' },
-      { value: 'template-4', label: 'Template Four', disabled: true },
-      { value: 'template-5', label: 'Template Five' },
-    ]
-
-    return (
-      <div className="p-8">
-        <div className="max-w-md">
-          <label className="block text-sm font-medium text-text-primary mb-2">
-            Templates (Some Disabled)
-          </label>
-          <Dropdown>
-            <DropdownTrigger>
-              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
-                {selectedValues.length === 0 
-                  ? 'Select templates...' 
-                  : `${selectedValues.length} template${selectedValues.length === 1 ? '' : 's'} selected`
-                }
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownTrigger>
-            <DropdownContentMultiselect
-              options={options}
-              selectedValues={selectedValues}
-              onSelectionChange={setSelectedValues}
-              enableSelectAll={true}
-              selectAllLabel="All Templates"
-            />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  },
-}
-
-export const MultiselectEmpty: Story = {
-  render: () => {
-    const [selectedValues, setSelectedValues] = useState<string[]>([])
-    
-    return (
-      <div className="p-8">
-        <div className="max-w-md">
-          <label className="block text-sm font-medium text-text-primary mb-2">
-            Empty Templates
-          </label>
-          <Dropdown>
-            <DropdownTrigger>
-              <button className="inline-flex items-center gap-2 rounded-md border border-border-default bg-background-secondary text-sm font-medium shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2">
-                Select templates...
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownTrigger>
-            <DropdownContentMultiselect
-              options={[]}
-              selectedValues={selectedValues}
-              onSelectionChange={setSelectedValues}
-              enableSelectAll={false}
-              placeholder="No templates available"
-            />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  },
-}
 
 
 

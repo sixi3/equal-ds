@@ -1,6 +1,48 @@
 import * as React from 'react'
 import { cn } from '../../lib/cn'
 
+// Status tag component for displaying status indicators
+interface StatusTagProps {
+  status: string
+  className?: string
+}
+
+const StatusTag: React.FC<StatusTagProps> = ({ status, className }) => {
+  const getStatusStyles = (status: string) => {
+    const statusLower = status.toLowerCase()
+    switch (statusLower) {
+      case 'active':
+        return 'bg-status-active-bg text-status-active-text'
+      case 'pending':
+        return 'bg-status-pending-bg text-status-pending-text'
+      case 'rejected':
+        return 'bg-status-rejected-bg text-status-rejected-text'
+      case 'revoked':
+        return 'bg-status-revoked-bg text-status-revoked-text'
+      case 'paused':
+        return 'bg-status-paused-bg text-status-paused-text'
+      case 'failed':
+        return 'bg-status-failed-bg text-status-failed-text'
+      case 'automatic':
+        return 'bg-[#4F46E5] text-white' // Default blue for automatic
+      default:
+        return 'bg-[#F3F4F6] text-[#374151]' // Default gray
+    }
+  }
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-1.5 py-1 rounded-md text-xs font-medium uppercase tracking-wider',
+        getStatusStyles(status),
+        className
+      )}
+    >
+      {status}
+    </span>
+  )
+}
+
 export interface DropdownItemMultiselectProps {
   /**
    * Whether the checkbox is checked
@@ -30,18 +72,23 @@ export interface DropdownItemMultiselectProps {
    * Whether to show a separator after this item
    */
   showSeparator?: boolean
+  /**
+   * Whether this item represents a status that should be displayed as a tag
+   */
+  isStatusTag?: boolean
 }
 
 export const DropdownItemMultiselect = React.forwardRef<HTMLDivElement, DropdownItemMultiselectProps>(
-  ({ 
-    checked, 
-    indeterminate = false, 
-    onToggle, 
-    label, 
-    disabled = false, 
+  ({
+    checked,
+    indeterminate = false,
+    onToggle,
+    label,
+    disabled = false,
     className,
     showSeparator = false,
-    ...props 
+    isStatusTag = false,
+    ...props
   }, ref) => {
     const handleClick = (e: React.MouseEvent) => {
       e.preventDefault()
@@ -67,7 +114,7 @@ export const DropdownItemMultiselect = React.forwardRef<HTMLDivElement, Dropdown
         data-multiselect-item
         className={cn(
           'relative flex items-center gap-3 px-3 py-4 text-sm cursor-pointer select-none',
-          'hover:bg-primary-300/10 focus:bg-primary-300/10 focus:outline-none',
+          'hover:bg-primary-300/10',
           'transition-colors duration-150',
           disabled && 'opacity-50 cursor-not-allowed',
           className
@@ -154,13 +201,19 @@ export const DropdownItemMultiselect = React.forwardRef<HTMLDivElement, Dropdown
         </div>
 
         {/* Label */}
-        <span
-          className={cn(
-            'flex-1 text-text-primary font-medium',
-            disabled && 'text-text-secondary'
+        <span className="flex-1 flex items-center">
+          {isStatusTag ? (
+            <StatusTag status={label} />
+          ) : (
+            <span
+              className={cn(
+                'text-text-primary font-normal tracking-wider',
+                disabled && 'text-text-secondary'
+              )}
+            >
+              {label}
+            </span>
           )}
-        >
-          {label}
         </span>
 
         {/* Separator */}
