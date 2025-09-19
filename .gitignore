@@ -7,7 +7,6 @@ build/
 
 # Generated artifacts
 tokens.tailwind.preset.*
-src/styles/tokens.css
 src/data/tokens.*
 src/types/tokens.d.ts
 figma-assets/

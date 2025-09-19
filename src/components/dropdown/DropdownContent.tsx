@@ -45,6 +45,7 @@ export const DropdownContent = React.forwardRef<HTMLDivElement, DropdownContentP
   }, ref) => {
     const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
       itemSelector: '[data-dropdown-item]',
+      excludeSelector: '[data-active="true"]',
       enabled: enableHoverAnimation
     })
 

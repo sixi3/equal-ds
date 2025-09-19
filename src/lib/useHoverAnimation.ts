@@ -15,6 +15,11 @@ export interface HoverAnimationOptions {
    */
   itemSelector?: string
   /**
+   * CSS selector to exclude items from hover animation (e.g., active/selected items)
+   * @default null
+   */
+  excludeSelector?: string | null
+  /**
    * Animation duration in milliseconds
    * @default 200
    */
@@ -41,13 +46,22 @@ export interface HoverAnimationReturn {
  * ```tsx
  * const { indicator, containerRef, handleMouseMove, handleMouseLeave } = useHoverAnimation({
  *   itemSelector: '[data-dropdown-item]',
+ *   excludeSelector: '[data-active]', // Exclude active/selected items
  *   duration: 200
  * })
- * 
+ *
  * return (
  *   <div ref={containerRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
  *     <HoverIndicator {...indicator} />
- *     {items.map(item => <div data-dropdown-item key={item.id}>{item.content}</div>)}
+ *     {items.map(item => (
+ *       <div
+ *         data-dropdown-item
+ *         data-active={item.isActive} // Mark active items
+ *         key={item.id}
+ *       >
+ *         {item.content}
+ *       </div>
+ *     ))}
  *   </div>
  * )
  * ```
@@ -55,6 +69,7 @@ export interface HoverAnimationReturn {
 export function useHoverAnimation(options: HoverAnimationOptions = {}): HoverAnimationReturn {
   const {
     itemSelector = '[data-hoverable]',
+    excludeSelector = null,
     duration = 200,
     enabled = true
   } = options
@@ -108,6 +123,13 @@ export function useHoverAnimation(options: HoverAnimationOptions = {}): HoverAni
     const targetItem = (e.target as HTMLElement).closest(itemSelector) as HTMLElement | null
     if (!targetItem) return
 
+    // Check if this item should be excluded from hover animation
+    if (excludeSelector && targetItem.matches(excludeSelector)) {
+      // Hide the indicator if hovering over an excluded item
+      setIndicator(prev => ({ ...prev, visible: false }))
+      return
+    }
+
     const cRect = container.getBoundingClientRect()
     const tRect = targetItem.getBoundingClientRect()
 
@@ -119,7 +141,7 @@ export function useHoverAnimation(options: HoverAnimationOptions = {}): HoverAni
       rafPendingRef.current = true
       requestAnimationFrame(flushPointerFrame)
     }
-  }, [enabled, itemSelector, flushPointerFrame])
+  }, [enabled, itemSelector, excludeSelector, flushPointerFrame])
 
   const handleMouseLeave = React.useCallback(() => {
     if (!enabled) return

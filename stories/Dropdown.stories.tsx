@@ -674,7 +674,7 @@ export const MultiselectFilter: Story = {
     dropdownGap: "gap-4", // Gap between dropdown components
 
     // Use design system defaults
-    backgroundColor: '--color-background-secondary',
+    backgroundColor: "--color-background-secondary",
 
     textColor: '--color-text-primary',
     borderColor: "--color-border-default",
@@ -688,9 +688,9 @@ export const MultiselectFilter: Story = {
     borderBottomWidth: "3px",
     hoverBorderBottomWidth: "3px",
     showLabel: true,
-    hoverBackgroundColor: "--color-background-tertiary",
+    hoverBackgroundColor: "--color-background-primary",
     hoverTextColor: "--color-text-primary",
-    hoverBorderColor: "--color-border-focus",
+    hoverBorderColor: "--color-border-hover",
     hoverBoxShadow: "--shadow-md",
 
     // Label typography controls
