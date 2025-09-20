@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Search } from 'lucide-react'
+import { Search, CornerDownLeft, X } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import type { SearchBarInputProps } from './types'
 
@@ -38,6 +38,13 @@ export const SearchBarInput = React.forwardRef<HTMLInputElement, SearchBarInputP
       }
     }
 
+    const handleClear = () => {
+      if (!isControlled) {
+        setInternalValue('')
+      }
+      onChange?.('')
+    }
+
     return (
       <div className={cn(
         // Search input container styles - matches design spec
@@ -54,9 +61,11 @@ export const SearchBarInput = React.forwardRef<HTMLInputElement, SearchBarInputP
           onClick={handleSubmit}
           disabled={disabled || loading}
           className={cn(
-            'flex h-4 w-4 flex-shrink-0 items-center justify-center text-text-secondary transition-colors',
+            'flex h-4 w-4 flex-shrink-0 items-center justify-center transition-colors',
             'hover:text-primary-500 focus:outline-none focus:text-primary-500',
             {
+              'text-text-primary': currentValue && !disabled && !loading,
+              'text-text-secondary': !currentValue || disabled || loading,
               'text-text-muted cursor-not-allowed': disabled,
               'cursor-pointer': !disabled && !loading,
             }
@@ -86,8 +95,35 @@ export const SearchBarInput = React.forwardRef<HTMLInputElement, SearchBarInputP
               'cursor-text': !disabled && !loading,
             }
           )}
+          style={currentValue ? { paddingRight: '8px' } : undefined}
           {...props}
         />
+
+        {/* Enter to search hint and clear button - only show when typing */}
+        {currentValue && (
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-1 text-text-tertiary text-xs whitespace-nowrap">
+              <CornerDownLeft size={12} strokeWidth={2} />
+              <span>Enter to search</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleClear}
+              disabled={disabled || loading}
+              className={cn(
+                'flex h-4 w-4 flex-shrink-0 items-center justify-center text-error-300 hover:text-text-primary transition-colors',
+                'focus:outline-none focus:text-text-primary',
+                {
+                  'text-error-300 cursor-not-allowed': disabled,
+                  'cursor-pointer': !disabled && !loading,
+                }
+              )}
+              aria-label="Clear search"
+            >
+              <X size={12} strokeWidth={2} />
+            </button>
+          </div>
+        )}
       </div>
     )
   }

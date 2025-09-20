@@ -17,7 +17,7 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
     return (
     <div className={cn(
       // Dropdown container styles - matches design spec
-      'flex h-full items-center justify-center gap-0.5 bg-background-primary hover:bg-primary-200 duration-300',
+      'flex h-full items-center justify-center gap-0.5 bg-background-primary hover:bg-background-tertiary duration-300',
       // State-based styles
       {
         'bg-background-secondary': disabled,
@@ -57,7 +57,7 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
           <DropdownContent
             align="end"
             sideOffset={4}
-            className="min-w-[160px] p-1 z-50"
+            className="min-w-[160px] p-1 z-50 border-border-default gap-2"
           >
             {/* Header - flush with edges */}
             <div className="-mx-1 -mt-1 mb-1 bg-gradient-to-b from-primary-50 to-primary-100 border-b border-primary-100 rounded-t-lg">
@@ -72,9 +72,9 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
                 disabled={domain.disabled}
                 onSelect={() => handleDomainSelect(domain.value)}
                 className={cn(
-                  'cursor-pointer text-xs font-medium',
+                  'cursor-pointer text-xs font-medium text-text-secondary hover:text-text-primary gap-2',
                   {
-                    'bg-primary-300/20 text-primary-500': domain.value === selectedDomain,
+                    'bg-background-tertiary border-border-default text-text-primary': domain.value === selectedDomain,
                   }
                 )}
                 data-active={domain.value === selectedDomain ? 'true' : undefined}
