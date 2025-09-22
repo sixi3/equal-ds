@@ -6,11 +6,21 @@ import { useDrawerContext } from './DrawerProvider'
  * Drawer component with configurable width, side positioning, and animation variants.
  * Supports both overlay and floating display modes.
  */
+/**
+ * Width values for drawer - numbers are converted to px, strings used as-is
+ */
+export type DrawerWidth = number | string
+
 export interface DrawerProps extends React.HTMLAttributes<HTMLElement> {
   /** Display variant: 'overlay' shows with backdrop, 'floating' appears elevated */
   variant?: 'floating' | 'overlay'
-  /** Custom width: accepts CSS width values (e.g., "400px") or numbers (e.g., 500 for 500px). Defaults to 320px */
-  width?: string | number
+  /**
+   * Drawer width - simple and flexible:
+   * - Numbers: converted to px (e.g., 500 → 500px width)
+   * - Strings: used directly (e.g., "400px", "w-96", "50vw")
+   * - Defaults to 320px for optimal mobile experience
+   */
+  width?: DrawerWidth
 }
 
 function DrawerImpl({ className, variant = 'overlay', width, ...props }: DrawerProps): JSX.Element {
@@ -35,7 +45,7 @@ function DrawerImpl({ className, variant = 'overlay', width, ...props }: DrawerP
         side === 'left'
           ? 'left-0 border-r'
           : 'right-0 border-l',
-        // Width and transform animations
+        // Width - simple and direct
         width ? (typeof width === 'number' ? `w-[${width}px]` : width) : 'w-[320px]',
         'transition-transform duration-300 cubic-bezier(0.95, 0.05, 0.795, 0.035)',
         side === 'left'

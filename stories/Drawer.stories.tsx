@@ -31,8 +31,9 @@ const meta: Meta = {
       options: ['left', 'right'],
     },
     width: {
-      control: { type: 'text' },
-      description: 'Custom width for the drawer (e.g., "400px", 500)',
+      control: { type: 'select' },
+      options: [320, 400, 500, 600, 800, 'w-64', 'w-80', 'w-96', '50vw', 'var(--drawer-width)'],
+      description: 'Drawer width: numbers (px), Tailwind classes, or CSS values',
     },
   },
 }
@@ -47,7 +48,7 @@ const DrawerExample = ({
   icon = <Columns3 className="w-5 h-5" />,
   variant = 'overlay',
   side = 'right',
-  width = 1000,
+  width = 600,
 }: {
   title?: string
   subtitle?: string
@@ -138,11 +139,33 @@ export const LeftSide: Story = {
 }
 
 export const CustomWidth: Story = {
-  render: () => <DrawerExample width={500} />,
+  render: () => <DrawerExample width={1000} />,
   parameters: {
     docs: {
       description: {
-        story: 'Drawer with custom width of 500px instead of the default 320px.',
+        story: 'Drawer with custom width of 1000px using numeric value.',
+      },
+    },
+  },
+}
+
+export const TailwindWidth: Story = {
+  render: () => <DrawerExample width="w-96" />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Drawer using Tailwind width class "w-96" (24rem/384px).',
+      },
+    },
+  },
+}
+
+export const ResponsiveWidth: Story = {
+  render: () => <DrawerExample width="w-72 sm:w-80 md:w-96 lg:w-[500px]" />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Drawer with responsive width that adapts to screen size.',
       },
     },
   },

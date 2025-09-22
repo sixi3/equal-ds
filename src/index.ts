@@ -16,6 +16,9 @@ export { FinProSidebar } from '../finpro-components/sidebar/FinProSidebar'
 // Export FinProSearchBar component
 export { FinProSearchBar } from '../finpro-components/search-bar/FinProSearchBar'
 
+// Export FinProDrawer component
+export { FinProDrawer } from '../finpro-components/drawer/FinProDrawer'
+
 // Typography utilities
 export * from './story-utils/designTokens'
 

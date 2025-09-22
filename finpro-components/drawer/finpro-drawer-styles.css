@@ -1,0 +1,67 @@
+/* FinProDrawer component-specific styles */
+
+/* Custom trigger button variations */
+.finpro-drawer-trigger-custom {
+  @apply fixed top-4 left-4 z-30 p-2 bg-white rounded-md shadow-md hover:shadow-lg transition-shadow;
+}
+
+/* Drawer content area customizations */
+.finpro-drawer-content-compact {
+  @apply p-3;
+}
+
+.finpro-drawer-content-spacious {
+  @apply p-6;
+}
+
+/* Header variations */
+.finpro-drawer-header-compact .finpro-drawer-title {
+  @apply text-lg;
+}
+
+.finpro-drawer-header-large .finpro-drawer-title {
+  @apply text-2xl;
+}
+
+/* Animation customizations */
+.finpro-drawer-slow {
+  --drawer-animation-duration: 500ms;
+}
+
+.finpro-drawer-fast {
+  --drawer-animation-duration: 150ms;
+}
+
+/* Theme variations */
+.finpro-drawer-dark {
+  @apply bg-gray-900 text-white;
+}
+
+.finpro-drawer-dark .finpro-drawer-trigger-custom {
+  @apply bg-gray-800 text-white border-gray-700;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .finpro-drawer-mobile-full {
+    width: 100vw !important;
+  }
+
+  .finpro-drawer-trigger-mobile {
+    @apply top-2 left-2 p-1.5;
+  }
+}
+
+/* Accessibility improvements */
+.finpro-drawer-high-contrast {
+  @apply border-2 border-gray-900;
+}
+
+.finpro-drawer-high-contrast .finpro-drawer-trigger-custom {
+  @apply border-2 border-gray-900 bg-white;
+}
+
+/* Focus management */
+.finpro-drawer-focus-managed :focus-visible {
+  @apply outline-2 outline-blue-500 outline-offset-2;
+}
