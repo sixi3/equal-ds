@@ -456,281 +456,31 @@ export const Accessibility: Story = {
 // FinPro Console specific implementation
 export const FinPro: Story = {
   render: () => {
-    const [searchResults, setSearchResults] = useState<Array<{
-      id: string
-      type: string
-      title: string
-      subtitle: string
-      status?: string
-      amount?: string
-    }>>([])
-    const [isSearching, setIsSearching] = useState(false)
+    const domains = [
+      { value: 'all', label: 'All Categories' },
+      { value: 'clients', label: 'Clients' },
+      { value: 'accounts', label: 'Accounts' },
+      { value: 'transactions', label: 'Transactions' },
+      { value: 'portfolios', label: 'Portfolios' },
+      { value: 'documents', label: 'Documents' }
+    ]
 
     const handleSearch = (value: string, domain?: string) => {
-      if (!value.trim()) {
-        setSearchResults([])
-        return
-      }
-
-      setIsSearching(true)
-
-      // Simulate API call delay
-      setTimeout(() => {
-        const mockResults = generateFinProResults(value, domain)
-        setSearchResults(mockResults)
-        setIsSearching(false)
-      }, 500)
+      console.log('FinPro Search:', { query: value, domain: domain || 'all' })
     }
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* FinPro Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">FP</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">FinPro Console</h1>
-                <p className="text-sm text-gray-500">Financial Professional Dashboard</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                Welcome back, John Doe
-              </div>
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Search Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Search & Filter</h2>
-                <p className="text-gray-600">Find clients, accounts, transactions, and more</p>
-              </div>
-            </div>
-
-            {/* FinPro Search Bar */}
-            <div className="max-w-2xl">
-              <FinProSearchBar onSearch={handleSearch} isSearching={isSearching} />
-            </div>
-          </div>
-
-          {/* Results Section */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Search Results
-                {searchResults.length > 0 && (
-                  <span className="ml-2 text-sm font-normal text-gray-500">
-                    ({searchResults.length} found)
-                  </span>
-                )}
-              </h3>
-            </div>
-
-            <div className="p-6">
-              {isSearching ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Searching...</span>
-                </div>
-              ) : searchResults.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">No results found</h4>
-                  <p className="text-gray-600">
-                    Try adjusting your search terms or selecting a different category
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {searchResults.map((result) => (
-                    <FinProResultCard key={result.id} result={result} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-            <StatCard title="Active Clients" value="1,247" change="+12%" trend="up" />
-            <StatCard title="Total Assets" value="$2.4M" change="+8%" trend="up" />
-            <StatCard title="This Month" value="$45.2K" change="+15%" trend="up" />
-            <StatCard title="Pending Tasks" value="23" change="-5%" trend="down" />
-          </div>
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="max-w-2xl">
+          <ExampleSearchBar
+            variant="with-dropdown"
+            placeholder="Search clients, accounts, transactions..."
+            domains={domains}
+            onSearch={handleSearch}
+          />
         </div>
       </div>
     )
   },
 }
 
-// Helper Components for FinPro Story
-function FinProSearchBar({ onSearch, isSearching }: {
-  onSearch: (value: string, domain?: string) => void
-  isSearching: boolean
-}) {
-  const domains = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'clients', label: 'Clients' },
-    { value: 'accounts', label: 'Accounts' },
-    { value: 'transactions', label: 'Transactions' },
-    { value: 'portfolios', label: 'Portfolios' },
-    { value: 'documents', label: 'Documents' }
-  ]
-
-  return (
-    <ExampleSearchBar
-      variant="with-dropdown"
-      onSearch={onSearch}
-      domains={domains}
-      loading={isSearching}
-    />
-  )
-}
-
-function FinProResultCard({ result }: { result: any }) {
-  const getStatusColor = (status?: string) => {
-    switch (status?.toLowerCase()) {
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'inactive': return 'bg-gray-100 text-gray-800'
-      case 'suspended': return 'bg-red-100 text-red-800'
-      default: return 'bg-blue-100 text-blue-800'
-    }
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'client': return '👤'
-      case 'account': return '💳'
-      case 'transaction': return '💰'
-      case 'portfolio': return '📊'
-      case 'document': return '📄'
-      default: return '📋'
-    }
-  }
-
-  return (
-    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-      <div className="flex items-center gap-4">
-        <div className="text-2xl">{getTypeIcon(result.type)}</div>
-        <div>
-          <h4 className="font-medium text-gray-900">{result.title}</h4>
-          <p className="text-sm text-gray-600">{result.subtitle}</p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        {result.amount && (
-          <span className="font-semibold text-gray-900">{result.amount}</span>
-        )}
-        {result.status && (
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
-            {result.status}
-          </span>
-        )}
-        <div className="text-gray-400">→</div>
-      </div>
-    </div>
-  )
-}
-
-function StatCard({ title, value, change, trend }: {
-  title: string
-  value: string
-  change: string
-  trend: 'up' | 'down'
-}) {
-  return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-        </div>
-        <div className={`text-sm font-medium ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-          {change}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Helper function to generate mock FinPro search results
-function generateFinProResults(searchTerm: string, domain?: string): Array<{
-  id: string
-  type: string
-  title: string
-  subtitle: string
-  status?: string
-  amount?: string
-}> {
-  const baseResults = [
-    {
-      id: '1',
-      type: 'Client',
-      title: 'Sarah Johnson',
-      subtitle: 'High-net-worth individual • Member since 2022',
-      status: 'Active',
-      amount: '$2.4M'
-    },
-    {
-      id: '2',
-      type: 'Account',
-      title: 'Premium Investment Account',
-      subtitle: 'Account #123456789 • Managed portfolio',
-      status: 'Active',
-      amount: '$890K'
-    },
-    {
-      id: '3',
-      type: 'Transaction',
-      title: 'Stock Purchase - AAPL',
-      subtitle: 'Buy order • 500 shares • Executed today',
-      status: 'Completed',
-      amount: '$75,250'
-    },
-    {
-      id: '4',
-      type: 'Portfolio',
-      title: 'Balanced Growth Portfolio',
-      subtitle: 'Conservative allocation • 8% YTD return',
-      status: 'Active',
-      amount: '$1.2M'
-    },
-    {
-      id: '5',
-      type: 'Document',
-      title: 'Q4 Financial Statement',
-      subtitle: 'Annual review • Generated Dec 2024',
-      status: 'Available'
-    }
-  ]
-
-  // Filter by domain if specified
-  let filteredResults = baseResults
-  if (domain && domain !== 'all') {
-    filteredResults = baseResults.filter(result =>
-      result.type.toLowerCase().includes(domain.slice(0, -1)) || // Remove 's' from plural
-      domain.slice(0, -1).includes(result.type.toLowerCase())
-    )
-  }
-
-  // Filter by search term
-  if (searchTerm.trim()) {
-    filteredResults = filteredResults.filter(result =>
-      result.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.subtitle.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }
-
-  return filteredResults.slice(0, 5) // Limit to 5 results
-}

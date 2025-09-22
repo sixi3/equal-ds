@@ -1,0 +1,11 @@
+/* FinPro Search Bar Component Styles */
+
+/* Component wrapper styles */
+.finpro-search-bar {
+  /* Component-specific layout adjustments */
+  width: 100%;
+  max-width: 32rem; /* 512px - matches the story layout */
+}
+
+/* Additional component-specific styles can be added here as needed */
+/* The main SearchBar component handles its own styling */

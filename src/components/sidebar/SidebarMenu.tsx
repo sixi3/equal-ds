@@ -479,7 +479,7 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
   }, [computedActive])
 
   const baseClass = cn(
-    'w-full inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ease-out will-change-[transform] h-10',
+    'w-full inline-flex items-center gap-3 rounded-lg px-3  text-sm transition-all duration-200 ease-out will-change-[transform] h-10',
     // Base styles for all tabs (prevents layout shift)
     'border border-transparent border-b-[2px]',
     computedActive
@@ -521,8 +521,8 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
     if (svg) {
       const wrap = doc.createElement('span')
       wrap.style.display = 'inline-flex'
-      wrap.style.width = '20px'
-      wrap.style.height = '20px'
+      wrap.style.width = '12px'
+      wrap.style.height = '12px'
       wrap.style.color = 'rgb(var(--color-text-muted))'
       wrap.appendChild(svg)
       el.appendChild(wrap)

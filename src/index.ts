@@ -6,11 +6,15 @@ export * from './components/sidebar'
 export * from './components/dropdown'
 export * from './components/datepicker'
 export * from './components/search'
+export * from './components/drawer'
 export * from './components/ui/HoverIndicator'
 export { useHoverAnimation } from './lib/useHoverAnimation'
 
 // Export FinProSidebar component
 export { FinProSidebar } from '../finpro-components/sidebar/FinProSidebar'
+
+// Export FinProSearchBar component
+export { FinProSearchBar } from '../finpro-components/search-bar/FinProSearchBar'
 
 // Typography utilities
 export * from './story-utils/designTokens'

@@ -130,4 +130,21 @@
   transform-origin: top center;
 }
 
+/* Simple fade in animation for overlays */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 200ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation-fill-mode: both;
+  will-change: opacity;
+  backface-visibility: hidden;
+}
+
+
 

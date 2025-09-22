@@ -56,7 +56,7 @@ const SidebarGroupContentImpl = ({ className, ...props }: SidebarGroupContentPro
 export interface SidebarGroupTriggerProps extends React.ComponentPropsWithoutRef<typeof Collapsible.Trigger> {}
 
 function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroupTriggerProps): JSX.Element {
-  const { open, fullyOpen } = useSidebarOpenContext()
+  const { open: sidebarOpen, fullyOpen } = useSidebarOpenContext()
   const reorderCtx = React.useContext(GroupReorderContext)
   const handleRef = React.useRef<HTMLSpanElement | null>(null)
   const labelRef = React.useRef<HTMLDivElement | null>(null)
@@ -147,10 +147,10 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
     >
       <div className={cn(
         'flex items-center text-xs font-semibold uppercase tracking-widest text-secondary',
-        open ? 'justify-start gap-2' : 'justify-center'
+        sidebarOpen ? 'justify-start gap-2' : 'justify-center'
       )}>
         {/* Handle - only visible when reordering is enabled and sidebar is open */}
-        {open && reorderCtx?.enabled ? (
+        {sidebarOpen && reorderCtx?.enabled ? (
           <span
             ref={handleRef}
             className="inline-flex items-center justify-center w-4 h-4 opacity-50 hover:opacity-100 cursor-grab active:cursor-grabbing group/icon"
@@ -167,14 +167,15 @@ function SidebarGroupTriggerImpl({ className, children, ...props }: SidebarGroup
         )}
         <div className={cn(
           'h-px bg-border-default',
-          open ? 'flex-1' : 'w-3'
+          sidebarOpen ? 'flex-1' : 'w-3'
         )} />
         <span className="inline-flex items-center justify-center h-6 w-6 rounded-full transition-colors group-hover/trigger:bg-primary-300/20">
           <ChevronIcon
             aria-hidden
-            isOpen={open}
             size="sm"
-            className="text-secondary"
+            className="text-secondary group-data-[state=open]:rotate-180"
+            duration={300}
+            easing="ease-out"
           />
         </span>
       </div>
