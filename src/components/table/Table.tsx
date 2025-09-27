@@ -1,12 +1,14 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { RotateCw } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { useControllableState } from '../../lib/useControllableProp'
 import { Loader } from '../loader'
 import { TableHeader } from './TableHeader'
 import { TableBody } from './TableBody'
 import { TablePagination } from './TablePagination'
+import { TableColumnManager } from './TableColumnManager'
 import { TableActionsMenu } from './TableActionsMenu'
-import type { TableProps } from './types'
+import type { TableProps, TableColumn } from './types'
 
 /**
  * Main Table component that supports 20+ columns with pagination and flexible cell content
@@ -29,10 +31,120 @@ function TableImpl<T = any>({
   enableHorizontalScroll = true,
   tableClassName,
   showHeaderShadowOnScroll = true,
+  columnOrder: columnOrderProp,
+  defaultColumnOrder,
+  onColumnOrderChange,
+  columnManager,
+  columnVisibility: columnVisibilityProp,
+  defaultColumnVisibility,
+  onColumnVisibilityChange,
   ...props
 }: TableProps<T>): JSX.Element {
+  const initialOrder = useMemo(() => {
+    const base = columns.map((column) => column.key)
+    if (defaultColumnOrder && defaultColumnOrder.length) {
+      const normalized = defaultColumnOrder.filter((key) => base.includes(key))
+      const missing = base.filter((key) => !normalized.includes(key))
+      return [...normalized, ...missing]
+    }
+    return base
+  }, [columns, defaultColumnOrder])
+
+  const [columnOrder, setColumnOrder] = useControllableState<string[]>({
+    value: columnOrderProp,
+    defaultValue: initialOrder,
+    onChange: onColumnOrderChange,
+  })
+
+  const initialVisibility = useMemo(() => {
+    const visibility: Record<string, boolean> = {}
+    columns.forEach((column) => {
+      const key = column.key
+      if (defaultColumnVisibility && key in defaultColumnVisibility) {
+        visibility[key] = Boolean(defaultColumnVisibility[key])
+      } else {
+        visibility[key] = true
+      }
+    })
+    return visibility
+  }, [columns, defaultColumnVisibility])
+
+  const [columnVisibility, setColumnVisibility] = useControllableState<Record<string, boolean>>({
+    value: columnVisibilityProp,
+    defaultValue: initialVisibility,
+    onChange: onColumnVisibilityChange,
+  })
+  const [visibilityBaseline] = useState(initialVisibility)
+
+  const columnKeys = useMemo(() => columns.map((column) => column.key), [columns])
+
+  const effectiveOrder = useMemo(() => {
+    const source = columnOrder && columnOrder.length ? columnOrder : initialOrder
+    const deduped = source.filter((key) => columnKeys.includes(key))
+    const missing = columnKeys.filter((key) => !deduped.includes(key))
+    return [...deduped, ...missing]
+  }, [columnKeys, columnOrder, initialOrder])
+
+  useEffect(() => {
+    if (columnOrderProp !== undefined) return
+    if (
+      !columnOrder ||
+      columnOrder.length !== effectiveOrder.length ||
+      effectiveOrder.some((key, index) => key !== columnOrder[index])
+    ) {
+      setColumnOrder(effectiveOrder)
+    }
+  }, [columnOrderProp, columnOrder, effectiveOrder, setColumnOrder])
+
+  const orderedColumns = useMemo(() => {
+    const columnMap = new Map(columns.map((column) => [column.key, column]))
+    return effectiveOrder
+      .map((key) => columnMap.get(key))
+      .filter((col): col is typeof columns[number] => Boolean(col))
+  }, [columns, effectiveOrder])
+
+  const managedColumns = useMemo<TableColumn<T>[]>(() => {
+    if (!columnManager?.enabled) {
+      return orderedColumns
+    }
+    return orderedColumns.map((column) => ({
+      ...column,
+      reorderable: column.reorderable ?? (!column.isActions && !column.locked),
+      hideable: column.hideable ?? (!column.isActions && !column.locked),
+    }))
+  }, [columnManager?.enabled, orderedColumns])
+
+  const visibleColumns = useMemo(() => {
+    return managedColumns.filter((column) => {
+      if (column.locked === true || column.isActions) return true
+      return columnVisibility[column.key] !== false
+    })
+  }, [managedColumns, columnVisibility])
+
+  const handleColumnOrderChange = useCallback(
+    (nextOrder: string[]) => {
+      setColumnOrder(nextOrder)
+    },
+    [setColumnOrder],
+  )
+
+  const handleColumnVisibilityToggle = useCallback(
+    (key: string, visible: boolean) => {
+      const column = managedColumns.find((col) => col.key === key)
+      if (!column || column.locked || column.isActions) return
+
+      setColumnVisibility({
+        ...columnVisibility,
+        [key]: visible,
+      })
+    },
+    [columnVisibility, managedColumns, setColumnVisibility],
+  )
+
+  const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false)
+
   // Calculate actions column width for positioning blur indicator
-  const actionsColumn = columns.find(col => col.isActions)
+  const actionsColumn = visibleColumns.find(col => col.isActions)
   const actionsColumnWidth = actionsColumn?.width
     ? typeof actionsColumn.width === 'string'
       ? parseInt(actionsColumn.width.toString())
@@ -59,7 +171,7 @@ function TableImpl<T = any>({
   const handleSelectAll = (selected: boolean) => {
     if (!onSelectionChange) return
 
-    const newSelected = selected ? data.map((_, index) => index) : []
+    const newSelected = selected ? data.map((row, index) => (row as any).id ?? index) : []
     onSelectionChange(newSelected)
   }
 
@@ -137,14 +249,14 @@ function TableImpl<T = any>({
           ) : (
             <table className={cn('w-full h-full border-collapse table-fixed', tableClassName)}>
               <TableHeader
-                columns={columns}
+                columns={visibleColumns}
                 selectable={selectable}
                 allSelected={data.length > 0 && selectedRows.length === data.length}
                 onSelectAll={handleSelectAll}
                 showShadow={showHeaderShadowOnScroll && isScrolled}
               />
               <TableBody
-                columns={columns.map(column => {
+                columns={visibleColumns.map(column => {
                   // If this is an actions column and onRefreshRow is provided,
                   // modify the render function to include the refresh action
                   if (column.isActions && onRefreshRow && column.render) {
@@ -197,8 +309,37 @@ function TableImpl<T = any>({
       {/* Pagination */}
       {pagination && (
         <div className="shrink-0">
-          <TablePagination {...pagination} />
+          <TablePagination
+            {...pagination}
+            columnManager={columnManager?.enabled
+              ? {
+                  onOpen: () => setIsColumnManagerOpen(true),
+                  label: columnManager.triggerLabel,
+                  srLabel: columnManager.triggerSrLabel,
+                  disabled: loading,
+                }
+              : undefined}
+          />
         </div>
+      )}
+
+      {columnManager?.enabled && (
+        <TableColumnManager
+          open={isColumnManagerOpen}
+          onOpenChange={setIsColumnManagerOpen}
+          columns={managedColumns}
+          visibleColumnKeys={visibleColumns.map((column) => column.key)}
+          columnOrder={managedColumns.length ? effectiveOrder : []}
+          onColumnOrderChange={handleColumnOrderChange}
+          defaultOrder={initialOrder}
+          title={columnManager.drawerTitle}
+          description={columnManager.drawerDescription}
+          width={columnManager.drawerWidth}
+          resetLabel={columnManager.resetLabel}
+          allowHiding={columnManager.allowHiding}
+          onColumnVisibilityChange={handleColumnVisibilityToggle}
+          onResetVisibility={() => setColumnVisibility(visibilityBaseline)}
+        />
       )}
     </div>
   )

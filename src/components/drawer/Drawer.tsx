@@ -23,8 +23,18 @@ export interface DrawerProps extends React.HTMLAttributes<HTMLElement> {
   width?: DrawerWidth
 }
 
-function DrawerImpl({ className, variant = 'overlay', width, ...props }: DrawerProps): JSX.Element {
+function DrawerImpl({ className, variant = 'overlay', width, style, ...props }: DrawerProps): JSX.Element {
   const { open, side } = useDrawerContext()
+
+  const widthClass = typeof width === 'string' && width.startsWith('w-') ? width : undefined
+  const widthStyle: React.CSSProperties = {
+    width:
+      typeof width === 'number'
+        ? `${width}px`
+        : typeof width === 'string' && !widthClass
+          ? width
+          : undefined,
+  }
 
   return (
     <aside
@@ -46,7 +56,7 @@ function DrawerImpl({ className, variant = 'overlay', width, ...props }: DrawerP
           ? 'left-0 border-r'
           : 'right-0 border-l',
         // Width - simple and direct
-        width ? (typeof width === 'number' ? `w-[${width}px]` : width) : 'w-[320px]',
+        widthClass ?? (!width ? 'w-[320px]' : undefined),
         'transition-transform duration-300 cubic-bezier(0.95, 0.05, 0.795, 0.035)',
         side === 'left'
           ? 'data-[state=open]:translate-x-0 data-[state=closed]:-translate-x-full'
@@ -60,6 +70,7 @@ function DrawerImpl({ className, variant = 'overlay', width, ...props }: DrawerP
         ],
         className,
       )}
+      style={{ ...widthStyle, ...style }}
       {...props}
     />
   )

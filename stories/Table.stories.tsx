@@ -557,6 +557,11 @@ export const FinPro: FinProStory = {
             data={paginatedData}
             onRefreshRow={refreshRow}
             refreshingRows={refreshingRows}
+            columnManager={{
+              enabled: true,
+              triggerLabel: 'Manage columns',
+              allowHiding: true,
+            }}
             pagination={{
               currentPage,
               totalPages: undefined,
@@ -576,8 +581,8 @@ export const FinPro: FinProStory = {
   },
   args: {
     columns: [
-      { key: 'fiData', header: 'FI DATA', accessor: (row) => row.fiData, width: 150 },
-      { key: 'dataRequestMode', header: 'DATA REQUEST MODE', accessor: (row) => row.dataRequestMode, width: 250 },
+      { key: 'fiData', header: 'FI Data', accessor: (row) => row.fiData, width: 150, locked: true },
+      { key: 'dataRequestMode', header: 'Data Request Mode', accessor: (row) => row.dataRequestMode, width: 250, locked: true },
       { key: 'dataStatus', header: 'Data Status', accessor: (row) => {
         const tagResult = getDataStatusTag(row.dataStatus);
         return {
@@ -598,7 +603,7 @@ export const FinPro: FinProStory = {
       { key: 'consentHandle', header: 'Consent HANDLE', accessor: (row) => row.consentHandle, width: 200, copyable: true },
       { key: 'consentId', header: 'Consent ID', accessor: (row) => row.consentId, width: 200, copyable: true },
       { key: 'consentTemplateId', header: 'Consent Template ID', accessor: (row) => row.consentTemplateId, width: 250 },
-      { key: 'consentValidity', header: 'Consent VALIDITY', accessor: (row) => row.consentValidity, width: 200 },
+      { key: 'consentValidity', header: 'Consent Validity', accessor: (row) => row.consentValidity, width: 200 },
       { key: 'consentMode', header: 'Consent Mode', accessor: (row) => row.consentMode, width: 200 },
       { key: 'consentType', header: 'Consent Type', accessor: (row) => row.consentType, width: 200 },
       { key: 'fetchType', header: 'Fetch Type', accessor: (row) => row.fetchType, width: 200 },
@@ -611,8 +616,8 @@ export const FinPro: FinProStory = {
       { key: 'accountsLinked', header: 'Accounts Linked', accessor: (row) => row.accountsLinked, width: 180 },
       { key: 'aaId', header: 'AA ID', accessor: (row) => row.aaId, width: 180 },
       { key: 'consentCreatedBy', header: 'Consent Created By', accessor: (row) => row.consentCreatedBy, width: 200 },
-      { key: 'consentCreatedAt', header: 'Consent Created AT', accessor: (row) => row.consentCreatedAt, width: 200 },
-      { key: 'consentActedOn', header: 'Consent ACTED On', accessor: (row) => row.consentActedOn, width: 200 },
+      { key: 'consentCreatedAt', header: 'Consent Created At', accessor: (row) => row.consentCreatedAt, width: 200 },
+      { key: 'consentActedOn', header: 'Consent Acted On', accessor: (row) => row.consentActedOn, width: 200 },
       {
         key: 'actions',
         header: 'Actions',

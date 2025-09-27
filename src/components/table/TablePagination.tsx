@@ -1,11 +1,18 @@
 import React from 'react'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Check, Columns3 } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { DropdownTrigger } from '../dropdown/DropdownTrigger'
 import { DropdownContent } from '../dropdown/DropdownContent'
 import { DropdownItem } from '../dropdown/DropdownItem'
 import { Dropdown } from '../dropdown/Dropdown'
 import type { TablePaginationProps } from './types'
+
+interface ColumnManagerTriggerProps {
+  onOpen: () => void
+  label?: string
+  srLabel?: string
+  disabled?: boolean
+}
 
 function TablePaginationImpl({
   currentPage,
@@ -18,7 +25,8 @@ function TablePaginationImpl({
   pageSizeOptions = [10, 25, 50, 100],
   showPageSizeSelector = true,
   isFetching = false,
-}: TablePaginationProps): JSX.Element {
+  columnManager,
+}: TablePaginationProps & { columnManager?: ColumnManagerTriggerProps }): JSX.Element {
   const startItem = (currentPage - 1) * pageSize + 1
   const totalKnown = typeof totalItems === 'number' && totalItems >= 0
   const endItem = totalKnown ? Math.min(currentPage * pageSize, totalItems) : currentPage * pageSize
@@ -119,15 +127,15 @@ function TablePaginationImpl({
                   {pageSize}
                 </DropdownTrigger>
                 {!isFetching && (
-                  <DropdownContent className="w-20">
+                  <DropdownContent className="w-20 py-0">
                     {pageSizeOptions.map((size) => (
                       <DropdownItem
                         key={size}
                         onClick={() => onPageSizeChange(size)}
                         data-active={size === pageSize ? "true" : undefined}
                         className={cn(
-                          "text-center justify-between",
-                          size === pageSize && "bg-primary-50 text-text-primary font-medium"
+                          "text-center justify-between my-1",
+                          size === pageSize && "bg-background-tertiary text-text-primary font-medium"
                         )}
                       >
                         <span>{size}</span>
@@ -139,6 +147,7 @@ function TablePaginationImpl({
               </Dropdown>
             </div>
           )}
+        
         <span className="h-4 w-px bg-border-default"></span>
         <div className="flex items-center gap-1">
           {/* First page */}
@@ -220,6 +229,25 @@ function TablePaginationImpl({
               <ChevronsRight className="w-3 h-3" />
             </button>
           )}
+          <span className="h-4 w-px bg-border-default" aria-hidden="true"></span>
+          {columnManager && (
+          <>
+            <button
+              type="button"
+              onClick={columnManager.onOpen}
+              disabled={columnManager.disabled}
+              className={cn(
+                'inline-flex items-center gap-1.5 text-xs font-medium text-text-primary hover:underline transition-colors duration-200 mx-3',
+                'hover:border-border-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+                columnManager.disabled && 'opacity-60 cursor-not-allowed',
+              )}
+              aria-label={columnManager.srLabel ?? columnManager.label ?? 'Manage columns'}
+            >
+              <Columns3 className="h-4 w-4" aria-hidden="true" />
+              <span>{columnManager.label ?? 'Manage columns'}</span>
+            </button>
+          </>
+        )}
         </div>
       </div>
     </div>

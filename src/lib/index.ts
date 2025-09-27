@@ -4,4 +4,5 @@ export { formatDate, formatDateRange, formatDateTimeRange, formatDateTimeRange24
 export { formatTime12, formatTime24, compareTimes, parseTimeString, parseTimeStringLegacy, addMinutesWithDays } from './timeUtils'
 export { useHoverAnimation } from './useHoverAnimation'
 export { useCopyToClipboard } from './useCopyToClipboard'
+export { useControllableProp, useControllableState } from './useControllableProp'
 export { getConsentStatusTag, getDataStatusTag, getAllConsentStatuses, getAllDataStatuses, type ConsentStatusKey, type DataStatusKey, type StatusTagResult } from './finpro-status-tags'

@@ -72,7 +72,7 @@ function TableBodyImpl<T = any>({
             columns={columns}
             onClick={onRowClick}
             selectable={selectable}
-            isSelected={selectedRows.includes(index)}
+            isSelected={selectedRows.includes(rowId)}
             onSelectionChange={onRowSelection}
             isRefreshing={isRefreshing}
           />

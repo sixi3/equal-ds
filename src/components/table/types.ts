@@ -54,6 +54,12 @@ export interface TableColumn<T = any> {
   copyable?: boolean | ((row: T, value: any) => string)
   /** Optional label for copy tooltip */
   copyLabel?: string
+  /** Whether this column participates in user-driven reordering */
+  reorderable?: boolean
+  /** Whether users can toggle visibility for this column */
+  hideable?: boolean
+  /** Whether column is locked from reordering and visibility changes */
+  locked?: boolean
 }
 
 /**
@@ -131,6 +137,29 @@ export interface TableProps<T = any> {
   tableClassName?: string
   /** Whether to add a shadow under the header when vertically scrolled */
   showHeaderShadowOnScroll?: boolean
+  /** External control over column ordering */
+  columnOrder?: string[]
+  /** Default order used when uncontrolled or for reset */
+  defaultColumnOrder?: string[]
+  /** Callback when column order changes */
+  onColumnOrderChange?: (order: string[]) => void
+  /** Column manager (drawer) configuration */
+  columnManager?: {
+    enabled?: boolean
+    triggerLabel?: string
+    triggerSrLabel?: string
+    drawerTitle?: string
+    drawerDescription?: string
+    drawerWidth?: number | string
+    resetLabel?: string
+    allowHiding?: boolean
+  }
+  /** External visibility control for columns */
+  columnVisibility?: Record<string, boolean>
+  /** Default visibility map when uncontrolled */
+  defaultColumnVisibility?: Record<string, boolean>
+  /** Callback when column visibility changes */
+  onColumnVisibilityChange?: (visibility: Record<string, boolean>) => void
 }
 
 /**
