@@ -30,7 +30,7 @@ export interface HoverIndicatorProps extends React.HTMLAttributes<HTMLDivElement
 }
 
 const variantStyles = {
-  default: 'bg-primary-300/20 border border-border-default',
+  default: 'bg-primary-300/10 border border-border-default',
   subtle: 'bg-gray-300/10 border border-gray-200/50',
   primary: 'bg-primary-400/30 border border-primary-300/50',
   accent: 'bg-accent-300/20 border border-accent-200/50'

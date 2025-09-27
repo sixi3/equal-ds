@@ -6,6 +6,7 @@ import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart,
 import { cn } from '../src/lib/cn'
 import { ChevronIcon } from '../src/lib/ChevronIcon'
 import { useState } from 'react'
+import { getConsentStatusTag } from '../src'
 
 
 
@@ -537,25 +538,12 @@ export const MultiselectFilter: Story = {
                       : selectedStatuses.length === 1
                       ? (() => {
                           const option = statusOptions.find(opt => opt.value === selectedStatuses[0])
-                        return (
-                          <span                             className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium uppercase tracking-wider ${
-                              option?.label.toLowerCase() === 'active'
-                                ? 'bg-status-active-bg text-status-active-text'
-                                : option?.label.toLowerCase() === 'pending'
-                                ? 'bg-status-pending-bg text-status-pending-text'
-                                : option?.label.toLowerCase() === 'rejected'
-                                ? 'bg-status-rejected-bg text-status-rejected-text'
-                                : option?.label.toLowerCase() === 'revoked'
-                                ? 'bg-status-revoked-bg text-status-revoked-text'
-                                : option?.label.toLowerCase() === 'paused'
-                                ? 'bg-status-paused-bg text-status-paused-text'
-                                : option?.label.toLowerCase() === 'failed'
-                                ? 'bg-status-failed-bg text-status-failed-text'
-                                : 'bg-[#F3F4F6] text-[#374151]'
-                            }`}>
-                            {option?.label}
-                          </span>
-                        )
+                          const tagResult = getConsentStatusTag(option?.value || '')
+                          return (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium uppercase tracking-wider ${tagResult.tagProps.className}`}>
+                              {tagResult.label}
+                            </span>
+                          )
                         })()
                       : `${selectedStatuses.length} selected`
                     }

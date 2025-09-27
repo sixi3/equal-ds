@@ -81,7 +81,7 @@
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.4.20",
-    "design-tokens-sync": "^1.4.1",
+    "design-tokens-sync": "^2.1.0",
     "eslint": "^9.7.0",
     "eslint-config-prettier": "^9.1.0",
     "jest-axe": "^9.0.0",

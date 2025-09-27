@@ -10,6 +10,10 @@ export interface DropdownProps extends React.ComponentPropsWithoutRef<typeof Dro
    * Default open state
    */
   defaultOpen?: boolean
+  /**
+   * Whether the dropdown is disabled
+   */
+  disabled?: boolean
 }
 
 export const DropdownContext = React.createContext<{
@@ -22,6 +26,7 @@ export const DropdownContext = React.createContext<{
 export function Dropdown({
   onOpenChange,
   defaultOpen = false,
+  disabled = false,
   children,
   ...props
 }: DropdownProps): JSX.Element {
@@ -36,11 +41,14 @@ export function Dropdown({
   }, [onOpenChange])
 
   const handleOpenChange = React.useCallback((open: boolean) => {
+    // Prevent opening if disabled
+    if (disabled && open) return
+
     if (!isControlled) {
       setInternalIsOpen(open)
     }
     onOpenChange?.(open)
-  }, [isControlled, onOpenChange])
+  }, [disabled, isControlled, onOpenChange])
 
   const currentIsOpen = isControlled ? (props.open ?? false) : internalIsOpen
 

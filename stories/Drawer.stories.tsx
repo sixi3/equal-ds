@@ -8,7 +8,7 @@ import {
   DrawerTrigger,
   DrawerOverlay,
 } from '../src'
-import { Settings, User, Bell, Menu, Columns3, ArrowLeft } from 'lucide-react'
+import { Settings, User, Bell, Menu, Columns3, ArrowLeft, FileText } from 'lucide-react'
 
 const meta: Meta = {
   title: 'Components/Drawer',
@@ -216,4 +216,51 @@ export const WithCustomHeader: Story = {
       </div>
     </DrawerProvider>
   ),
+}
+
+export const FinProNew: Story = {
+  render: () => (
+    <DrawerProvider side="right">
+      <div className="relative h-screen bg-gray-100">
+        {/* Trigger Button */}
+        <DrawerTrigger className="fixed top-4 left-4 z-30 p-2 bg-white rounded-md shadow-md hover:shadow-lg transition-shadow">
+          <Menu className="w-5 h-5" />
+        </DrawerTrigger>
+
+        {/* Main Content */}
+        <div className="p-8">
+          <h1 className="text-2xl font-bold mb-4">Main Content</h1>
+          <p className="text-gray-600 mb-4">
+            Extra wide logs drawer with guaranteed width using inline styles.
+          </p>
+        </div>
+
+        {/* Overlay */}
+        <DrawerOverlay />
+
+        {/* Custom wide drawer using inline styles */}
+        <Drawer
+          variant="overlay"
+          className="border-border-default"
+          style={{ width: '1000px' }}
+        >
+          <DrawerHeader
+            title="View Logs"
+            subtitle="Monitor system activity, errors, and performance metrics in real-time"
+            icon={<FileText className="w-5 h-5" />}
+          />
+          <DrawerContent>
+            {/* Empty content as requested */}
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </DrawerProvider>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Extra wide drawer (1200px) for viewing system logs using inline styles for guaranteed width.',
+      },
+    },
+  },
 }

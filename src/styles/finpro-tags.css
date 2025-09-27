@@ -1,0 +1,107 @@
+/* FinPro Status Tag Styles */
+
+.finpro-tag {
+  /* Base styles are handled by the Tag component */
+}
+
+/* Status tag color themes using design system tokens */
+
+.status-active {
+  background-color: var(--component-status-active-backgroundColor, #dcfce7);
+  color: var(--component-status-active-textColor, #166534);
+  border-color: var(--component-status-active-borderColor, #bbf7d0);
+}
+
+.status-pending {
+  background-color: var(--component-status-pending-backgroundColor, #dbeafe);
+  color: var(--component-status-pending-textColor, #1e40af);
+  border-color: var(--component-status-pending-borderColor, #bfdbfe);
+}
+
+.status-rejected {
+  background-color: var(--component-status-rejected-backgroundColor, #fef2f2);
+  color: var(--component-status-rejected-textColor, #dc2626);
+  border-color: var(--component-status-rejected-borderColor, #fecaca);
+}
+
+.status-revoked {
+  background-color: var(--component-status-revoked-backgroundColor, #faf5ff);
+  color: var(--component-status-revoked-textColor, #7c3aed);
+  border-color: var(--component-status-revoked-borderColor, #d8b4fe);
+}
+
+.status-paused {
+  background-color: var(--component-status-paused-backgroundColor, #fff7ed);
+  color: var(--component-status-paused-textColor, #c2410c);
+  border-color: var(--component-status-paused-borderColor, #fed7aa);
+}
+
+.status-failed {
+  background-color: var(--component-status-failed-backgroundColor, #1f1f23);
+  color: var(--component-status-failed-textColor, #ef4444);
+  border-color: var(--component-status-failed-borderColor, #dc2626);
+}
+
+.status-expired {
+  background-color: var(--component-status-expired-backgroundColor, #f3f4f6);
+  color: var(--component-status-expired-textColor, #6b7280);
+}
+
+/* Consent status specific variants */
+
+.consent-active {
+  background-color: var(--component-status-active-backgroundColor, #dcfce7);
+  color: var(--component-status-active-textColor, #166534);
+}
+
+.consent-pending {
+  background-color: var(--component-status-pending-backgroundColor, #dbeafe);
+  color: var(--component-status-pending-textColor, #1e40af);
+}
+
+.consent-rejected {
+  background-color: var(--component-status-rejected-backgroundColor, #fef2f2);
+  color: var(--component-status-rejected-textColor, #dc2626);
+}
+
+.consent-revoked {
+  background-color: var(--component-status-revoked-backgroundColor, #faf5ff);
+  color: var(--component-status-revoked-textColor, #7c3aed);
+}
+
+.consent-paused {
+  background-color: var(--component-status-paused-backgroundColor, #fff7ed);
+  color: var(--component-status-paused-textColor, #c2410c);
+}
+
+.consent-failed {
+  background-color: var(--component-status-failed-backgroundColor, #1f1f23);
+  color: var(--component-status-failed-textColor, #ef4444);
+}
+
+.consent-expired {
+  background-color: var(--component-status-expired-backgroundColor, #f3f4f6);
+  color: var(--component-status-expired-textColor, #6b7280);
+}
+
+/* Data status specific variants */
+
+.data-fetched {
+  background-color: var(--component-status-active-backgroundColor, #dcfce7);
+  color: var(--component-status-active-textColor, #166534);
+}
+
+.data-new {
+  background-color: var(--component-status-pending-backgroundColor, #dbeafe);
+  color: var(--component-status-pending-textColor, #1e40af);
+}
+
+.data-expired {
+  background-color: var(--component-status-expired-backgroundColor, #f3f4f6);
+  color: var(--component-status-expired-textColor, #6b7280);
+}
+
+.data-refreshing {
+  background-color: var(--component-status-paused-backgroundColor, #fff7ed);
+  color: var(--component-status-paused-textColor, #c2410c);
+}

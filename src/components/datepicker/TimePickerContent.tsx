@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Check } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { useHoverAnimation } from '../../lib/useHoverAnimation'
 import { HoverIndicator } from '../ui/HoverIndicator'
@@ -94,6 +95,7 @@ export const TimePickerContent = React.forwardRef<HTMLDivElement, TimePickerCont
     // Hover animation setup
     const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
       itemSelector: '[data-timepicker-item]',
+      excludeSelector: '[data-active="true"]',
       enabled: enableHoverAnimation
     })
 
@@ -184,7 +186,7 @@ export const TimePickerContent = React.forwardRef<HTMLDivElement, TimePickerCont
     React.useEffect(() => {
       if (isOpen && selectedTime && scrollRef.current) {
         // Find the selected time button
-        const selectedButton = scrollRef.current.querySelector('[data-selected="true"]') as HTMLElement
+        const selectedButton = scrollRef.current.querySelector('[data-active="true"]') as HTMLElement
         if (selectedButton) {
           // Use setTimeout to ensure DOM is fully rendered
           setTimeout(() => {
@@ -239,23 +241,25 @@ export const TimePickerContent = React.forwardRef<HTMLDivElement, TimePickerCont
           <div className="time-picker-scroll space-y-1">
             {timeOptions.map((time) => {
               const isDisabled = isTimeDisabled ? isTimeDisabled(time) : false
+              const isSelected = isTimeSelected(time)
               return (
                 <button
                   key={time.value}
-                  {...(!isTimeSelected(time) && !isDisabled ? { 'data-timepicker-item': true } : {})}
-                  {...(isTimeSelected(time) ? { 'data-selected': 'true' } : {})}
+                  {...(!isSelected && !isDisabled ? { 'data-timepicker-item': true } : {})}
+                  {...(isSelected ? { 'data-active': 'true' } : {})}
                   onClick={() => !isDisabled && handleTimeSelect(time)}
                   disabled={isDisabled}
                   className={cn(
-                    'w-full px-3 py-2 text-left text-sm rounded-md transition-colors duration-200',
+                    'w-full px-3 py-2 text-left text-sm rounded-md transition-colors duration-200 flex items-center justify-between',
                     isDisabled
                       ? 'opacity-50 cursor-not-allowed text-[var(--color-text-secondary)] bg-transparent'
-                      : isTimeSelected(time)
-                      ? 'bg-primary-200 text-text-primary font-[var(--typography-fontWeight-medium)]'
+                      : isSelected
+                      ? 'bg-primary-50 text-text-primary font-medium'
                       : 'text-[var(--color-text-primary)] font-[var(--typography-fontWeight-normal)] hover:bg-[var(--color-background-tertiary)]'
                   )}
                 >
-                  {time.label}
+                  <span>{time.label}</span>
+                  {isSelected && <Check className="h-4 w-4" />}
                 </button>
               )
             })}

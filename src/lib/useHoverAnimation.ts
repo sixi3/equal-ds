@@ -3,6 +3,8 @@ import * as React from 'react'
 export interface HoverIndicator {
   top: number
   left: number
+  bottom: number
+  right: number
   width: number
   height: number
   visible: boolean
@@ -37,6 +39,16 @@ export interface HoverAnimationReturn {
   handleMouseLeave: () => void
   setContainerRef: (node: HTMLElement | null) => void
 }
+
+const HIDDEN_INDICATOR: HoverIndicator = Object.freeze({
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  width: 0,
+  height: 0,
+  visible: false
+})
 
 /**
  * Reusable hook for creating smooth hover animations that follow the cursor
@@ -75,46 +87,95 @@ export function useHoverAnimation(options: HoverAnimationOptions = {}): HoverAni
   } = options
 
   const containerRef = React.useRef<HTMLElement | null>(null)
-  const [indicator, setIndicator] = React.useState<HoverIndicator>({
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    visible: false
-  })
+  const [indicator, setIndicatorState] = React.useState<HoverIndicator>(() => HIDDEN_INDICATOR)
 
-  // Performance optimization: batch updates using requestAnimationFrame
+  const indicatorRef = React.useRef<HoverIndicator>(indicator)
+
+  // Performance optimisation: batch updates using requestAnimationFrame
   const rafPendingRef = React.useRef<boolean>(false)
+  const rafIdRef = React.useRef<number | null>(null)
+  const lastTargetRef = React.useRef<HTMLElement | null>(null)
   const pendingDataRef = React.useRef<{
-    tRect: DOMRect
-    cRect: DOMRect
+    target: HTMLElement
   } | null>(null)
+
+  const commitIndicator = React.useCallback((updater: HoverIndicator | ((prev: HoverIndicator) => HoverIndicator)) => {
+    setIndicatorState(prevState => {
+      const nextState = typeof updater === 'function' ? (updater as (prev: HoverIndicator) => HoverIndicator)(prevState) : updater
+
+      const current = indicatorRef.current
+      if (
+        current.top === nextState.top &&
+        current.left === nextState.left &&
+        current.bottom === nextState.bottom &&
+        current.right === nextState.right &&
+        current.width === nextState.width &&
+        current.height === nextState.height &&
+        current.visible === nextState.visible
+      ) {
+        return prevState
+      }
+
+      indicatorRef.current = nextState
+      return nextState
+    })
+  }, [])
+
+  const hideIndicator = React.useCallback(() => {
+    commitIndicator(prev => (prev.visible ? HIDDEN_INDICATOR : prev))
+    lastTargetRef.current = null
+    pendingDataRef.current = null
+  }, [commitIndicator])
 
   const setContainerRef = React.useCallback((node: HTMLElement | null) => {
     containerRef.current = node
   }, [])
 
+  const isTouchDevice = React.useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  }, [])
+
+  const effectiveEnabled = enabled && !isTouchDevice
+
   const flushPointerFrame = React.useCallback(() => {
     rafPendingRef.current = false
+    rafIdRef.current = null
     const data = pendingDataRef.current
-    if (!data || !enabled) return
+    if (!data || !effectiveEnabled) return
 
-    const { tRect, cRect } = data
     const container = containerRef.current
-    if (!container) return
+    const target = data.target
+    if (!container || !target?.isConnected) return
 
-    // Calculate relative position within the container
-    setIndicator({
-      top: tRect.top - cRect.top + (container.scrollTop ?? 0),
-      left: tRect.left - cRect.left + (container.scrollLeft ?? 0),
+    const cRect = container.getBoundingClientRect()
+    const tRect = target.getBoundingClientRect()
+
+    const scrollTop = 'scrollTop' in container ? container.scrollTop : 0
+    const scrollLeft = 'scrollLeft' in container ? container.scrollLeft : 0
+    const borderTop = 'clientTop' in container ? container.clientTop : 0
+    const borderLeft = 'clientLeft' in container ? container.clientLeft : 0
+
+    commitIndicator({
+      top: tRect.top - cRect.top + scrollTop - borderTop,
+      left: tRect.left - cRect.left + scrollLeft - borderLeft,
+      bottom: tRect.bottom - cRect.bottom + scrollTop - borderTop,
+      right: tRect.right - cRect.right + scrollLeft - borderLeft,
       width: tRect.width,
       height: tRect.height,
       visible: true
     })
-  }, [enabled])
+  }, [commitIndicator, effectiveEnabled])
+
+  const scheduleFrame = React.useCallback(() => {
+    if (!rafPendingRef.current) {
+      rafPendingRef.current = true
+      rafIdRef.current = requestAnimationFrame(flushPointerFrame)
+    }
+  }, [flushPointerFrame])
 
   const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (!enabled) return
+    if (!effectiveEnabled) return
 
     const container = containerRef.current
     if (!container) return
@@ -126,27 +187,85 @@ export function useHoverAnimation(options: HoverAnimationOptions = {}): HoverAni
     // Check if this item should be excluded from hover animation
     if (excludeSelector && targetItem.matches(excludeSelector)) {
       // Hide the indicator if hovering over an excluded item
-      setIndicator(prev => ({ ...prev, visible: false }))
+      hideIndicator()
       return
     }
 
-    const cRect = container.getBoundingClientRect()
-    const tRect = targetItem.getBoundingClientRect()
+    if (targetItem === lastTargetRef.current && indicatorRef.current.visible) {
+      return
+    }
 
     // Store pending data for the next animation frame
-    pendingDataRef.current = { tRect, cRect }
+    pendingDataRef.current = { target: targetItem }
+    lastTargetRef.current = targetItem
 
     // Schedule update if not already pending
-    if (!rafPendingRef.current) {
-      rafPendingRef.current = true
-      requestAnimationFrame(flushPointerFrame)
-    }
-  }, [enabled, itemSelector, excludeSelector, flushPointerFrame])
+    scheduleFrame()
+  }, [effectiveEnabled, itemSelector, excludeSelector, hideIndicator, scheduleFrame])
 
   const handleMouseLeave = React.useCallback(() => {
-    if (!enabled) return
-    setIndicator(prev => ({ ...prev, visible: false }))
-  }, [enabled])
+    if (!effectiveEnabled) return
+    hideIndicator()
+  }, [effectiveEnabled, hideIndicator])
+
+  React.useEffect(() => {
+    if (!effectiveEnabled) {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+        rafIdRef.current = null
+      }
+      rafPendingRef.current = false
+      hideIndicator()
+    }
+
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+        rafIdRef.current = null
+      }
+      rafPendingRef.current = false
+      pendingDataRef.current = null
+      lastTargetRef.current = null
+    }
+  }, [effectiveEnabled, hideIndicator])
+
+  React.useEffect(() => {
+    const container = containerRef.current
+    if (!container || !effectiveEnabled || !indicator.visible) return
+
+    const handleScroll = () => {
+      if (lastTargetRef.current?.isConnected) {
+        pendingDataRef.current = { target: lastTargetRef.current }
+        scheduleFrame()
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+    }
+  }, [effectiveEnabled, indicator.visible, scheduleFrame])
+
+  React.useEffect(() => {
+    const container = containerRef.current
+    if (!container || !effectiveEnabled) return
+
+    const observer = new ResizeObserver(() => {
+      if (lastTargetRef.current?.isConnected) {
+        pendingDataRef.current = { target: lastTargetRef.current }
+        scheduleFrame()
+      } else {
+        hideIndicator()
+      }
+    })
+
+    observer.observe(container)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [effectiveEnabled, hideIndicator, scheduleFrame])
 
 
   return {

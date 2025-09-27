@@ -57,11 +57,11 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
           <DropdownContent
             align="end"
             sideOffset={4}
-            className="min-w-[160px] p-1 z-50 border-border-default gap-2"
+            className="min-w-[160px] px-1 py-0 z-50 border-border-default"
           >
             {/* Header - flush with edges */}
             <div className="-mx-1 -mt-1 mb-1 bg-gradient-to-b from-primary-50 to-primary-100 border-b border-primary-100 rounded-t-lg">
-              <h3 className="px-2 py-2 text-xs font-medium text-text-primary tracking-widest">
+              <h3 className="px-2 py-2 text-xs font-medium text-text-primary tracking-wide">
                 Search Using:
               </h3>
             </div>
@@ -72,7 +72,7 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
                 disabled={domain.disabled}
                 onSelect={() => handleDomainSelect(domain.value)}
                 className={cn(
-                  'cursor-pointer text-xs font-medium text-text-secondary hover:text-text-primary gap-2',
+                  'cursor-pointer text-xs font-medium text-text-secondary hover:text-text-primary my-1',
                   {
                     'bg-background-tertiary border-border-default text-text-primary': domain.value === selectedDomain,
                   }

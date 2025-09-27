@@ -1,0 +1,102 @@
+/* FinProLogsDrawer component-specific styles */
+
+/* Logs drawer specific styling for wide content */
+.finpro-logs-drawer {
+  /* Ensure fixed width is maintained */
+  width: 1200px !important;
+  max-width: 1200px;
+}
+
+/* Log content area styling */
+.finpro-logs-content {
+  @apply font-mono text-sm;
+  /* Monospace font for log readability */
+}
+
+/* Log entry styling */
+.finpro-log-entry {
+  @apply p-2 border-b border-gray-200 hover:bg-gray-50 transition-colors;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.finpro-log-entry:last-child {
+  @apply border-b-0;
+}
+
+/* Log levels styling */
+.finpro-log-error {
+  @apply text-red-600 bg-red-50 border-l-4 border-red-400;
+}
+
+.finpro-log-warn {
+  @apply text-yellow-600 bg-yellow-50 border-l-4 border-yellow-400;
+}
+
+.finpro-log-info {
+  @apply text-blue-600 bg-blue-50 border-l-4 border-blue-400;
+}
+
+.finpro-log-debug {
+  @apply text-gray-600 bg-gray-50 border-l-4 border-gray-400;
+}
+
+/* Scrollable log container */
+.finpro-logs-scrollable {
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Log timestamp styling */
+.finpro-log-timestamp {
+  @apply text-xs text-gray-500 mr-2;
+  min-width: 120px;
+}
+
+/* Log message styling */
+.finpro-log-message {
+  @apply flex-1;
+}
+
+/* Dark theme for logs drawer */
+.finpro-logs-drawer-dark {
+  @apply bg-gray-900 text-green-400;
+}
+
+.finpro-logs-drawer-dark .finpro-log-entry {
+  @apply border-gray-700 hover:bg-gray-800;
+}
+
+.finpro-logs-drawer-dark .finpro-log-error {
+  @apply text-red-400 bg-red-900/20 border-red-600;
+}
+
+.finpro-logs-drawer-dark .finpro-log-warn {
+  @apply text-yellow-400 bg-yellow-900/20 border-yellow-600;
+}
+
+.finpro-logs-drawer-dark .finpro-log-info {
+  @apply text-blue-400 bg-blue-900/20 border-blue-600;
+}
+
+.finpro-logs-drawer-dark .finpro-log-debug {
+  @apply text-gray-400 bg-gray-900/20 border-gray-600;
+}
+
+/* Mobile responsive adjustments for logs drawer */
+@media (max-width: 1280px) {
+  .finpro-logs-drawer-mobile {
+    width: 100vw !important;
+    max-width: 100vw;
+  }
+}
+
+/* Compact mode for smaller screens */
+.finpro-logs-drawer-compact .finpro-log-entry {
+  @apply p-1 text-xs;
+}
+
+.finpro-logs-drawer-compact .finpro-log-timestamp {
+  @apply text-xs min-w-0 w-16;
+}

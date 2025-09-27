@@ -32,12 +32,20 @@ export const FinProDrawer: React.FC<FinProDrawerProps> = ({
   subtitle = 'Use the controls below to view/hide/reorganise the columns in the table.',
   icon = <Columns3 className="w-5 h-5" />,
   variant = 'overlay',
-  width = 1000,
+  width = 200,
   children,
   className = '',
 }) => {
+  const drawerStyle = {
+    width: typeof width === 'number' ? `${width}px` : width,
+  }
+
   return (
-    <Drawer variant={variant} width={width} className={className}>
+    <Drawer 
+      variant={variant} 
+      className={className}
+      style={drawerStyle}
+    >
       <DrawerHeader title={title} subtitle={subtitle} icon={icon} />
       <DrawerContent>
         {children || (
