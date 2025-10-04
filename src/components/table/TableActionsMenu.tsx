@@ -66,7 +66,7 @@ const CustomTrigger: React.FC<{ children: React.ReactNode; disabled?: boolean; s
   return (
     <DropdownTrigger className='shadow-none border-0 bg-transparent hover:bg-transparent hover:shadow-none' asChild showChevron={false}>
       <button
-        className={`flex items-center justify-center h-8 w-8 rounded-full hover:bg-background-tertiary transition-colors ${
+        className={`flex items-center justify-center h-8 w-8 rounded-full hover:bg-background-primary hover:border hover:border-border-default transition-colors focus:outline-none focus:ring-0 ${
           isOpen ? 'bg-background-tertiary' : ''
         }`}
         aria-label={srLabel}

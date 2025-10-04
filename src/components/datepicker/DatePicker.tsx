@@ -14,7 +14,7 @@ function getSmartDefaults(): DateRangeValue {
   const today = new Date()
   const currentTime = getCurrentTime()
   const roundedTime = roundToLowestHalfHour(currentTime)
-  const nextTime = getNextAvailableTime(15)
+  const nextTime = getNextAvailableTime(30)
 
   // Ensure period is defined (both functions always return a period)
   const startTime: { hours: number; minutes: number; period: 'AM' | 'PM' } = {

@@ -46,10 +46,10 @@ function DrawerImpl({ className, variant = 'overlay', width, style, ...props }: 
         // Base styles
         'bg-background-secondary text-text-primary border-border-default',
         'flex flex-col h-full min-h-0',
-        // Directional shadows based on side
-        side === 'left'
+        // Directional shadows based on side - only when open
+        open && (side === 'left'
           ? 'shadow-[-6px_0_16px_4px_rgba(0,0,0,0.7)]'
-          : 'shadow-[6px_0_16px_4px_rgba(0,0,0,0.7)]',
+          : 'shadow-[6px_0_16px_4px_rgba(0,0,0,0.7)]'),
         'fixed top-0 z-50',
         // Positioning based on side
         side === 'left'

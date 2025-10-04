@@ -21,7 +21,7 @@ export interface DropdownTriggerProps extends React.ComponentPropsWithoutRef<typ
 }
 
 export const DropdownTrigger = React.forwardRef<HTMLButtonElement, DropdownTriggerProps>(
-  ({ className, srLabel, variant = 'default', showChevron = true, chevronIcons, children, ...props }, ref) => {
+  ({ className, srLabel, variant = 'default', showChevron = true, chevronIcons, children, asChild = false, ...props }, ref) => {
     const { isOpen } = React.useContext(DropdownContext)
 
     const baseClasses = 'inline-flex items-center gap-2 rounded-md border text-sm font-medium shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -37,6 +37,21 @@ export const DropdownTrigger = React.forwardRef<HTMLButtonElement, DropdownTrigg
     // Default chevron icon with smooth rotation animation
     const defaultChevronIcon = <ChevronIcon isOpen={isOpen} />
 
+    // If asChild is true, render children directly as the trigger
+    if (asChild && React.isValidElement(children)) {
+      return (
+        <DropdownMenu.Trigger asChild>
+          {React.cloneElement(children, {
+            ref,
+            className: cn(children.props.className, className),
+            'aria-label': srLabel || children.props['aria-label'],
+            ...props,
+          })}
+        </DropdownMenu.Trigger>
+      )
+    }
+
+    // Default behavior: render button with children
     return (
       <DropdownMenu.Trigger asChild>
         <button

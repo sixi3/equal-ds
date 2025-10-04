@@ -56,7 +56,8 @@ function TableRowImpl<T = any>({
   }
 
   const handleSelectionChange = (selected: boolean) => {
-    onSelectionChange?.(index, selected)
+    const rowId = (row as any).id || index
+    onSelectionChange?.(rowId, selected)
   }
 
   return (
@@ -73,13 +74,52 @@ function TableRowImpl<T = any>({
       {/* Selection column */}
       {selectable && (
         <td className="w-12 px-3 py-3">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(e) => handleSelectionChange(e.target.checked)}
-            onClick={(e) => e.stopPropagation()}
-            className="rounded border-border-default text-brand-primary focus:ring-brand-primary focus:ring-2"
-          />
+          <div className="relative flex-shrink-0">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(e) => handleSelectionChange(e.target.checked)}
+              onClick={(e) => e.stopPropagation()}
+              className="sr-only"
+              tabIndex={-1}
+            />
+            <div
+              className={cn(
+                'w-4 h-4 border-2 rounded border-border-default flex items-center justify-center relative cursor-pointer',
+                'transition-all duration-200 ease-in-out',
+                isSelected && 'bg-primary-700 border-primary-700',
+                !isSelected && 'bg-background-secondary',
+                // Subtle scale effect when checked
+                isSelected && 'scale-105'
+              )}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleSelectionChange(!isSelected)
+              }}
+            >
+              {/* Checkmark */}
+              <div
+                className={cn(
+                  'transition-all duration-200 ease-in-out',
+                  isSelected
+                    ? 'opacity-100 scale-100'
+                    : 'opacity-0 scale-75'
+                )}
+              >
+                <svg
+                  className="w-3 h-3 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
         </td>
       )}
 

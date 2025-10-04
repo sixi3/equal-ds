@@ -237,8 +237,8 @@ function TablePaginationImpl({
               onClick={columnManager.onOpen}
               disabled={columnManager.disabled}
               className={cn(
-                'inline-flex items-center gap-1.5 text-xs font-medium text-text-primary hover:underline transition-colors duration-200 mx-3',
-                'hover:border-border-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+                'inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary transition-colors duration-200 mx-3',
+                'hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
                 columnManager.disabled && 'opacity-60 cursor-not-allowed',
               )}
               aria-label={columnManager.srLabel ?? columnManager.label ?? 'Manage columns'}

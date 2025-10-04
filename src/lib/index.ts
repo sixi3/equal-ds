@@ -5,4 +5,5 @@ export { formatTime12, formatTime24, compareTimes, parseTimeString, parseTimeStr
 export { useHoverAnimation } from './useHoverAnimation'
 export { useCopyToClipboard } from './useCopyToClipboard'
 export { useControllableProp, useControllableState } from './useControllableProp'
+export { useFilterState } from './use-filter-state'
 export { getConsentStatusTag, getDataStatusTag, getAllConsentStatuses, getAllDataStatuses, type ConsentStatusKey, type DataStatusKey, type StatusTagResult } from './finpro-status-tags'

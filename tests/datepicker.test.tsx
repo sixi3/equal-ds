@@ -8,11 +8,11 @@ describe('Date Picker Date Time Range Formatting', () => {
       startDate: new Date('2025-01-15'),
       startTime: { hours: 9, minutes: 30, period: 'AM' },
       endDate: new Date('2025-01-16'),
-      endTime: { hours: 5, minutes: 45, period: 'PM' }
+      endTime: { hours: 5, minutes: 30, period: 'PM' }
     }
 
     const result = formatDateTimeRange(range)
-    expect(result).toBe('Jan 15, 2025 9:30 AM - Jan 16, 2025 5:45 PM')
+    expect(result).toBe('Jan 15, 2025 9:30 AM - Jan 16, 2025 5:30 PM')
   })
 
   it('should format date range with only start time', () => {
@@ -32,11 +32,11 @@ describe('Date Picker Date Time Range Formatting', () => {
       startDate: new Date('2025-01-15'),
       startTime: null,
       endDate: new Date('2025-01-16'),
-      endTime: { hours: 5, minutes: 45, period: 'PM' }
+      endTime: { hours: 5, minutes: 30, period: 'PM' }
     }
 
     const result = formatDateTimeRange(range)
-    expect(result).toBe('Jan 15, 2025 - Jan 16, 2025 5:45 PM')
+    expect(result).toBe('Jan 15, 2025 - Jan 16, 2025 5:30 PM')
   })
 
   it('should format date range without times', () => {

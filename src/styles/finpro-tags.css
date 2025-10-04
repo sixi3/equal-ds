@@ -1,9 +1,5 @@
 /* FinPro Status Tag Styles */
 
-.finpro-tag {
-  /* Base styles are handled by the Tag component */
-}
-
 /* Status tag color themes using design system tokens */
 
 .status-active {
@@ -87,21 +83,37 @@
 /* Data status specific variants */
 
 .data-fetched {
-  background-color: var(--component-status-active-backgroundColor, #dcfce7);
+  background-color: white;
   color: var(--component-status-active-textColor, #166534);
+  border: 2px solid var(--component-status-active-backgroundColor, #dcfce7);
+}
+
+.data-denied {
+  background-color: white;
+  color: var(--component-status-rejected-textColor, #dc2626);
+  border: 2px solid var(--component-status-rejected-backgroundColor, #fef2f2);
 }
 
 .data-new {
-  background-color: var(--component-status-pending-backgroundColor, #dbeafe);
+  background-color: white;
   color: var(--component-status-pending-textColor, #1e40af);
+  border: 2px solid var(--component-status-pending-backgroundColor, #dbeafe);
 }
 
 .data-expired {
-  background-color: var(--component-status-expired-backgroundColor, #f3f4f6);
+  background-color: white;
   color: var(--component-status-expired-textColor, #6b7280);
+  border: 2px solid var(--component-status-expired-backgroundColor, #f3f4f6);
 }
 
 .data-refreshing {
-  background-color: var(--component-status-paused-backgroundColor, #fff7ed);
+  background-color: white;
   color: var(--component-status-paused-textColor, #c2410c);
+  border: 2px solid var(--component-status-paused-backgroundColor, #fff7ed);
+}
+
+.data-timeout {
+  background-color: white;
+  color: var(--component-status-revoked-textColor, #7c3aed);
+  border: 2px solid var(--component-status-revoked-backgroundColor, #faf5ff);
 }

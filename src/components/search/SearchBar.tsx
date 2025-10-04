@@ -63,9 +63,9 @@ export const SearchBar = React.forwardRef<HTMLDivElement, SearchBarProps>(
 
     // Size-based classes
     const sizeClasses = {
-      sm: 'h-10 text-xs',
-      md: 'h-12 text-sm',
-      lg: 'h-14 text-base'
+      sm: 'h-10 text-xs rounded-lg',
+      md: 'h-12 text-sm rounded-lg',
+      lg: 'h-14 text-base rounded-lg'
     }
 
     return (

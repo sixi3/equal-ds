@@ -137,6 +137,23 @@ describe('Dropdown Components', () => {
 
       expect(ref.current).toBeInstanceOf(HTMLButtonElement)
     })
+
+    it('supports asChild prop to render custom element as trigger', () => {
+      render(
+        <Dropdown>
+          <DropdownTrigger asChild className="custom-trigger-class">
+            <button data-testid="custom-button">Custom Trigger</button>
+          </DropdownTrigger>
+        </Dropdown>
+      )
+
+      const customButton = screen.getByTestId('dropdown-trigger') // Mock adds this testid
+      expect(customButton).toBeInTheDocument()
+      expect(customButton).toHaveTextContent('Custom Trigger')
+      expect(customButton).toHaveAttribute('data-testid', 'dropdown-trigger')
+      // Should have merged custom className
+      expect(customButton).toHaveClass('custom-trigger-class')
+    })
   })
 
   describe('DropdownContent', () => {

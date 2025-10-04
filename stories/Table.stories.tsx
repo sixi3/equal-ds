@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Table, type TableColumn, TableActionsMenu, type TableAction, SearchBar } from '../src'
-import { Edit, Trash2, Eye, Download, Logs, RotateCw } from 'lucide-react'
-import { getConsentStatusTag, getDataStatusTag } from '../src'
+import { Table, type TableColumn, TableActionsMenu, type TableAction, SearchBar, Button, Dropdown, DropdownTrigger, DropdownContentMultiselect, DatePicker, DateRangeValue, getSmartDefaults } from '../src'
+import { Edit, Trash2, Eye, Download, Logs, RotateCw, GitPullRequestArrow, PlusCircle, Filter, ChevronUp, LucidePlus, ListPlus, Check } from 'lucide-react'
+import { getConsentStatusTag, getDataStatusTag, ChevronIcon, useFilterState } from '../src'
 
 // Sample data types
 interface User {
@@ -92,7 +92,7 @@ const generateSampleData = (count: number): User[] => {
 // Generate FinPro sample data
 const generateFinProData = (count: number): FinProData[] => {
   const names = ['Alice Johnson', 'Bob Smith', 'Charlie Brown', 'Diana Prince', 'Eve Wilson', 'Frank Miller', 'Grace Lee', 'Henry Davis', 'Iris Chen', 'Jack Wilson']
-  const dataRequestModes = ['ONETIME', 'PERIODIC', 'ADHOC']
+  const dataRequestModes = ['AUTOMATIC', 'MANUAL']
   // Use only the 5 Figma data tag statuses
   const dataStatuses: FinProData['dataStatus'][] = ['DATA_READY', 'DELIVERED', 'DENIED', 'PENDING', 'TIMEOUT']
   const consentStatuses: FinProData['consentStatus'][] = ['ACTIVE', 'PENDING', 'REJECTED', 'REVOKED', 'PAUSED', 'FAILED']
@@ -409,8 +409,107 @@ export const FinPro: FinProStory = {
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [refreshingRows, setRefreshingRows] = useState<Set<number>>(new Set())
+    const [selectedFormats, setSelectedFormats] = useState<Record<number, string>>({})
+    const [selectedRows, setSelectedRows] = useState<(string | number)[]>([])
     const tableArgs = args as any
     const isFetching = false
+
+    // Filter component state
+    const [isFilterExpanded, setIsFilterExpanded] = useState(true)
+
+    // Define options arrays for filters
+    const templateOptions = [
+      { value: 'template-1', label: 'Template One' },
+      { value: 'template-2', label: 'Template Two' },
+      { value: 'template-3', label: 'Template Three' },
+      { value: 'template-4', label: 'Template Four' },
+      { value: 'template-5', label: 'Template Five' },
+    ]
+
+    const purposeCodeOptions = [
+      { value: 'purpose-101', label: 'Purpose 101' },
+      { value: 'purpose-102', label: 'Purpose 102' },
+      { value: 'purpose-103', label: 'Purpose 103' },
+      { value: 'purpose-104', label: 'Purpose 104' },
+      { value: 'purpose-105', label: 'Purpose 105' },
+    ]
+
+    const statusOptions = [
+      { value: 'pending', label: 'PENDING' },
+      { value: 'active', label: 'ACTIVE' },
+      { value: 'rejected', label: 'REJECTED' },
+      { value: 'revoked', label: 'REVOKED' },
+      { value: 'paused', label: 'PAUSED' },
+      { value: 'failed', label: 'FAILED' },
+    ]
+
+    const aggregatorOptions = [
+      { value: 'agg-1', label: 'Aggregator One' },
+      { value: 'agg-2', label: 'Aggregator Two' },
+      { value: 'agg-3', label: 'Aggregator Three' },
+      { value: 'agg-4', label: 'Aggregator Four' },
+      { value: 'agg-5', label: 'Aggregator Five' },
+    ]
+
+    // Initialize with all options selected by default
+    const defaultTemplates = templateOptions.map(option => option.value)
+    const defaultPurposeCodes = purposeCodeOptions.map(option => option.value)
+    const defaultStatuses = statusOptions.map(option => option.value)
+    const defaultAggregators = aggregatorOptions.map(option => option.value)
+    const defaultDateRange = getSmartDefaults()
+
+
+    // Date range comparison function
+    const compareDateRanges = (a: DateRangeValue, b: DateRangeValue) => {
+      return a.startDate?.getTime() === b.startDate?.getTime() &&
+             a.endDate?.getTime() === b.endDate?.getTime()
+    }
+
+    // Filter state management
+    const [selectedTemplates, setSelectedTemplates, templatesChanged] = useFilterState(defaultTemplates)
+    const [selectedPurposeCodes, setSelectedPurposeCodes, purposeCodesChanged] = useFilterState(defaultPurposeCodes)
+    const [selectedStatuses, setSelectedStatuses, statusesChanged] = useFilterState(defaultStatuses)
+    const [selectedAggregators, setSelectedAggregators, aggregatorsChanged] = useFilterState(defaultAggregators)
+    const [selectedRange, setSelectedRange, dateRangeChanged] = useFilterState(defaultDateRange, compareDateRanges)
+
+    // Combined filter change state - tracks if current filters differ from defaults
+    const hasUnappliedChanges = React.useMemo(() => {
+      return templatesChanged || purposeCodesChanged || statusesChanged || aggregatorsChanged || dateRangeChanged
+    }, [templatesChanged, purposeCodesChanged, statusesChanged, aggregatorsChanged, dateRangeChanged])
+
+    // Track if filters have been applied
+    const [filtersApplied, setFiltersApplied] = useState(false)
+
+    // Filter action handlers
+    const handleApplyFilters = React.useCallback(() => {
+      // Here you would apply the filters to the data
+      console.log('Applying filters:', {
+        templates: selectedTemplates,
+        purposeCodes: selectedPurposeCodes,
+        statuses: selectedStatuses,
+        aggregators: selectedAggregators,
+        dateRange: selectedRange
+      })
+      setFiltersApplied(true)
+    }, [selectedTemplates, selectedPurposeCodes, selectedStatuses, selectedAggregators, selectedRange])
+
+    const handleResetFilters = React.useCallback(() => {
+      setSelectedTemplates(defaultTemplates)
+      setSelectedPurposeCodes(defaultPurposeCodes)
+      setSelectedStatuses(defaultStatuses)
+      setSelectedAggregators(defaultAggregators)
+      setSelectedRange(defaultDateRange)
+      setFiltersApplied(false)
+    }, [])
+
+    // Individual hover states for each dropdown
+    const [isTemplateHovered, setIsTemplateHovered] = useState(false)
+    const [isPurposeHovered, setIsPurposeHovered] = useState(false)
+    const [isStatusHovered, setIsStatusHovered] = useState(false)
+    const [isAggregatorHovered, setIsAggregatorHovered] = useState(false)
+    const [isDatePickerHovered, setIsDatePickerHovered] = useState(false)
+
+    // Date range picker state - initialized with smart defaults (current time rounded to last 30 mins)
 
     // Generate FinPro sample data
     let allData = generateFinProData(120)
@@ -420,7 +519,7 @@ export const FinPro: FinProStory = {
       {
         id: 99991,
         fiData: "FI-9991",
-        dataRequestMode: "ONETIME",
+        dataRequestMode: "Manual",
         dataStatus: "DATA_READY",
         mobileNumber: "+91-9876543210",
         vua: "john.doe@okhdfcbank",
@@ -533,6 +632,64 @@ export const FinPro: FinProStory = {
         })
       }
     }
+
+    // Function to handle download format selection
+    const handleFormatChange = (rowId: number, format: string) => {
+      setSelectedFormats(prev => ({
+        ...prev,
+        [rowId]: format
+      }))
+      console.log(`Download FI-${String(1000 + rowId).padStart(4, '0')} as ${format}`)
+    }
+
+    // Helper function to create trigger styles
+    const createTriggerStyles = (isHovered: boolean) => {
+      const baseStyles: any = {
+        transform: isHovered ? 'translateY(-1px)' : 'translateY(0)',
+        transition: 'all 0.2s ease-in-out',
+      }
+
+      // Apply base styles or hover styles based on hover state
+      const bgColor = isHovered ? '--color-background-primary' : '--color-background-secondary'
+      const txtColor = '--color-text-primary'
+      const brdColor = isHovered ? '--color-border-hover' : '--color-border-default'
+      const shadow = isHovered ? '--shadow-md' : '--core-shadows-sm'
+
+      // Apply CSS variables directly (they'll be resolved by CSS)
+      if (bgColor) baseStyles.backgroundColor = `var(${bgColor})`
+      if (txtColor) baseStyles.color = `var(${txtColor})`
+      if (brdColor) baseStyles.borderColor = `var(${brdColor})`
+      baseStyles.fontSize = 'var(--typography-fontSize-sm)'
+      baseStyles.fontWeight = 'var(--typography-fontWeight-medium)'
+      baseStyles.letterSpacing = '0.05em'
+      baseStyles.padding = 'var(--spacing-2)'
+      baseStyles.borderRadius = 'var(--border-radius-lg)'
+      baseStyles.borderWidth = '1px'
+      baseStyles.borderStyle = 'solid'
+      baseStyles.borderBottomWidth = '2px'
+      if (shadow) baseStyles.boxShadow = `var(${shadow})`
+
+      return baseStyles
+    }
+
+    // Individual trigger styles for each dropdown
+    const getTemplateTriggerStyles = () => createTriggerStyles(isTemplateHovered)
+    const getPurposeTriggerStyles = () => createTriggerStyles(isPurposeHovered)
+    const getStatusTriggerStyles = () => createTriggerStyles(isStatusHovered)
+    const getAggregatorTriggerStyles = () => createTriggerStyles(isAggregatorHovered)
+    const getDatePickerTriggerStyles = () => createTriggerStyles(isDatePickerHovered)
+
+    // Individual hover handlers
+    const handleTemplateMouseEnter = () => setIsTemplateHovered(true)
+    const handleTemplateMouseLeave = () => setIsTemplateHovered(false)
+    const handlePurposeMouseEnter = () => setIsPurposeHovered(true)
+    const handlePurposeMouseLeave = () => setIsPurposeHovered(false)
+    const handleStatusMouseEnter = () => setIsStatusHovered(true)
+    const handleStatusMouseLeave = () => setIsStatusHovered(false)
+    const handleAggregatorMouseEnter = () => setIsAggregatorHovered(true)
+    const handleAggregatorMouseLeave = () => setIsAggregatorHovered(false)
+    const handleDatePickerMouseEnter = () => setIsDatePickerHovered(true)
+    const handleDatePickerMouseLeave = () => setIsDatePickerHovered(false)
     const domains = [
       { value: 'all', label: 'All Categories' },
       { value: 'clients', label: 'Clients' },
@@ -542,47 +699,53 @@ export const FinPro: FinProStory = {
       { value: 'documents', label: 'Documents' }
     ]
 
-    return (
-      
-      <div className="h-screen flex flex-col p-4 border border-border-default rounded-lg">
-        <SearchBar 
-        variant="with-dropdown"
-        domains={domains}
-        className="mb-4"
-        />
-        <div className="flex-1 min-h-0 flex flex-col">
-          <Table
-            className="flex-1 min-h-0"
-            {...tableArgs}
-            data={paginatedData}
-            onRefreshRow={refreshRow}
-            refreshingRows={refreshingRows}
-            columnManager={{
-              enabled: true,
-              triggerLabel: 'Manage columns',
-              allowHiding: true,
-            }}
-            pagination={{
-              currentPage,
-              totalPages: undefined,
-              pageSize,
-              totalItems: undefined,
-              currentPageItems: paginatedData.length,
-              onPageChange: setCurrentPage,
-              onPageSizeChange: setPageSize,
-              pageSizeOptions: [5, 10, 25, 50],
-              showPageSizeSelector: true,
-              isFetching,
-            }}
-          />
-        </div>
-      </div>
-    )
-  },
-  args: {
-    columns: [
-      { key: 'fiData', header: 'FI Data', accessor: (row) => row.fiData, width: 150, locked: true },
-      { key: 'dataRequestMode', header: 'Data Request Mode', accessor: (row) => row.dataRequestMode, width: 250, locked: true },
+    const columns: TableColumn<FinProData>[] = [
+      {
+        key: 'fiData',
+        header: 'FI Data',
+        width: 220,
+        locked: true,
+        render: (value, row) => (
+          <Button
+            variant="secondary"
+            withDropdown={true}
+            showDropdownHeader
+            dropdownHeaderText="Select Format:"
+            size="sm"
+            dropdownOptions={[
+              { value: 'pdf', label: 'PDF' },
+              { value: 'csv', label: 'CSV' },
+              { value: 'excel', label: 'XLSX' }
+            ]}
+            selectedDropdownOption={selectedFormats[row.id] || 'pdf'}
+            onDropdownChange={(format) => handleFormatChange(row.id, format)}
+          >
+            <Download className="w-4 h-4" />
+            <span className="mr-1">Download</span>
+          </Button>
+        )
+      },
+      {
+        key: 'dataRequestMode',
+        header: 'Data Request Mode',
+        width: 220,
+        locked: true,
+        render: (value, row) => {
+          if (row.dataRequestMode === 'MANUAL') {
+            return (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => console.log('Request data for', row.id)}
+              >
+                <GitPullRequestArrow className="w-4 h-4" />
+                Request Data
+              </Button>
+            )
+          }
+          return row.dataRequestMode
+        }
+      },
       { key: 'dataStatus', header: 'Data Status', accessor: (row) => {
         const tagResult = getDataStatusTag(row.dataStatus);
         return {
@@ -592,7 +755,7 @@ export const FinPro: FinProStory = {
       }, width: 200 },
       { key: 'mobileNumber', header: 'Mobile Number', accessor: (row) => row.mobileNumber, width: 200 },
       { key: 'vua', header: 'VUA', accessor: (row) => row.vua, width: 200 },
-      { key: 'consentStatus', header: 'Consent STATUS', accessor: (row) => {
+      { key: 'consentStatus', header: 'Consent Status', accessor: (row) => {
         const tagResult = getConsentStatusTag(row.consentStatus);
         return {
           type: 'tag' as const,
@@ -600,7 +763,7 @@ export const FinPro: FinProStory = {
         };
       }, width: 200 },
       { key: 'accountId', header: 'Account ID', accessor: (row) => row.accountId, width: 200 },
-      { key: 'consentHandle', header: 'Consent HANDLE', accessor: (row) => row.consentHandle, width: 200, copyable: true },
+      { key: 'consentHandle', header: 'Consent Handle', accessor: (row) => row.consentHandle, width: 200, copyable: true },
       { key: 'consentId', header: 'Consent ID', accessor: (row) => row.consentId, width: 200, copyable: true },
       { key: 'consentTemplateId', header: 'Consent Template ID', accessor: (row) => row.consentTemplateId, width: 250 },
       { key: 'consentValidity', header: 'Consent Validity', accessor: (row) => row.consentValidity, width: 200 },
@@ -649,8 +812,302 @@ export const FinPro: FinProStory = {
           />
         )
       },
-    ],
-    enableHorizontalScroll: true,
+    ]
+
+    return (
+      <div className="h-full flex flex-col">
+        {/* Filter Component */}
+        <div className="bg-white border border-border-default rounded-xl p-4 shadow-md mb-4">
+          <div
+            className="flex justify-between items-center cursor-pointer rounded-lg p-2 -m-2 transition-colors duration-200"
+            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-background-tertiary p-1.5 rounded-lg">
+                <Filter className="w-4 h-4 text-text-primary" />
+              </div>
+              <h2 className="text-xl font-medium text-text-primary tracking-wider">
+                Filter Table
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasUnappliedChanges && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleApplyFilters()
+                    }}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium text-success-100 hover:bg-success-50 transition-colors duration-200"
+                  >
+                    <Check className="w-3 h-3 mt-1" />
+                    Apply Filters
+                  </button>
+                  <div className="w-px h-4 bg-border-default mx-1" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleResetFilters()
+                    }}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium text-error-100 hover:bg-error-50 transition-colors duration-200"
+                  >
+                    <RotateCw className="w-3 h-3 mt-1" />
+                    Reset
+                  </button>
+                </>
+              )}
+              <div className="p-1 rounded hover:bg-background-primary border border-transparent hover:border hover:border-border-default transition-colors duration-200">
+                <ChevronIcon
+                  isOpen={isFilterExpanded}
+                  className="text-text-primary"
+                  duration={200}
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full"
+            style={{
+              transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-out, margin-top 0.5s ease-out, pointer-events 0.3s ease-out',
+              maxHeight: isFilterExpanded ? '384px' : '0px',
+              opacity: isFilterExpanded ? 1 : 0,
+              marginTop: isFilterExpanded ? '16px' : '0px',
+              pointerEvents: isFilterExpanded ? 'auto' : 'none'
+            }}
+          >
+            {/* Multiselect Consent Template Dropdown */}
+            <div className="w-full">
+              <label className="block text-xs font-normal text-text-tertiary tracking-wide mb-1 font-mono">
+                Consent Template
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getTemplateTriggerStyles()}
+                  onMouseEnter={handleTemplateMouseEnter}
+                  onMouseLeave={handleTemplateMouseLeave}
+                >
+                  <span className={`flex-1 text-left ${selectedTemplates.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedTemplates.length === templateOptions.length
+                      ? 'All Templates'
+                      : selectedTemplates.length === 0
+                      ? 'None Selected'
+                      : `${selectedTemplates.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={templateOptions}
+                  selectedValues={selectedTemplates}
+                  onSelectionChange={setSelectedTemplates}
+                  enableSelectAll={true}
+                  selectAllLabel="All Templates"
+                  enableSearch={true}
+                  searchPlaceholder="Search for templates"
+                  maxHeight="200px"
+            
+                />
+              </Dropdown>
+            </div>
+
+            {/* Multiselect Purpose Code Dropdown */}
+            <div className="w-full">
+              <label className="block text-xs font-normal text-text-tertiary tracking-wide mb-1 font-mono">
+                Purpose Code
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getPurposeTriggerStyles()}
+                  onMouseEnter={handlePurposeMouseEnter}
+                  onMouseLeave={handlePurposeMouseLeave}
+                >
+                  <span className={`flex-1 text-left ${selectedPurposeCodes.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedPurposeCodes.length === purposeCodeOptions.length
+                      ? 'All Purpose Codes'
+                      : selectedPurposeCodes.length === 0
+                      ? 'None Selected'
+                      : `${selectedPurposeCodes.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={purposeCodeOptions}
+                  selectedValues={selectedPurposeCodes}
+                  onSelectionChange={setSelectedPurposeCodes}
+                  enableSelectAll={true}
+                  selectAllLabel="All Purpose Codes"
+                  enableSearch={true}
+                  searchPlaceholder="Search purpose codes"
+                  maxHeight="200px"
+                />
+              </Dropdown>
+            </div>
+
+            {/* Multiselect Consent Status Dropdown */}
+            <div className="w-full">
+              <label className="block text-xs font-normal text-text-tertiary tracking-wide mb-1 font-mono">
+                Consent Status
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getStatusTriggerStyles()}
+                  onMouseEnter={handleStatusMouseEnter}
+                  onMouseLeave={handleStatusMouseLeave}
+                >
+                  <span className={`flex-1 text-left ${selectedStatuses.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedStatuses.length === statusOptions.length
+                      ? 'All Statuses'
+                      : selectedStatuses.length === 0
+                      ? 'None Selected'
+                      : selectedStatuses.length === 1
+                      ? (() => {
+                          const option = statusOptions.find(opt => opt.value === selectedStatuses[0])
+                          const tagResult = getConsentStatusTag(option?.value || '')
+                          return (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium uppercase tracking-wider ${tagResult.tagProps.className}`}>
+                              {tagResult.label}
+                            </span>
+                          )
+                        })()
+                      : `${selectedStatuses.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={statusOptions}
+                  selectedValues={selectedStatuses}
+                  onSelectionChange={setSelectedStatuses}
+                  enableSelectAll={true}
+                  selectAllLabel="All Statuses"
+                  enableSearch={true}
+                  searchPlaceholder="Search statuses"
+                  maxHeight="200px"
+                  isStatusTag={true}
+                />
+              </Dropdown>
+            </div>
+
+            {/* Multiselect Account Aggregator Dropdown */}
+            <div className="w-full">
+              <label className="block text-xs font-normal text-text-tertiary tracking-wide mb-1 font-mono">
+                Account Aggregator
+              </label>
+              <Dropdown>
+                <DropdownTrigger
+                  variant="default"
+                  className="w-full"
+                  style={getAggregatorTriggerStyles()}
+                  onMouseEnter={handleAggregatorMouseEnter}
+                  onMouseLeave={handleAggregatorMouseLeave}
+                >
+                  <span className={`flex-1 text-left ${selectedAggregators.length === 0 ? 'text-text-secondary' : ''}`}>
+                    {selectedAggregators.length === aggregatorOptions.length
+                      ? 'All Account Aggregators'
+                      : selectedAggregators.length === 0
+                      ? 'None Selected'
+                      : `${selectedAggregators.length} selected`
+                    }
+                  </span>
+                </DropdownTrigger>
+                <DropdownContentMultiselect
+                  options={aggregatorOptions}
+                  selectedValues={selectedAggregators}
+                  onSelectionChange={setSelectedAggregators}
+                  enableSelectAll={true}
+                  selectAllLabel="All Aggregators"
+                  enableSearch={true}
+                  searchPlaceholder="Search aggregators"
+                  maxHeight="200px"
+                />
+              </Dropdown>
+            </div>
+
+            <div className="w-full">
+              <label className="block text-xs font-normal text-text-secondary tracking-wide mb-1 font-mono">
+                Consent Created On
+              </label>
+              <DatePicker
+                selectedRange={selectedRange}
+                rangeMode={true}
+                onRangeChange={setSelectedRange}
+                placeholder="Select date range"
+                dateFormat="medium"
+                variant="default"
+                showCalendarIcon={true}
+                triggerClassName="w-full"
+                triggerStyle={getDatePickerTriggerStyles()}
+                onTriggerMouseEnter={handleDatePickerMouseEnter}
+                onTriggerMouseLeave={handleDatePickerMouseLeave}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Table Container */}
+        <div className="flex-1 min-h-0 flex flex-col p-4 border border-border-default rounded-xl shadow-lg">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex-1">
+            <SearchBar
+              variant="with-dropdown"
+              domains={domains}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => console.log('Create Consent clicked')}
+            >
+              <ListPlus className="w-6 h-6" />
+              Create Consent
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => console.log('Download clicked')}
+            >
+              <Download className="w-6 h-6" />
+            </Button>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <Table
+            className="flex-1 min-h-0 shadow-sm rounded-xl"
+            {...tableArgs}
+            columns={columns}
+            data={paginatedData}
+            selectable={true}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            onRefreshRow={refreshRow}
+            refreshingRows={refreshingRows}
+            columnManager={{
+              enabled: true,
+              triggerLabel: 'Manage columns',
+              allowHiding: true,
+            }}
+            pagination={{
+              currentPage,
+              totalPages: undefined,
+              pageSize,
+              totalItems: undefined,
+              currentPageItems: paginatedData.length,
+              onPageChange: setCurrentPage,
+              onPageSizeChange: setPageSize,
+              pageSizeOptions: [1, 5, 10, 25, 50],
+              showPageSizeSelector: true,
+              isFetching,
+            }}
+          />
+        </div>
+      </div>
+      </div>
+    )
   },
 }
 

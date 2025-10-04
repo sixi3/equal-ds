@@ -5,7 +5,7 @@ export { DatePickerItem } from './DatePickerItem'
 export { CalendarGrid } from './CalendarGrid'
 export { CalendarContent } from './CalendarContent'
 export { TimePickerContent } from './TimePickerContent'
-export { DateRangePickerContent } from './DateRangePickerContent'
+export { DateRangePickerContent, getSmartDefaults, getQuickDatePresets } from './DateRangePickerContent'
 
 export type { DatePickerProps, DatePickerRef } from './DatePicker'
 export type { DatePickerContentProps } from './DatePickerContent'

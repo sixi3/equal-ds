@@ -63,7 +63,7 @@ const TimePickerRow: React.FC<TimePickerRowProps> = ({
       >
       {/* Time Display */}
       <div className="flex items-center gap-1">
-        <span className="text-sm font-medium text-text-primary">
+        <span className="text-sm font-medium text-text-primary w-10 text-left">
           {selectedTime
             ? `${selectedTime.hours.toString().padStart(2, '0')}:${selectedTime.minutes.toString().padStart(2, '0')}`
             : '00:00'
@@ -144,7 +144,7 @@ const DatePickerRow: React.FC<DatePickerRowProps> = ({
 
       {/* Date Display and Chevron Container */}
       <div className="flex items-center gap-2 flex-1">
-        <span className="text-sm font-medium text-text-primary tracking-wider">
+        <span className="text-sm font-medium text-text-primary tracking-wider w-14 text-left">
           {selectedDate
             ? formatDate(selectedDate, 'short').replace('/', '/')
             : '20/06/2025'
@@ -191,11 +191,11 @@ const DatePickerRow: React.FC<DatePickerRowProps> = ({
  * - End date: Current date (same day)
  * - End time: Next available time slot (minimum 30 minutes from start time)
  */
-function getSmartDefaults(): DateRangeValue {
+export function getSmartDefaults(): DateRangeValue {
   const today = new Date()
   const currentTime = getCurrentTime()
   const roundedTime = roundToLowestHalfHour(currentTime)
-  const nextTime = getNextAvailableTime(15) // Next available slot, rounded to 15 minutes
+  const nextTime = getNextAvailableTime(30) // Next available slot, rounded to 30 minutes
 
   // Ensure period is defined (both functions always return a period)
   const startTime: { hours: number; minutes: number; period: 'AM' | 'PM' } = {
@@ -216,6 +216,76 @@ function getSmartDefaults(): DateRangeValue {
     endDate: today,
     endTime
   }
+}
+
+/**
+ * Get quick date range presets
+ */
+export function getQuickDatePresets(): Array<{ label: string; value: DateRangeValue }> {
+  const today = new Date()
+  const currentTime = getCurrentTime()
+  const roundedCurrentTime = roundToLowestHalfHour(currentTime)
+
+  // Helper to create date range
+  const createRange = (startDate: Date, endDate: Date = today): DateRangeValue => {
+    const isEndToday = endDate.toDateString() === today.toDateString()
+
+    return {
+      startDate,
+      startTime: { hours: 0, minutes: 0, period: 'AM' }, // Start of day
+      endDate,
+      endTime: isEndToday
+        ? { hours: roundedCurrentTime.hours, minutes: roundedCurrentTime.minutes, period: roundedCurrentTime.period || 'AM' }
+        : { hours: 23, minutes: 59, period: 'PM' } // End of day for past dates
+    }
+  }
+
+  return [
+    {
+      label: 'Last Week',
+      value: createRange(new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000))
+    },
+    {
+      label: 'Last Month',
+      value: createRange(new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000))
+    },
+    {
+      label: 'Last 3 Months',
+      value: createRange(new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000))
+    },
+    {
+      label: 'Last 6 Months',
+      value: createRange(new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000))
+    }
+  ]
+}
+
+/**
+ * Check if a date range matches any of the quick presets
+ */
+function findMatchingPreset(currentRange: DateRangeValue | null): string | null {
+  if (!currentRange) return null
+
+  const presets = getQuickDatePresets()
+
+  for (const preset of presets) {
+    const presetValue = preset.value
+
+    // Check if dates match (allowing for small time differences)
+    const datesMatch =
+      currentRange.startDate &&
+      currentRange.endDate &&
+      presetValue.startDate &&
+      presetValue.endDate &&
+      Math.abs(currentRange.startDate.getTime() - presetValue.startDate.getTime()) < 24 * 60 * 60 * 1000 && // Within 1 day
+      Math.abs(currentRange.endDate.getTime() - presetValue.endDate.getTime()) < 24 * 60 * 60 * 1000 // Within 1 day
+
+    if (datesMatch) {
+      return preset.label
+    }
+  }
+
+  return null
 }
 
 export interface DateRangeValue {
@@ -692,6 +762,46 @@ export const DateRangePickerContent = React.forwardRef<HTMLDivElement, DateRange
                 {errors.endTime && <div>{errors.endTime}</div>}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Quick Date Range Presets */}
+        <div className="mt-4">
+          <h3 id="date-range-description" className="text-xs font-medium text-text-secondary tracking-wide mb-1">Presets:</h3>
+          <div className="flex flex-wrap gap-2">
+            {getQuickDatePresets().map((preset) => {
+              const isSelected = findMatchingPreset(effectiveRange) === preset.label
+              return (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    // Mark that user has modified the range
+                    setHasUserModified(true)
+
+                    // Update effective range
+                    setEffectiveRange(preset.value)
+
+                    // Clear any existing errors
+                    clearErrors()
+
+                    // Close all pickers
+                    closeAllPickers()
+
+                    // Notify parent component
+                    onRangeChange?.(preset.value)
+                  }}
+                  className={cn(
+                    " px-3 py-1.5 text-xs font-medium rounded-full transition-colors duration-200 focus:outline-none tracking-wide",
+                    isSelected
+                      ? "text-text-primary bg-background-primary border border-border-hover"
+                      : "text-text-primary bg-background-secondary hover:bg-background-primary hover:text-text-primary border border-border-default"
+                  )}
+                >
+                  {preset.label}
+                </button>
+              )
+            })}
           </div>
         </div>
 

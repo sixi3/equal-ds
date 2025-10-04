@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../../lib/cn'
+import { getConsentStatusTag } from '../../lib/finpro-status-tags'
 
 // Status tag component for displaying status indicators
 interface StatusTagProps {
@@ -8,37 +9,17 @@ interface StatusTagProps {
 }
 
 const StatusTag: React.FC<StatusTagProps> = ({ status, className }) => {
-  const getStatusStyles = (status: string) => {
-    const statusLower = status.toLowerCase()
-    switch (statusLower) {
-      case 'active':
-        return 'bg-status-active-bg text-status-active-text'
-      case 'pending':
-        return 'bg-status-pending-bg text-status-pending-text'
-      case 'rejected':
-        return 'bg-status-rejected-bg text-status-rejected-text'
-      case 'revoked':
-        return 'bg-status-revoked-bg text-status-revoked-text'
-      case 'paused':
-        return 'bg-status-paused-bg text-status-paused-text'
-      case 'failed':
-        return 'bg-status-failed-bg text-status-failed-text'
-      case 'automatic':
-        return 'bg-[#4F46E5] text-white' // Default blue for automatic
-      default:
-        return 'bg-[#F3F4F6] text-[#374151]' // Default gray
-    }
-  }
+  const tagResult = getConsentStatusTag(status)
 
   return (
     <span
       className={cn(
         'inline-flex items-center px-1.5 py-1 rounded-md text-xs font-medium uppercase tracking-wider',
-        getStatusStyles(status),
+        tagResult.tagProps.className,
         className
       )}
     >
-      {status}
+      {tagResult.label}
     </span>
   )
 }

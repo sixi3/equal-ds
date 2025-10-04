@@ -11,7 +11,9 @@ export * from './components/drawer'
 export * from './components/table'
 export * from './components/loader'
 export * from './components/ui'
-export { useHoverAnimation, useCopyToClipboard } from './lib'
+export * from './components/timeline'
+export * from './components/tab-switcher'
+export { useHoverAnimation, useCopyToClipboard, useFilterState } from './lib'
 
 // Export FinProSidebar component
 export { FinProSidebar } from '../finpro-components/sidebar/FinProSidebar'

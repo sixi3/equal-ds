@@ -40,6 +40,26 @@ export function DrawerProvider(props: DrawerProviderProps): JSX.Element {
   const isControlled = typeof open === 'boolean'
   const [internalOpen, setInternalOpen] = useState<boolean>(Boolean(defaultOpen))
   const [fullyOpen, setFullyOpen] = useState<boolean>(Boolean(defaultOpen))
+  const previousOverflowRef = React.useRef<string | undefined>(undefined)
+
+  React.useEffect(() => {
+    const currentOpen = isControlled ? Boolean(open) : internalOpen
+    if (typeof document === 'undefined') return
+
+    if (currentOpen) {
+      previousOverflowRef.current = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+    } else if (previousOverflowRef.current !== undefined) {
+      document.body.style.overflow = previousOverflowRef.current
+    }
+
+    return () => {
+      if (typeof document === 'undefined') return
+      if (previousOverflowRef.current !== undefined) {
+        document.body.style.overflow = previousOverflowRef.current
+      }
+    }
+  }, [isControlled, open, internalOpen])
 
   // Manage fullyOpen state based on open state and animation timing
   React.useEffect(() => {

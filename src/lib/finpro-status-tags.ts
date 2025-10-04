@@ -136,11 +136,11 @@ const CONSENT_STATUS_CONFIG: Record<ConsentStatusKey, StatusTagConfig> = {
  * Matches Figma data tag design with appropriate status colors
  */
 const DATA_STATUS_CONFIG: Record<DataStatusKey, StatusTagConfig> = {
-  DATA_READY: { label: 'DATA READY', className: 'status-paused' }, // #FFF1DF background, #AC732B text
-  DELIVERED: { label: 'DELIVERED', className: 'status-active' }, // #E6F4EC background, #2D8659 text
-  DENIED: { label: 'DENIED', className: 'status-rejected' }, // #FCF0EE background, #CA7373 text
-  PENDING: { label: 'PENDING', className: 'status-pending' }, // #E0F5FF background, #0074A5 text
-  TIMEOUT: { label: 'TIMEOUT', className: 'status-revoked' }, // #F9ECF3 background, #7C3A60 text
+  DATA_READY: { label: 'DATA READY', className: 'data-refreshing' }, // White background with orange border
+  DELIVERED: { label: 'DELIVERED', className: 'data-fetched' }, // White background with green border
+  DENIED: { label: 'DENIED', className: 'data-denied' }, // White background with gray border
+  PENDING: { label: 'PENDING', className: 'data-new' }, // White background with blue border
+  TIMEOUT: { label: 'TIMEOUT', className: 'data-timeout' }, // White background with gray border
 };
 
 /**
@@ -148,7 +148,7 @@ const DATA_STATUS_CONFIG: Record<DataStatusKey, StatusTagConfig> = {
  */
 const DEFAULT_STATUS_CONFIG: StatusTagConfig = {
   label: 'Unknown',
-  className: 'status-paused', // Neutral fallback
+  className: 'data-expired', // Neutral fallback with white background
 };
 
 /**

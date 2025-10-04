@@ -90,7 +90,7 @@ function SortableColumnCard({
           <GripVertical className="h-4 w-4" aria-hidden="true" />
         </button>
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-text-primary tracking-wide ">{column.header.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}</span>
+          <span className="text-sm font-medium text-text-primary tracking-wider ">{column.header}</span>
           
           {column.isActions && (
             <span className="text-xs text-text-tertiary tracking-wide">Actions column</span>
@@ -100,7 +100,7 @@ function SortableColumnCard({
           )}
           
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
           <span className="text-xs text-text-tertiary">#{index + 1}</span>
           {allowHiding && column.hideable !== false && onToggleVisibility && (
             <button
@@ -129,7 +129,7 @@ export function TableColumnManager({
   columnOrder,
   onColumnOrderChange,
   defaultOrder,
-  title = 'Arrange columns',
+  title = 'Manage columns',
   description = 'Use the controls below to view/hide/reorganise the columns in the table.',
   width = 900,
   resetLabel = 'Reset Table',
@@ -216,7 +216,7 @@ export function TableColumnManager({
               onClick={handleReset}
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-text-secondary transition-colors duration-150',
-                'hover:border-border-hover hover:text-text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+                'hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
               )}
             >
               <ListRestart className="h-4 w-4" aria-hidden="true" />

@@ -1,6 +1,24 @@
 import React from 'react'
 import { GripVertical } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import type { DraggableAttributes } from '@dnd-kit/core'
 import { cn } from '../../lib/cn'
 import { useSidebarOpenContext, useSidebarActiveItemContext } from './SidebarProvider'
 import { useHoverAnimation } from '../../lib/useHoverAnimation'
@@ -58,53 +76,89 @@ function getTooltipRoot(doc: Document): HTMLElement | null {
   return el
 }
 
-function measureItemRects(list: HTMLUListElement): Record<string, DOMRect> {
-  const rects: Record<string, DOMRect> = {}
-  list.querySelectorAll('li[data-drag-id]')?.forEach((el) => {
-    const id = (el as HTMLElement).dataset.dragId
-    if (id) rects[id] = el.getBoundingClientRect()
+function collectDragIds(children: React.ReactNode): string[] {
+  const ids: string[] = []
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return
+    if (child.type === React.Fragment) {
+      ids.push(...collectDragIds(child.props.children))
+      return
+    }
+    if (child.props?.children) {
+      ids.push(...collectDragIds(child.props.children))
+    }
+    const maybeDragId = (child.props as { dragId?: string; draggable?: boolean }).dragId
+    const isDraggable = (child.props as { draggable?: boolean }).draggable
+    if (maybeDragId && isDraggable) ids.push(String(maybeDragId))
   })
-  return rects
+  return ids
 }
 
-const DROP_THRESHOLD_PX = 12
-const ITEM_INDICATOR_GAP_PX = 4
-
-type DropIndicator = { top: number; left: number; width: number; visible: boolean }
-
-type ReorderContextValue = {
-  enabled: boolean
-  registerItem?: (id: string, el: HTMLLIElement | null) => void
-  onItemDragStart?: (e: React.DragEvent<HTMLLIElement>, id: string) => void
-  onItemDragEnd?: (e: React.DragEvent<HTMLLIElement>, id: string) => void
+type ItemDragContextValue = {
+  draggable: boolean
+  dragId?: string
+  attributes?: DraggableAttributes
+  listeners?: any
+  setNodeRef?: (node: HTMLElement | null) => void
+  transform?: React.CSSProperties['transform']
+  transition?: string | null
+  isDragging?: boolean
 }
 
-const ReorderContext = React.createContext<ReorderContextValue | null>(null)
-const ItemDragContext = React.createContext<{ draggable: boolean; dragId?: string } | null>(null)
+const ItemDragContext = React.createContext<ItemDragContextValue | null>(null)
+
+const SortableMenuContext = React.createContext<{ enabled: boolean }>({ enabled: false })
 
 function SidebarMenuImpl({ className, children, reorderable = false, onReorder, ...props }: SidebarMenuProps): JSX.Element {
   const { open, fullyOpen } = useSidebarOpenContext()
-  
-  // Use reusable hover animation hook
+
+  const sortableEnabled = Boolean(reorderable && open)
+  const [isDragging, setIsDragging] = React.useState(false)
+
   const { indicator, handleMouseMove, handleMouseLeave, setContainerRef } = useHoverAnimation({
     itemSelector: '[data-sidebar-menu-button]',
-    enabled: true
+    enabled: !isDragging,
   })
 
-  // Tooltip state (keeping this for collapsed sidebar tooltips)
   const [tooltip, setTooltip] = React.useState<{ top: number; left: number; visible: boolean }>({ top: 0, left: 0, visible: false })
   const [tooltipLabel, setTooltipLabel] = React.useState<string>('')
   const tooltipLabelRef = React.useRef<string>('')
   const [textVisible, setTextVisible] = React.useState<boolean>(false)
-  const [tooltipWidth, setTooltipWidth] = React.useState<number | null>(null)
   const textFadeTimeout = React.useRef<number | null>(null)
   const measureRef = React.useRef<HTMLSpanElement | null>(null)
 
-  // Drag/reorder state
-  const draggingIdRef = React.useRef<string | null>(null)
-  const overIdRef = React.useRef<string | null>(null)
-  const atEndRef = React.useRef<boolean>(false)
-  const [dropIndicator, setDropIndicator] = React.useState<DropIndicator>({ top: 0, left: 0, width: 0, visible: false })
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor))
+  const sortableIds = React.useMemo(() => collectDragIds(children), [children])
+
+  const handleDragStart = React.useCallback(() => {
+    if (!reorderable) return
+    setIsDragging(true)
+  }, [reorderable])
+
+  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+    if (!reorderable) return
+    const { active, over } = event
+    if (!over || active.id === over.id) {
+      setIsDragging(false)
+      return
+    }
+    const activeId = String(active.id)
+    const overId = String(over.id)
+    const currentOrder = sortableIds
+    const oldIndex = currentOrder.indexOf(activeId)
+    const newIndex = currentOrder.indexOf(overId)
+    if (oldIndex === -1 || newIndex === -1) {
+      setIsDragging(false)
+      return
+    }
+    const next = arrayMove(currentOrder, oldIndex, newIndex)
+    onReorder?.(next)
+    setIsDragging(false)
+  }, [reorderable, sortableIds, onReorder])
+
+  const handleDragCancel = React.useCallback(() => {
+    setIsDragging(false)
+  }, [])
 
   // Stable portal container per menu instance
   const tooltipContainerRef = React.useRef<HTMLElement | null>(null)
@@ -137,6 +191,7 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
 
   // Custom mouse move handler that combines hover animation and tooltip logic
   const handlePointerMove = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
+    if (isDragging) return
     const container = e.currentTarget
     if (!container) return
 
@@ -144,10 +199,8 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
     if (!targetButton) return
 
     const cRect = container.getBoundingClientRect()
-    const tRect = targetButton.getBoundingClientRect()
     const label = targetButton.getAttribute('aria-label') || targetButton.textContent?.trim() || ''
 
-    // Update tooltip position (fixed next to sidebar, ensure pixel-perfect positioning)
     const sidebarRight = Math.round(cRect.right)
     const tooltipTop = Math.round(e.clientY)
     const tooltipLeft = sidebarRight + 20
@@ -155,15 +208,10 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
 
     if (label !== tooltipLabelRef.current) {
       setTextVisible(false)
-      // Measure next label width via hidden measurer
       requestAnimationFrame(() => {
         tooltipLabelRef.current = label
-        // Update measurer text
         if (measureRef.current) {
           measureRef.current.textContent = label
-          const w = measureRef.current.getBoundingClientRect().width
-          // container has px-2 (8px each side) -> add 16
-          setTooltipWidth(Math.ceil(w + 16))
         }
         setTooltipLabel(label)
         if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current)
@@ -173,9 +221,8 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
       setTextVisible(true)
     }
 
-    // Call the hover animation handler
     handleMouseMove(e)
-  }, [handleMouseMove, setContainerRef])
+  }, [handleMouseMove, isDragging])
 
   const handleLeave = React.useCallback(() => {
     handleMouseLeave()
@@ -185,217 +232,72 @@ function SidebarMenuImpl({ className, children, reorderable = false, onReorder, 
 
   React.useEffect(() => () => { if (textFadeTimeout.current) window.clearTimeout(textFadeTimeout.current) }, [])
 
-  const tooltipElement = portalMounted && tooltipContainerRef.current
-    ? createPortal(
-        <div
-          aria-hidden
-          className={cn(
-            'pointer-events-none fixed z-[9999] rounded-md border border-border-default bg-background-primary px-2 py-1 text-sm shadow tooltip-follow transition-[width,opacity] duration-150 ease-out antialiased',
-            textVisible && !open && tooltip.visible ? 'opacity-100' : 'opacity-0',
-          )}
-          style={{
-            top: Math.round(tooltip.top),
-            left: Math.round(tooltip.left),
-            width: tooltipWidth ?? 'auto',
-            // Keep mounted, only toggle visibility
-            visibility: !open && tooltip.visible ? 'visible' : 'hidden',
-          }}
-        >
-          {/* Arrow: border (outer) */}
-          <span
-            className="pointer-events-none absolute left-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-transparent"
-            style={{ borderRightColor: 'var(--color-border-hover)' }}
+  const tooltipElement =
+    portalMounted && tooltipContainerRef.current
+      ? createPortal(
+          <div
             aria-hidden
-          />
-          {/* Arrow: fill (inner) */}
-          <span
-            className="pointer-events-none absolute left-[-7px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-transparent"
-            style={{ borderRightColor: 'var(--color-background-secondary)' }}
-            aria-hidden
-          />
-          <span className={cn('block transition-opacity duration-150 whitespace-nowrap antialiased', textVisible ? 'opacity-100' : 'opacity-0')}>
-            {tooltipLabel}
-          </span>
-          {/* Hidden measurer for smooth width animation */}
-          <span ref={measureRef} className="absolute left-[-9999px] top-[-9999px] text-sm whitespace-nowrap" aria-hidden />
-        </div>,
-        tooltipContainerRef.current,
-      )
-    : null
-
-  // Reorder handlers provided via context to items
-  const registerItem = React.useCallback((_id: string, _el: HTMLLIElement | null) => {
-    // No-op: DOM is queried directly for ordering operations
-  }, [])
-
-  const updateDropIndicator = React.useCallback((targetEl: HTMLElement, atEnd?: boolean) => {
-    // Find the specific menu container that contains the target element
-    const container = targetEl.closest('[data-sidebar-menu]') as HTMLElement
-    if (!container) return
-    const cRect = container.getBoundingClientRect()
-    const tRect = targetEl.getBoundingClientRect()
-    // Show indicator precisely at the boundary with a small gap
-    const top = atEnd ? (tRect.bottom + ITEM_INDICATOR_GAP_PX) : (tRect.top - ITEM_INDICATOR_GAP_PX)
-    setDropIndicator({
-      top: top - cRect.top + (container.scrollTop ?? 0),
-      left: tRect.left - cRect.left + (container.scrollLeft ?? 0),
-      width: tRect.width,
-      visible: true,
-    })
-  }, [])
-
-  const handleItemDragStart = React.useCallback((e: React.DragEvent<HTMLLIElement>, id: string) => {
-    if (!reorderable) return
-    draggingIdRef.current = id
-    overIdRef.current = null
-    try { e.dataTransfer.setData('text/plain', id) } catch {}
-    e.dataTransfer.effectAllowed = 'move'
-  }, [reorderable])
-
-  // Container-level drag over to avoid dead zones between items
-  const handleListDragOver = React.useCallback((e: React.DragEvent<HTMLUListElement>) => {
-    if (!reorderable) return
-    const draggingId = draggingIdRef.current
-    if (!draggingId) return
-    e.preventDefault()
-    const list = e.currentTarget
-    if (!list) return
-    const items = Array.from(list.querySelectorAll('li[data-drag-id]')) as HTMLElement[]
-    if (items.length === 0) return
-    // Find nearest boundary
-    let targetEl: HTMLElement = items[0]
-    let atEndLocal = false
-    for (let i = 0; i < items.length; i++) {
-      const it = items[i]
-      const rect = it.getBoundingClientRect()
-      if (e.clientY < rect.top + DROP_THRESHOLD_PX) { targetEl = it; atEndLocal = false; break }
-      const isLast = i === items.length - 1
-      if (!isLast && e.clientY < rect.bottom + DROP_THRESHOLD_PX) { targetEl = it; atEndLocal = false; break }
-      if (isLast) { targetEl = it; atEndLocal = e.clientY >= rect.bottom - DROP_THRESHOLD_PX }
-    }
-    const overId = targetEl.dataset.dragId || null
-    if (overId) {
-      // If hovering the dragged item itself, it's a no-op: hide indicator
-      if (overId === draggingId) {
-        setDropIndicator((prev) => ({ ...prev, visible: false }))
-        e.dataTransfer.dropEffect = 'none'
-        return
-      }
-      overIdRef.current = overId
-      atEndRef.current = atEndLocal
-      updateDropIndicator(targetEl, atEndLocal)
-      e.dataTransfer.dropEffect = 'move'
-    }
-  }, [reorderable, updateDropIndicator])
-
-  const computeNextOrder = React.useCallback((): string[] | null => {
-    const draggingId = draggingIdRef.current
-    const overId = overIdRef.current
-    const atEnd = atEndRef.current
-    if (!draggingId || !overId) return null
-    
-    // Find the specific menu container that contains the dragged item
-    const draggedElement = document.querySelector(`li[data-drag-id="${draggingId}"]`) as HTMLElement
-    if (!draggedElement) return null
-    const container = draggedElement.closest('[data-sidebar-menu]') as HTMLElement
-    if (!container) return null
-    
-    const ids = Array.from(container.querySelectorAll('li[data-drag-id]')).map((el) => (el as HTMLElement).dataset.dragId!).filter(Boolean)
-    const fromIndex = ids.indexOf(draggingId)
-    const toIndex = ids.indexOf(overId)
-    if (fromIndex === -1 || toIndex === -1) return null
-    const next = ids.filter((x) => x !== draggingId)
-
-    let insertionIndex: number
-    if (atEnd) {
-      // Insert after the last item
-      insertionIndex = next.length
-    } else {
-      // Insert before the hovered target
-      insertionIndex = toIndex
-      if (toIndex > fromIndex) insertionIndex = toIndex - 1
-    }
-
-    insertionIndex = Math.max(0, Math.min(next.length, insertionIndex))
-    next.splice(insertionIndex, 0, draggingId)
-    return next
-  }, [])
-
-  const clearDragState = React.useCallback(() => {
-    draggingIdRef.current = null
-    overIdRef.current = null
-    atEndRef.current = false
-    setDropIndicator((prev) => ({ ...prev, visible: false }))
-  }, [])
-
-  const handleListDrop = React.useCallback((e: React.DragEvent<HTMLUListElement>) => {
-    if (!reorderable) return
-    e.preventDefault()
-    const draggedId = draggingIdRef.current
-    const next = computeNextOrder()
-    clearDragState()
-    if (next && onReorder) {
-      onReorder(next)
-      if (draggedId) {
-        requestAnimationFrame(() => {
-          const l = e.currentTarget
-          if (!l) return
-          const el = l.querySelector(`li[data-drag-id="${draggedId}"]`) as HTMLElement | null
-          if (!el) return
-          el.classList.add('animate-sidebar-pop-in')
-          const onEnd = () => {
-            el.classList.remove('animate-sidebar-pop-in')
-            el.removeEventListener('animationend', onEnd)
-          }
-          el.addEventListener('animationend', onEnd)
-        })
-      }
-    }
-  }, [reorderable, computeNextOrder, clearDragState, onReorder])
-
-  const handleItemDragEnd = React.useCallback((e: React.DragEvent<HTMLLIElement>, _id: string) => {
-    if (!reorderable) return
-    clearDragState()
-  }, [reorderable, clearDragState])
-
-  const reorderContextValue = React.useMemo<ReorderContextValue>(() => ({
-    enabled: Boolean(reorderable && open),
-    registerItem,
-    onItemDragStart: handleItemDragStart,
-    onItemDragEnd: handleItemDragEnd,
-  }), [reorderable, open, registerItem, handleItemDragStart, handleItemDragEnd])
+            className={cn(
+              'pointer-events-none fixed z-[9999] rounded-md border border-border-default bg-background-primary px-2 py-1 text-sm shadow tooltip-follow transition-[opacity] duration-150 ease-out antialiased',
+              textVisible && !open && tooltip.visible ? 'opacity-100' : 'opacity-0',
+            )}
+            style={{
+              top: Math.round(tooltip.top),
+              left: Math.round(tooltip.left),
+              visibility: !open && tooltip.visible ? 'visible' : 'hidden',
+            }}
+          >
+            {/* Arrow: border (outer) */}
+            <span
+              className="pointer-events-none absolute left-[-8px] top-1/2 -translate-y-1/2 h-0 w-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-transparent"
+              style={{ borderRightColor: 'var(--color-border-hover)' }}
+              aria-hidden
+            />
+            {/* Arrow: fill (inner) */}
+            <span
+              className="pointer-events-none absolute left-[-7px] top-1/2 -translate-y-1/2 h-0 w-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-transparent"
+              style={{ borderRightColor: 'var(--color-background-secondary)' }}
+              aria-hidden
+            />
+            <span className={cn('block whitespace-nowrap transition-opacity duration-150 antialiased', textVisible ? 'opacity-100' : 'opacity-0')}>
+              {tooltipLabel}
+            </span>
+            {/* Hidden measurer for smooth width animation */}
+            <span ref={measureRef} className="absolute left-[-9999px] top-[-9999px] whitespace-nowrap text-sm" aria-hidden />
+          </div>,
+          tooltipContainerRef.current,
+        )
+      : null
 
   return (
     <>
       {tooltipElement}
-      <ReorderContext.Provider value={reorderContextValue}>
-        <ul
-          ref={setContainerRef}
-          data-sidebar-menu
-          onDragOver={handleListDragOver}
-          onDrop={handleListDrop}
-          onMouseMove={handlePointerMove}
-          onMouseLeave={() => {
-            handleLeave()
-            setDropIndicator((prev) => ({ ...prev, visible: false }))
-          }}
-          className={cn('relative px-1 py-2', className)}
-          {...props}
-        >
-          <HoverIndicator indicator={indicator} variant="default" zIndex={0} />
-          {children}
-          {/* Drop indicator bar for reordering (on top of items) */}
-          <div
-            aria-hidden
-            className={cn('pointer-events-none absolute z-[100] h-[2px] transition-all duration-75 ease-out bg-primary-400', dropIndicator.visible && reorderable ? 'opacity-100' : 'opacity-0')}
-            style={{ 
-              top: dropIndicator.top, 
-              left: dropIndicator.left, 
-              width: dropIndicator.width
-            }}
-          />
-        </ul>
-      </ReorderContext.Provider>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis]}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+          <SortableMenuContext.Provider value={{ enabled: sortableEnabled }}>
+            <ul
+              ref={setContainerRef}
+              data-sidebar-menu
+              onMouseMove={handlePointerMove}
+              onMouseLeave={() => {
+                handleLeave()
+              }}
+              className={cn('relative px-1 py-2', className)}
+              {...props}
+            >
+              {!isDragging ? <HoverIndicator indicator={indicator} variant="default" zIndex={0} /> : null}
+              {children}
+            </ul>
+          </SortableMenuContext.Provider>
+        </SortableContext>
+      </DndContext>
     </>
   )
 }
@@ -414,36 +316,52 @@ export interface SidebarMenuItemProps extends React.LiHTMLAttributes<HTMLLIEleme
 }
 
 const SidebarMenuItemImpl = React.forwardRef<HTMLLIElement, SidebarMenuItemProps>(function SidebarMenuItem(
-  { className, active, disabled, draggable: draggableProp, dragId, onDragStart, onDragOver, onDrop, onDragEnd, ...props },
+  { className, active, disabled, draggable: draggableProp, dragId, ...props },
   ref,
 ) {
-  const reorderCtx = React.useContext(ReorderContext)
-  const draggable = Boolean(draggableProp && reorderCtx?.enabled)
+  const sortableCtx = React.useContext(SortableMenuContext)
+  const enabled = Boolean(sortableCtx.enabled && draggableProp && dragId)
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: dragId ?? '', disabled: !enabled })
 
-  const composedDragEnd = React.useCallback((e: React.DragEvent<HTMLLIElement>) => {
-    onDragEnd?.(e)
-    if (draggable && dragId && reorderCtx?.onItemDragEnd) reorderCtx.onItemDragEnd(e, dragId)
-  }, [onDragEnd, draggable, dragId, reorderCtx])
+  const appliedListeners = enabled ? listeners : undefined
+  const appliedAttributes = enabled ? attributes : undefined
 
-  const setRef = React.useCallback((node: HTMLLIElement | null) => {
-    if (typeof ref === 'function') ref(node)
-    else if (ref) (ref as React.MutableRefObject<HTMLLIElement | null>).current = node
-    if (draggable && dragId && reorderCtx?.registerItem) reorderCtx.registerItem(dragId, node)
-  }, [ref, draggable, dragId, reorderCtx])
+  const mergedRef = React.useCallback(
+    (node: HTMLLIElement | null) => {
+      setNodeRef(node)
+      if (typeof ref === 'function') ref(node)
+      else if (ref) (ref as React.MutableRefObject<HTMLLIElement | null>).current = node
+    },
+    [setNodeRef, ref],
+  )
+
+  const style = React.useMemo<React.CSSProperties>(() => ({
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
+    transition: transition ?? undefined,
+  }), [transform, transition])
+
+  const providerValue = React.useMemo<ItemDragContextValue>(() => ({
+    draggable: enabled,
+    dragId,
+    attributes: appliedAttributes,
+    listeners: appliedListeners,
+    setNodeRef,
+    transform: style.transform,
+    transition: style.transition,
+    isDragging,
+  }), [enabled, dragId, appliedAttributes, appliedListeners, setNodeRef, style.transform, style.transition, isDragging])
 
   return (
     <li
-      ref={setRef}
+      ref={mergedRef}
       data-active={active ? '' : undefined}
       aria-disabled={disabled || undefined}
-      className={cn('list-none relative z-10 group/reorder py-1', className)}
-      data-drag-id={draggable && dragId ? dragId : undefined}
-      onDragEnd={composedDragEnd}
+      className={cn('list-none relative z-10 group/reorder py-1', isDragging && 'opacity-70', className)}
+      data-drag-id={enabled && dragId ? dragId : undefined}
+      style={style}
       {...props}
     >
-      <ItemDragContext.Provider value={{ draggable, dragId }}>
-        {props.children}
-      </ItemDragContext.Provider>
+      <ItemDragContext.Provider value={providerValue}>{props.children}</ItemDragContext.Provider>
     </li>
   )
 })
@@ -462,8 +380,8 @@ export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLB
 function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, active, disabled, itemId, children, ...props }: SidebarMenuButtonProps): JSX.Element {
   const { open, fullyOpen } = useSidebarOpenContext()
   const { activeItem, setActiveItem } = useSidebarActiveItemContext()
-  const reorderCtx = React.useContext(ReorderContext)
   const itemDrag = React.useContext(ItemDragContext)
+  const sortableCtx = React.useContext(SortableMenuContext)
   const inferredLabel = label ?? (typeof children === 'string' ? children : undefined)
   const computedActive = active ?? (itemId ? activeItem === itemId : false)
   const wasActiveRef = React.useRef<boolean>(computedActive)
@@ -492,81 +410,19 @@ function SidebarMenuButtonImpl({ className, icon, endAdornment, label, href, act
     className,
   )
 
-  // Custom drag preview so users see both handle and the tab name while dragging
-  const dragPreviewRef = React.useRef<HTMLDivElement | null>(null)
-  const createDragPreview = React.useCallback((e: React.DragEvent) => {
-    if (!e.dataTransfer) return
-    const current = e.currentTarget as HTMLElement
-    const btn = current.closest('[data-sidebar-menu-button]') as HTMLElement | null
-    const labelText = (btn?.getAttribute('aria-label') || btn?.textContent || inferredLabel || '').toString().trim()
-    const doc = current.ownerDocument || document
-    const el = doc.createElement('div')
-    el.style.pointerEvents = 'none'
-    el.style.position = 'fixed'
-    el.style.top = '-9999px'
-    el.style.left = '-9999px'
-    el.style.zIndex = '2147483647'
-    el.style.display = 'inline-flex'
-    el.style.alignItems = 'center'
-    el.style.gap = '8px'
-    el.style.padding = '6px 10px'
-    el.style.borderRadius = '8px'
-    el.style.border = '1px solid var(--color-border-default)'
-    el.style.background = 'var(--color-background-secondary)'
-    el.style.boxShadow = 'var(--shadow-md)'
-    el.style.color = 'rgb(var(--color-text-primary))'
-
-    // Try to clone the handle SVG if present for fidelity
-    const svg = current.querySelector('svg')?.cloneNode(true) as SVGElement | null
-    if (svg) {
-      const wrap = doc.createElement('span')
-      wrap.style.display = 'inline-flex'
-      wrap.style.width = '12px'
-      wrap.style.height = '12px'
-      wrap.style.color = 'rgb(var(--color-text-muted))'
-      wrap.appendChild(svg)
-      el.appendChild(wrap)
-    }
-    const text = doc.createElement('span')
-    text.textContent = labelText
-    text.style.fontSize = '12px'
-    text.style.fontWeight = '500'
-    text.style.whiteSpace = 'nowrap'
-    el.appendChild(text)
-
-    doc.body.appendChild(el)
-    try { e.dataTransfer.setDragImage(el, 12, 14) } catch {}
-    dragPreviewRef.current = el
-  }, [inferredLabel])
-
-  const cleanupDragPreview = React.useCallback(() => {
-    const el = dragPreviewRef.current
-    if (el && el.parentNode) el.parentNode.removeChild(el)
-    dragPreviewRef.current = null
-  }, [])
-
   const content = (
     <>
       {icon ? (
         <span className="shrink-0 w-5 h-5 text-current transition-colors duration-200 ease-out relative group/icon" aria-hidden>
-          {/* Original icon, hidden on hover when reordering is available */}
-          <span className={cn('absolute inset-0 transition-opacity', (reorderCtx?.enabled && itemDrag?.draggable && itemDrag.dragId) ? 'opacity-100 group-hover/icon:opacity-0' : 'opacity-100')}>
+          <span className={cn('absolute inset-0 transition-opacity', (itemDrag?.draggable && itemDrag.dragId) ? 'opacity-100 group-hover/icon:opacity-0' : 'opacity-100')}>
             {icon}
           </span>
-          {/* Drag handle, shown on hover when reordering is available */}
-          {(reorderCtx?.enabled && itemDrag?.draggable && itemDrag.dragId) ? (
+          {(itemDrag?.draggable && itemDrag.dragId && sortableCtx.enabled) ? (
             <span
               className="absolute inset-0 opacity-0 group-hover/icon:opacity-100 cursor-grab active:cursor-grabbing flex items-center justify-center"
-              draggable
-              onClick={(e) => e.preventDefault()}
-              onDragStart={(e) => {
-                createDragPreview(e)
-                if (itemDrag?.dragId) reorderCtx?.onItemDragStart?.(e as any, itemDrag.dragId!)
-              }}
-              onDragEnd={(e) => {
-                cleanupDragPreview()
-                if (itemDrag?.dragId) reorderCtx?.onItemDragEnd?.(e as any, itemDrag.dragId!)
-              }}
+              role="presentation"
+              {...itemDrag.listeners}
+              {...itemDrag.attributes}
             >
               <GripVertical className="w-5 h-5" />
             </span>

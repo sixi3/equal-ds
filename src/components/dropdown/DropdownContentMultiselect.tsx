@@ -222,7 +222,7 @@ export const DropdownContentMultiselect = React.forwardRef<HTMLDivElement, Dropd
                   />
                 ))
               ) : (
-                <div className="px-3 py-2 text-sm text-text-secondary tracking-wide text-center">
+                <div className="px-3 py-2 text-sm  text-text-tertiary tracking-wider text-center">
                   {searchTerm ? 'No match found!' : placeholder}
                 </div>
               )}

@@ -1,7 +1,7 @@
 import './tailwind.css'
 import React from 'react'
 import type { StoryObj } from '@storybook/react'
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownContentMultiselect, DropdownItem, DropdownItemMultiselect, DropdownSeparator, DatePicker, DateRangePickerContent, DateRangeValue } from '../src'
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownContentMultiselect, DropdownItem, DropdownItemMultiselect, DropdownSeparator, DatePicker, DateRangePickerContent, DateRangeValue, getSmartDefaults } from '../src'
 import { ChevronDown, Settings, User, LogOut, Hammer, Wrench, Bell, Mail, Heart, Star, ChevronUp, Filter } from 'lucide-react'
 import { cn } from '../src/lib/cn'
 import { ChevronIcon } from '../src/lib/ChevronIcon'
@@ -15,6 +15,7 @@ import { generateAllControls } from '../src/story-utils/simpleControls'
 
 // Generate controls for dropdown
 const { argTypes, args } = generateAllControls('dropdown')
+
 
 // Storybook meta configuration
 const meta = {
@@ -303,13 +304,8 @@ export const MultiselectFilter: Story = {
     const [isAggregatorHovered, setIsAggregatorHovered] = useState(false)
     const [isDatePickerHovered, setIsDatePickerHovered] = useState(false)
 
-    // Date range picker state
-    const [selectedRange, setSelectedRange] = useState<DateRangeValue>({
-      startDate: new Date('2025-01-15'),
-      startTime: { hours: 9, minutes: 30, period: 'AM' },
-      endDate: new Date('2025-01-16'),
-      endTime: { hours: 5, minutes: 45, period: 'PM' }
-    })
+    // Date range picker state - initialized with smart defaults (current time rounded to last 30 mins)
+    const [selectedRange, setSelectedRange] = useState<DateRangeValue>(getSmartDefaults)
 
     // Helper function to create trigger styles
     const createTriggerStyles = (isHovered: boolean) => {
@@ -673,7 +669,7 @@ export const MultiselectFilter: Story = {
     borderRadius: "--border-radius-lg",
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderBottomWidth: "3px",
+    borderBottomWidth: "2px",
     hoverBorderBottomWidth: "3px",
     showLabel: true,
     hoverBackgroundColor: "--color-background-primary",

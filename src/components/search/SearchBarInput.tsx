@@ -48,7 +48,7 @@ export const SearchBarInput = React.forwardRef<HTMLInputElement, SearchBarInputP
     return (
       <div className={cn(
         // Search input container styles - matches design spec
-        'flex w-80 flex-1 items-center gap-2 bg-background-secondary px-3 py-0',
+        'flex w-96 flex-1 items-center gap-2 bg-background-secondary px-3 py-0',
         // State-based styles
         {
           'bg-gray-50': disabled,

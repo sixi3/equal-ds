@@ -57,7 +57,7 @@ export const SearchBarDropdown = React.forwardRef<HTMLButtonElement, SearchBarDr
           <DropdownContent
             align="end"
             sideOffset={4}
-            className="min-w-[160px] px-1 py-0 z-50 border-border-default"
+            className="min-w-[200px] px-1 py-0 z-50 border-border-default mt-1"
           >
             {/* Header - flush with edges */}
             <div className="-mx-1 -mt-1 mb-1 bg-gradient-to-b from-primary-50 to-primary-100 border-b border-primary-100 rounded-t-lg">

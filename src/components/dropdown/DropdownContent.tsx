@@ -3,6 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cn } from '../../lib/cn'
 import { useHoverAnimation } from '../../lib/useHoverAnimation'
 import { HoverIndicator } from '../ui/HoverIndicator'
+import { Search } from 'lucide-react'
 
 export interface DropdownContentProps extends React.ComponentPropsWithoutRef<typeof DropdownMenu.Content> {
   /**
@@ -97,28 +98,16 @@ export const DropdownContent = React.forwardRef<HTMLDivElement, DropdownContentP
         >
           {/* Search Input */}
           {enableSearch && (
-            <div className="flex items-center gap-1 px-2 py-2 border-b border-border-default group mb-1">
+            <div className="flex items-center gap-1 px-2 py-2 border-b border-border-default group mb-1 focus:outline-none focus:ring-0">
               {/* Search Icon */}
-              <svg
-                className="w-4 h-4 text-text-tertiary group-hover:text-primary-500 flex-shrink-0 transition-colors duration-200"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Search size={16} strokeWidth={2} className="text-text-tertiary group-hover:text-primary-500 transition-colors duration-200" />
               <input
                 ref={searchRef}
                 type="text"
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="flex-1 pt-0.5 pl-0.5 text-sm text-text-primary bg-transparent border-0 placeholder:text-text-tertiary placeholder:text-sm placeholder:font-normal placeholder:tracking-widest"
+                className="flex-1 pt-0.5 pl-0.5 text-sm text-text-primary bg-transparent border-0 placeholder:text-text-tertiary placeholder:text-sm placeholder:font-normal placeholder:tracking-wider focus:outline-none focus:ring-0"
               />
             </div>
           )}

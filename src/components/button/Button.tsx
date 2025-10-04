@@ -29,22 +29,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || variant === 'disabled'
 
     // Base button styles
-    const baseClasses = 'inline-flex items-center justify-center gap-2 font-regular  transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+    const baseClasses = 'inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 
     // Size-based styles
     const sizeClasses = {
-      sm: 'h-8 px-3 py-1.5 text-xs rounded-md',
-      md: 'h-12 px-4 py-2.5 text-base rounded-lg',
-      lg: 'h-16 px-6 py-3 text-base rounded-lg',
+      sm: 'h-8 px-1.5 py-1.5 text-xs rounded-md gap-1',
+      md: 'h-12 px-4 py-2.5 text-base rounded-lg gap-1',
+      lg: 'h-16 px-6 py-3 text-base rounded-lg gap-1',
     }
 
     // Variant-based styles using design tokens
     const variantClasses = {
       primary: cn(
-        'bg-brand-primary text-text-inverse hover:bg-brand-primary/90 hover:translate-y-[-1px] tracking-wider border border-b-4 border-t-0 border-l-0 border-r-0 border-black transition-all duration-200',
+        'bg-primary-500 text-text-inverse hover:bg-primary-600 font-medium tracking-wider border border-t-0 border-l-0 border-r-0 border-b-2 border-primary-600 transition-all duration-200',
       ),
       secondary: cn(
-        'bg-background-secondary tracking-wide text-brand-primary hover:translate-y-[-1px] border border-b-2 border-border-hover transition-all duration-200',
+        'bg-background-secondary tracking-wide font-medium  text-brand-primary border border-b-2 border-border-hover transition-all duration-200',
         'hover:bg-background-tertiary'
       ),
       disabled: cn(
@@ -56,11 +56,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Dropdown trigger styles - complementary to main button variants
     const dropdownTriggerClasses = {
       primary: cn(
-        'bg-brand-primary text-text-inverse hover:bg-brand-primary/90 tracking-wider hover:border-black border tracking-wider border-b-4 border-t-0 border-black transition-all duration-200',
-        'hover:translate-y-[0px]'
+        'bg-primary-500 text-text-inverse hover:bg-primary-600 tracking-wider border tracking-wider border-b-2 border-t-0 border-primary-600 hover:border-primary-600 hover:shadow-none transition-all duration-200',
       ),
       secondary: cn(
-        'bg-background-secondary tracking-wide text-brand-primary border border-b-2 border-border-hover hover:border-border-hover hover:shadow-none',
+        'bg-background-secondary font-regular tracking-wide text-text-primary border border-b-2 border-border-hover hover:border-border-hover hover:shadow-none',
         'hover:bg-background-tertiary'
       ),
       disabled: cn(
@@ -88,7 +87,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               baseClasses,
               sizeClasses[size],
               variantClasses[variant],
-              'rounded-r-none border-r-0 hover:translate-y-[0px]',
+              'rounded-r-none border-r-0',
               className
             )}
             {...props}

@@ -23,11 +23,11 @@ export const Tag: React.FC<TagProps> = ({
   size = 'sm',
   className,
 }) => {
-  const baseClasses = 'inline-flex items-center font-medium leading-none tracking-wider'
+  const baseClasses = 'inline-flex items-center  leading-none tracking-wide font-mono'
 
   const sizeClasses = {
-    sm: 'px-2 py-1 text-xs rounded-md',
-    md: 'px-3 py-1.5 text-sm rounded-md',
+    sm: 'px-1 py-0.5 text-xs rounded-md',
+    md: 'px-2 py-1 text-sm rounded-md',
   }
 
   const finalClasses = cn(baseClasses, sizeClasses[size], className)

@@ -207,11 +207,17 @@ function TableImpl<T = any>({
     handleScroll()
   }, [data.length, loading, tableClassName, handleScroll])
 
+  const isCompact = data.length <= 1
 
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
+    <div className={cn('flex flex-col', className, isCompact && 'flex-none')} {...props}>
       {/* Table Container with horizontal scroll */}
-      <div className="relative flex flex-col flex-1 min-h-0">
+      <div
+        className={cn(
+          'relative flex flex-col',
+          isCompact ? 'flex-none' : 'flex-1 min-h-0',
+        )}
+      >
         {/* Bottom blur indicator */}
         {showBottomBlur && (
           <div className="pointer-events-none absolute left-0 right-0 bottom-0 z-10 h-6 bg-gradient-to-t from-primary-500/20 via-white/20 to-transparent" />
@@ -219,13 +225,13 @@ function TableImpl<T = any>({
 
         {/* Left blur indicator */}
         {enableHorizontalScroll && showLeftBlur && (
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-50 w-10 rounded-tl-lg bg-gradient-to-r from-primary-500/20 via-white/20 to-transparent" />
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-40 w-10 rounded-tl-lg bg-gradient-to-r from-primary-500/20 via-white/20 to-transparent" />
         )}
 
         {/* Right blur indicator - positioned before actions column */}
         {enableHorizontalScroll && showRightBlur && (
           <div
-            className="pointer-events-none absolute top-0 bottom-0 z-50 w-10 bg-gradient-to-l from-primary-500/20 via-white/20 to-transparent"
+            className="pointer-events-none absolute top-0 bottom-0 z-40 w-10 bg-gradient-to-l from-primary-500/30 via-white/20 to-transparent"
             style={{ right: `${actionsColumnWidth}px` }} // Position before actions column
           />
         )}
@@ -233,7 +239,8 @@ function TableImpl<T = any>({
         <div
           ref={scrollContainerRef}
           className={cn(
-            'flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-t-lg border border border-border-default',
+            'overflow-x-auto overflow-y-auto rounded-t-lg border border border-border-default',
+            isCompact ? 'flex-none' : 'flex-1 min-h-0',
             enableHorizontalScroll && 'scrollbar-hide'
           )}
         >
@@ -247,11 +254,18 @@ function TableImpl<T = any>({
               </div>
             </div>
           ) : (
-            <table className={cn('w-full h-full border-collapse table-fixed', tableClassName)}>
+            <table
+              className={cn(
+                'w-full h-full border-collapse table-fixed',
+                isCompact ? 'min-h-[64px]' : 'min-h-0',
+                tableClassName,
+              )}
+            >
               <TableHeader
                 columns={visibleColumns}
                 selectable={selectable}
                 allSelected={data.length > 0 && selectedRows.length === data.length}
+                someSelected={selectedRows.length > 0 && selectedRows.length < data.length}
                 onSelectAll={handleSelectAll}
                 showShadow={showHeaderShadowOnScroll && isScrolled}
               />
