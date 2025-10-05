@@ -151,7 +151,7 @@ export const HorizontalTabs: React.FC<HorizontalTabsProps> = ({
       {/* Sliding active indicator */}
       <div
         className={cn(
-          "absolute top-1 bottom-1 bg-background-secondary rounded-md border border-primary-400 border-b-2 border-b-primary-400 shadow-sm transition-all duration-300 ease-out z-0",
+          "absolute top-1 bottom-1 bg-background-secondary rounded-md border border-primary-400 border-b-2 border-b-primary-400 shadow-sm transition-all duration-300 ease-out z-10",
           !indicatorReady && "opacity-0"
         )}
         style={indicatorStyle}

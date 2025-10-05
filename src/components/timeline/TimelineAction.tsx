@@ -10,7 +10,8 @@ import type { TimelineActionProps } from './types'
  */
 export const TimelineAction: React.FC<TimelineActionProps> = ({
   action,
-  className
+  className,
+  disabled = false
 }) => {
   const { copy, copied, error } = useCopyToClipboard({ timeout: 2000 })
 
@@ -32,14 +33,15 @@ export const TimelineAction: React.FC<TimelineActionProps> = ({
     <div
       className={cn(
         'inline-flex items-center gap-2 px-1 py-0.5 bg-background-secondary border border-border-hover rounded text-xs',
-        'hover:bg-background-primary transition-colors cursor-pointer',
+        disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-background-primary transition-colors cursor-pointer',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
         className
       )}
-      onClick={handleActionClick}
+      onClick={disabled ? undefined : handleActionClick}
       role="button"
-      tabIndex={0}
+      tabIndex={disabled ? -1 : 0}
       onKeyDown={(e) => {
+        if (disabled) return
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           handleActionClick()

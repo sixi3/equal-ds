@@ -16,8 +16,13 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
   showConnector,
   registerIcon
 }) => {
+  const isDisabled = item.disabled || false
+
   return (
-    <div className="w-full flex items-center gap-4 relative" data-timeline-item>
+    <div className={cn(
+      "w-full flex items-center gap-4 relative",
+      isDisabled && "opacity-60"
+    )} data-timeline-item>
 
       {/* Event Information - Timestamp, Icon, Title, Description */}
       <TimelineEventInfo
@@ -27,12 +32,14 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
         description={item.description}
         className=""
         iconRef={registerIcon}
+        disabled={isDisabled}
       />
 
       {/* Optional Action - Transaction ID with copy functionality */}
       {item.action && (
         <TimelineAction
           action={item.action}
+          disabled={isDisabled}
         />
       )}
 

@@ -41,7 +41,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Variant-based styles using design tokens
     const variantClasses = {
       primary: cn(
-        'bg-primary-500 text-text-inverse hover:bg-primary-600 font-medium tracking-wider border border-t-0 border-l-0 border-r-0 border-b-2 border-primary-600 transition-all duration-200',
+        'bg-background-inverse text-text-inverse hover:bg-primary-600 font-medium tracking-wider border border-t-0 border-l-0 border-r-0 border-b-2 border-primary-600 transition-all duration-200',
       ),
       secondary: cn(
         'bg-background-secondary tracking-wide font-medium  text-brand-primary border border-b-2 border-border-hover transition-all duration-200',

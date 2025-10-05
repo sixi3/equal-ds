@@ -160,15 +160,23 @@ export const Timeline = React.forwardRef<HTMLDivElement, TimelineProps>(
         )}
         {...props}
       >
-        {showConnectors && Array.from({ length: Math.max(0, items.length - 1) }, (_, index) => (
-          <span
-            key={`timeline-connector-${index}`}
-            ref={(node) => registerConnector(index, node)}
-            className="absolute w-px bg-border-default pointer-events-none"
-            style={{ display: 'none' }}
-            aria-hidden
-          />
-        ))}
+        {showConnectors && Array.from({ length: Math.max(0, items.length - 1) }, (_, index) => {
+          const nextItem = items[index + 1]
+          const isDashed = nextItem?.disabled || false
+
+          return (
+            <span
+              key={`timeline-connector-${index}`}
+              ref={(node) => registerConnector(index, node)}
+              className={cn(
+                "absolute w-px pointer-events-none",
+                isDashed ? "border-l border-dashed border-border-default" : "bg-border-default"
+              )}
+              style={{ display: 'none' }}
+              aria-hidden
+            />
+          )
+        })}
 
         {items.map((item, index) => (
           <TimelineItem

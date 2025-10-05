@@ -88,7 +88,7 @@ function TableCellImpl({
   return (
     <td
       className={cn(
-        'px-4 py-3 text-sm text-text-primary whitespace-nowrap',
+        'px-4 py-3 text-sm text-text-primary whitespace-nowrap font-regular',
         align === 'left' && 'text-left',
         align === 'center' && 'text-center',
         align === 'right' && 'text-right',

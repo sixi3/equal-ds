@@ -22,6 +22,7 @@ export interface TimelineItem {
     content: string
     details?: Record<string, any>
   }
+  disabled?: boolean // Whether this timeline item is disabled
 }
 
 export interface TimelineProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -59,6 +60,7 @@ export interface TimelineItemProps {
 export interface TimelineActionProps {
   action: TimelineAction
   className?: string
+  disabled?: boolean
 }
 
 export interface TimelineEventInfoProps {
@@ -68,6 +70,7 @@ export interface TimelineEventInfoProps {
   description?: string
   className?: string
   iconRef?: (node: HTMLDivElement | null) => void
+  disabled?: boolean
 }
 
 export interface TimelineConnectorProps {

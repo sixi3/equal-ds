@@ -6,6 +6,7 @@ A comprehensive timeline component for displaying chronological events with stat
 
 - **Dynamic Spacing**: Automatically distributes timeline items to fill available container height
 - **Status Indicators**: 6 status types with appropriate icons and colors (success, warning, error, info, pending, neutral)
+- **Disabled Items**: Support for disabled timeline items with muted styling and dashed connectors
 - **Copy Actions**: Built-in copy-to-clipboard functionality for transaction IDs
 - **Rich Tooltips**: Detailed information displays using Radix UI tooltips
 - **Status Badges**: Optional status labels (like "PENDING") with colored backgrounds
@@ -72,6 +73,7 @@ interface TimelineItem {
   description?: string          // Optional description
   action?: TimelineAction       // Optional copy action
   tooltip?: TimelineTooltip     // Optional tooltip content
+  disabled?: boolean            // Whether this item is disabled (muted styling + dashed connectors)
 }
 ```
 

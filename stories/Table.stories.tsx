@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Table, type TableColumn, TableActionsMenu, type TableAction, SearchBar, Button, Dropdown, DropdownTrigger, DropdownContentMultiselect, DatePicker, DateRangeValue, getSmartDefaults } from '../src'
-import { Edit, Trash2, Eye, Download, Logs, RotateCw, GitPullRequestArrow, PlusCircle, Filter, ChevronUp, LucidePlus, ListPlus, Check } from 'lucide-react'
-import { getConsentStatusTag, getDataStatusTag, ChevronIcon, useFilterState } from '../src'
+import { Table, type TableColumn, TableActionsMenu, type TableAction, SearchBar, Button, Dropdown, DropdownTrigger, DropdownContentMultiselect, DatePicker, DateRangeValue, getSmartDefaults, DrawerProvider, DrawerOverlay } from '../src'
+import { Edit, Trash2, Eye, Download, Logs, RotateCw, GitPullRequestArrow, PlusCircle, Filter, ChevronUp, LucidePlus, ListPlus, Check, FileText, Clock } from 'lucide-react'
+import { getConsentStatusTag, getDataStatusTag, ChevronIcon, useFilterState, TabSwitcher, Drawer, DrawerHeader, DrawerContent, Timeline, TimelineItemType } from '../src'
 
 // Sample data types
 interface User {
@@ -55,6 +55,113 @@ interface FinProData {
   consentCreatedBy: string
   consentCreatedAt: string
   consentActedOn: string
+}
+
+// Generate consent timeline data for the selected row
+const generateConsentTimeline = (selectedRowData: FinProData | null): TimelineItemType[] => {
+  if (!selectedRowData) return []
+
+  return [
+    {
+      id: 'consent-created',
+      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      status: { type: 'success' },
+      title: 'Consent requested by FIU',
+      tooltip: {
+        title: 'Consent Creation Details',
+        content: 'The consent request has been initiated and stored securely in the system.',
+      }
+    },
+    {
+      id: 'consent-sent-aa',
+      timestamp: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
+      status: { type: 'success' },
+      title: 'Consent created by AA',
+      action: {
+        type: 'copy',
+        label: `Txn ID: 53242143z122133123x1`,
+        value: '53242143z122133123x1'
+      },
+      tooltip: {
+        title: 'Account Aggregator Communication',
+        content: 'The consent request has been securely transmitted to the Account Aggregator for user review and approval.', 
+      }
+    },
+    {
+      id: 'user-action',
+      timestamp: new Date(Date.now() - 20 * 60 * 1000), // 20 minutes ago
+      status: selectedRowData.consentStatus === 'ACTIVE' ? { type: 'success' } :
+              selectedRowData.consentStatus === 'REJECTED' ? { type: 'error', label: 'REJECTED' } :
+              selectedRowData.consentStatus === 'PENDING' ? { type: 'pending', label: 'PENDING' } :
+              { type: 'warning', label: selectedRowData.consentStatus },
+      title: 'Consent acted on by user',
+      action: {
+        type: 'copy',
+        label: `Txn ID: A1B2C3D4E5F6G7H8I9J0`,
+        value: 'A1B2C3D4E5F6G7H8I9J0'
+      },
+      tooltip: {
+        title: 'User Communication',
+        content: 'The user has been notified about the consent request via their registered communication channel.',
+      }
+    },
+    {
+      id: 'consent-approved',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+      status: { type:'success'},
+      title: `Consent notification sent to FIU`,
+      tooltip: {
+        title: 'Consent Decision',
+        content: `The user has ${selectedRowData.consentStatus.toLowerCase()} the consent request. ${selectedRowData.consentStatus === 'ACTIVE' ? 'Data access is now authorized.' : selectedRowData.consentStatus === 'REJECTED' ? 'Data access has been denied.' : 'Consent is awaiting final decision.'}`,
+        
+      }
+    },
+    {
+      id: 'consent-confirmation',
+      timestamp: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
+      status: selectedRowData.consentStatus === 'ACTIVE' ? { type: 'success' } :
+              selectedRowData.consentStatus === 'REJECTED' ? { type: 'error', label: 'REJECTED' } :
+              selectedRowData.consentStatus === 'PENDING' ? { type: 'pending', label: 'PENDING' } :
+              { type: 'warning', label: selectedRowData.consentStatus },
+      title: 'Consent acted on by the user',
+      action: {
+        type: 'copy',
+        label: `Txn ID: ${selectedRowData.consentId.slice(-10)}`,
+        value: selectedRowData.consentId.slice(-10)
+      },
+      tooltip: {
+        title: 'Confirmation Details',
+        content: 'The Account Aggregator has confirmed receipt and processing of the user\'s consent decision.',
+      }
+    },
+    {
+      id: 'consent-stored',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+      status: { type: 'success' },
+      title: 'Consent Stored Securely',
+      tooltip: {
+        title: 'Storage Confirmation',
+        content: 'The consent decision has been securely stored and is ready for compliance auditing.',
+      }
+    },
+    {
+      id: 'consent-expiry',
+      timestamp: new Date(Date.now() - 1 * 60 * 1000), // 1 minute ago
+      status: { type: 'pending' },
+      disabled: true,
+      title: 'Consent Expired',
+      tooltip: {
+        title: 'Journey Summary',
+        content: `The complete consent journey for ${selectedRowData.consentId} has been processed. ${selectedRowData.consentStatus === 'ACTIVE' ? 'The user has authorized data access and the consent is now active.' : 'The consent request has been finalized according to user decision.'}`,
+        details: {
+          'Total Duration': '29 minutes',
+          'Steps Completed': '6/6',
+          'Final Status': selectedRowData.consentStatus,
+          'Next Action': selectedRowData.consentStatus === 'ACTIVE' ? 'Data Request Available' : 'Request Archived'
+        }
+      }
+    }
+  ]
 }
 
 // Generate sample data
@@ -511,6 +618,11 @@ export const FinPro: FinProStory = {
 
     // Date range picker state - initialized with smart defaults (current time rounded to last 30 mins)
 
+    // Drawer state management
+    const [logsDrawerOpen, setLogsDrawerOpen] = useState(false)
+    const [activeTab, setActiveTab] = useState<'consent' | 'data'>('consent')
+    const [selectedRowData, setSelectedRowData] = useState<FinProData | null>(null)
+
     // Generate FinPro sample data
     let allData = generateFinProData(120)
 
@@ -798,12 +910,20 @@ export const FinPro: FinProStory = {
                   {
                     key: 'consent',
                     label: 'Consent',
-                    onClick: () => console.log('View Consent Logs', row.id),
+                    onClick: () => {
+                      setSelectedRowData(row)
+                      setActiveTab('consent')
+                      setLogsDrawerOpen(true)
+                    },
                   },
                   {
                     key: 'data',
                     label: 'Data',
-                    onClick: () => console.log('View Data Logs', row.id),
+                    onClick: () => {
+                      setSelectedRowData(row)
+                      setActiveTab('data')
+                      setLogsDrawerOpen(true)
+                    },
                   },
                 ],
               },
@@ -815,7 +935,8 @@ export const FinPro: FinProStory = {
     ]
 
     return (
-      <div className="h-full flex flex-col">
+      <DrawerProvider side="right" open={logsDrawerOpen} onOpenChange={setLogsDrawerOpen}>
+        <div className="h-full flex flex-col">
         {/* Filter Component */}
         <div className="bg-white border border-border-default rounded-xl p-4 shadow-md mb-4">
           <div
@@ -1107,6 +1228,105 @@ export const FinPro: FinProStory = {
         </div>
       </div>
       </div>
+
+      {/* Logs Drawer with Tabs */}
+      <DrawerOverlay />
+      <Drawer
+        variant="overlay"
+        className="border-border-default bg-gradient-to-b from-background-secondary to-primary-50"
+        style={{ width: '1200px' }}
+      >
+        <DrawerHeader
+          title={`View Logs`}
+          subtitle={`View complete logs for consent and data journeys of your users`}
+          icon={<FileText className="w-5 h-5 bg-transparent" />}
+        />
+        <DrawerContent className="flex flex-col h-full">
+        {selectedRowData ? (
+          <>
+            <TabSwitcher
+              tabs={[
+                { id: 'consent', label: 'Consent Logs' },
+                { id: 'data', label: 'Data Logs' },
+              ]}
+              activeTab={activeTab}
+              onTabChange={(tabId) => setActiveTab(tabId as 'consent' | 'data')}
+              variant="horizontal"
+              className="rounded-xl mb-2"
+            />
+
+            <div className="flex-1 min-h-0 finpro-logs-scrollable finpro-logs-content flex flex-col">
+              {activeTab === 'consent' ? (
+                <>
+                  {/* Timeline Header */}
+                  <div className="flex items-center justify-between mb-1.5 flex-shrink-0">
+                    <h3 className="text-sm font-medium text-text-primary tracking-wider">
+                      CONSENT TIMELINE
+                    </h3>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium text-text-muted tracking-wider">
+                        OVERALL TAT:
+                      </span>
+                      <div className="flex items-end gap-1 items-center">
+                        <Clock className="w-3 h-3 text-text-primary" />
+                        <span className="text-sm font-medium text-text-primary tracking-wide">
+                          3m 54s
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-h-0 bg-background-secondary border border-border-light rounded-xl p-2">
+                    <Timeline
+                      items={generateConsentTimeline(selectedRowData)}
+                      variant="default"
+                      showConnectors={true}
+                      connectorGap={8}
+                      className="h-full w-full"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-background-secondary rounded-lg">
+                    <h4 className="font-semibold text-text-primary mb-2">Data Request Details</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div><strong>FI Data:</strong> {selectedRowData.fiData}</div>
+                      <div><strong>Data Status:</strong> {selectedRowData.dataStatus}</div>
+                      <div><strong>Request Mode:</strong> {selectedRowData.dataRequestMode}</div>
+                      <div><strong>Data Range:</strong> {selectedRowData.fiDataRange}</div>
+                      <div><strong>Data Life:</strong> {selectedRowData.dataLife}</div>
+                      <div><strong>Fetch Type:</strong> {selectedRowData.fetchType}</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-text-primary">Data Processing Activity</h4>
+                    {[
+                      { timestamp: '2024-01-15 14:30:45', level: 'info', message: `Data request initiated for ${selectedRowData.fiData}` },
+                      { timestamp: '2024-01-15 14:31:12', level: 'info', message: `FI connection established for ${selectedRowData.fiData}` },
+                      { timestamp: '2024-01-15 14:32:05', level: 'info', message: `Data fetch started - ${selectedRowData.fetchType} mode` },
+                      { timestamp: '2024-01-15 14:35:18', level: 'warn', message: 'Rate limiting applied - slowing down requests' },
+                      { timestamp: '2024-01-15 14:40:33', level: 'info', message: `Data received: ${selectedRowData.dataStatus}` },
+                      { timestamp: '2024-01-15 14:45:22', level: 'info', message: 'Data validation and processing completed' },
+                      { timestamp: '2024-01-15 14:50:10', level: 'info', message: 'Data stored successfully in secure vault' },
+                    ].map((log, index) => (
+                      <div key={index} className={`finpro-log-entry finpro-log-${log.level}`}>
+                        <span className="finpro-log-timestamp">{log.timestamp}</span>
+                        <span className="finpro-log-message">{log.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-text-secondary py-8">No data selected</div>
+        )}
+        </DrawerContent>
+      </Drawer>
+      </DrawerProvider>
     )
   },
 }

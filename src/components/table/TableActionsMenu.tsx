@@ -1,9 +1,11 @@
 import React from 'react'
 import { Ellipsis, ChevronRight, ArrowRight } from 'lucide-react'
+import { cn } from '../../lib/cn'
 import { Dropdown, DropdownContext } from '../dropdown/Dropdown'
 import { DropdownTrigger } from '../dropdown/DropdownTrigger'
 import { DropdownContent } from '../dropdown/DropdownContent'
 import { DropdownItem } from '../dropdown/DropdownItem'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
 export interface TableAction {
   /**
@@ -78,6 +80,26 @@ const CustomTrigger: React.FC<{ children: React.ReactNode; disabled?: boolean; s
   )
 }
 
+// Sub-action button component that closes dropdown when clicked
+const SubActionButton: React.FC<{ subAction: TableAction }> = ({ subAction }) => {
+  return (
+    <DropdownMenu.Item
+      onClick={subAction.onClick}
+      disabled={subAction.disabled}
+      data-dropdown-item
+      className={cn(
+        'relative flex cursor-default select-none items-center rounded-md px-1.5 py-1 text-xs font-medium text-primary-700 outline-none transition-colors',
+        'hover:bg-primary-300/10',
+        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'gap-1'
+      )}
+    >
+      <span>{subAction.label}</span>
+      <ArrowRight className="h-3 w-3 rotate-[-45deg] transition-transform duration-200" />
+    </DropdownMenu.Item>
+  )
+}
+
 export const TableActionsMenu: React.FC<TableActionsMenuProps> = ({
   actions,
   srLabel = 'Open actions menu',
@@ -109,15 +131,7 @@ export const TableActionsMenu: React.FC<TableActionsMenuProps> = ({
                   <div className="flex items-center gap-2 px-2 pb-1">
                     {action.subActions.map((subAction, subIndex) => (
                       <React.Fragment key={subAction.key}>
-                        <button
-                          onClick={subAction.onClick}
-                          disabled={subAction.disabled}
-                          data-dropdown-item
-                          className="flex items-center gap-1 text-xs font-medium text-primary-700 disabled:opacity-50 disabled:cursor-not-allowed px-1.5 py-1"
-                        >
-                          <span>{subAction.label}</span>
-                          <ArrowRight className="h-3 w-3 rotate-[-45deg] transition-transform duration-200" />
-                        </button>
+                        <SubActionButton subAction={subAction} />
                         {subIndex < action.subActions!.length - 1 && (
                           <div className="w-px h-4 bg-border-default" />
                         )}

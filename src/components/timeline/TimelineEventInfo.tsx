@@ -8,6 +8,7 @@ import {
   Circle
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { Tag } from '../ui/Tag'
 import type { TimelineEventInfoProps } from './types'
 
 /**
@@ -20,7 +21,8 @@ export const TimelineEventInfo: React.FC<TimelineEventInfoProps> = ({
   title,
   description,
   className,
-  iconRef
+  iconRef,
+  disabled = false
 }) => {
   // Format timestamp to match design: "HH:MM:SS AM, MM/DD/YY"
   const formatTimestamp = (timestamp: string | Date): string => {
@@ -89,38 +91,53 @@ export const TimelineEventInfo: React.FC<TimelineEventInfoProps> = ({
     <div className={cn('flex items-center gap-4', className)}>
       {/* Timestamp - Right aligned */}
       <div className="text-right flex-shrink-0 w-24">
-        <span className="text-xs text-text-tertiary font-normal tracking-wider">
+        <span className={cn(
+          "text-xs font-normal tracking-wider",
+          disabled ? "text-text-muted" : "text-text-tertiary"
+        )}>
           {formatTimestamp(timestamp)}
         </span>
       </div>
 
       {/* Status Icon */}
       <div className="flex-shrink-0" data-status-icon ref={iconRef}>
-        <StatusIcon className={cn('w-4 h-4', statusConfig.color)} />
+        <StatusIcon className={cn(
+          'w-4 h-4',
+          disabled ? 'text-text-muted' : statusConfig.color
+        )} />
       </div>
 
       {/* Title and Description */}
       <div className="flex-1">
         <div className="flex items-center gap-2 flex-nowrap">
-          <h4 className="text-base font-medium text-text-primary leading-normal">
+          <h4 className={cn(
+            "text-base font-medium leading-normal tracking-wide",
+            disabled ? "text-text-secondary" : "text-text-primary"
+          )}>
             {title}
           </h4>
 
           {/* Status Badge - only show if status has a label */}
           {status.label && (
-            <span className={cn(
-              'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium tracking-wider flex-shrink-0',
-              statusConfig.bgColor,
-              statusConfig.color
-            )}>
+            <Tag
+              size="sm"
+              className={cn(
+                statusConfig.bgColor,
+                statusConfig.color,
+                'font-medium tracking-wider'
+              )}
+            >
               {status.label}
-            </span>
+            </Tag>
           )}
         </div>
 
         {/* Description */}
         {description && (
-          <p className="text-sm text-text-secondary mt-0.5 leading-normal">
+          <p className={cn(
+            "text-sm mt-0.5 leading-normal",
+            disabled ? "text-text-muted" : "text-text-secondary"
+          )}>
             {description}
           </p>
         )}
