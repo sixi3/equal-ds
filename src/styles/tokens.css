@@ -9,10 +9,10 @@
   --color-primary-300: #C3E7FF;
   --color-primary-400: #C1E4FB;
   --color-primary-500: #0F3340;
-  --color-primary-600: #0F1F40;
-  --color-primary-700: #0074A5;
-  --color-primary-800: #556A7D;
-  --color-primary-900: #475A66;
+  --color-primary-600: #021D27;
+  --color-primary-700: #01131A;
+  --color-primary-800: #01090D;
+  --color-primary-900: #000203;
   --color-gray-50: #FFFFFF;
   --color-gray-100: #FAFAFA;
   --color-gray-200: #F3F8FC;
@@ -48,10 +48,10 @@
   --color-background-inverse: #0F3340;
   --color-border-default: #E7EDF0;
   --color-border-hover: #C1E4FB;
-  --color-border-focus: #0F1F40;
+  --color-border-focus: #0F3340;
   --color-border-light: #E7EDF0;
   --color-brand-primary: #0F3340;
-  --color-brand-secondary: #0F1F40;
+  --color-brand-secondary: #021D27;
   --color-brand-tertiary: #E5F5FF;
   --color-feedback-success: #2D8659;
   --color-feedback-success-bg: #E6F4EC;
@@ -152,18 +152,18 @@
   --component-button-primary-backgroundColor: #0F3340;
   --component-button-primary-textColor: #FFFFFF;
   --component-button-primary-borderRadius: 0.375rem;
-  --component-button-primary-padding: 0.75rem 1.5rem;
+  --component-button-primary-padding: {core.spacing.3} {core.spacing.6};
   --component-button-primary-fontWeight: 500;
   --component-button-secondary-backgroundColor: transparent;
   --component-button-secondary-textColor: #0F3340;
   --component-button-secondary-borderColor: #0F3340;
   --component-button-secondary-borderRadius: 0.375rem;
-  --component-button-secondary-padding: 0.75rem;
+  --component-button-secondary-padding: {core.spacing.3} {core.spacing.6};
   --component-button-gradient-backgroundColor: linear-gradient(180deg, #FFFFFF 0%, #F6FCFF 100%);
   --component-button-gradient-borderColor: #E7EDF0;
   --component-button-gradient-textColor: #0F3340;
   --component-button-gradient-borderRadius: 0.75rem;
-  --component-button-gradient-padding: 0.75rem;
+  --component-button-gradient-padding: {core.spacing.3} {core.spacing.3};
   --component-card-backgroundColor: #FFFFFF;
   --component-card-borderColor: #E7EDF0;
   --component-card-borderRadius: 0.75rem;
@@ -172,7 +172,7 @@
   --component-input-backgroundColor: #FFFFFF;
   --component-input-borderColor: #E7EDF0;
   --component-input-borderRadius: 0.5rem;
-  --component-input-padding: 0.75rem 1rem;
+  --component-input-padding: {core.spacing.3} {core.spacing.4};
   --component-input-fontSize: 1rem;
   --component-navbar-backgroundColor: #FFFFFF;
   --component-navbar-borderColor: #E7EDF0;
@@ -181,7 +181,7 @@
   --component-navbar-iconColor: #708497;
   --component-navbar-activeIconColor: #0F3340;
   --component-table-headerBackground: linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%);
-  --component-table-headerText: #556A7D;
+  --component-table-headerText: #01090D;
   --component-table-rowBackground: #FFFFFF;
   --component-table-alternateRowBackground: #F3F8FC;
   --component-table-borderColor: #E7EDF0;
@@ -247,7 +247,7 @@
 .text-background-secondary { color: var(--color-background-secondary); }
 .text-background-tertiary { color: var(--color-background-tertiary); }
 .text-background-inverse { color: var(--color-background-inverse); }
-.text-border-default { color: var(--color-border-defaulttepp); }
+.text-border-default { color: var(--color-border-default); }
 .text-border-hover { color: var(--color-border-hover); }
 .text-border-focus { color: var(--color-border-focus); }
 .text-border-light { color: var(--color-border-light); }

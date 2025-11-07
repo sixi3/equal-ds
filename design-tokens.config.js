@@ -21,10 +21,7 @@ export default {
   "output": {
     "css": "src/styles/tokens.css",
     "typescript": "src/types/tokens.d.ts",
-    "tailwindPresetEsm": "tokens.tailwind.preset.js",
-    "tailwindPresetCjs": "tokens.tailwind.preset.cjs",
-    "tokensCjs": "src/data/tokens.cjs",
-    "shadcnThemeCss": "src/styles/shadcn-theme.css"
+    "tailwind": "tailwind.config.js"
   },
   "react": {
     "hooks": "src/hooks/useTokens.ts",
@@ -33,13 +30,13 @@ export default {
     "emotionSupport": false
   },
   "git": {
-    "enabled": true,
+    "enabled": false,
     "autoCommit": true,
     "autoPush": false,
     "commitMessage": "🎨 Update design tokens"
   },
   "analytics": {
-    "enabled": true,
+    "enabled": false,
     "autoCollect": true,
     "scanDirs": [
       "src/**/*"
@@ -67,15 +64,5 @@ export default {
   "build": {
     "beforeBuild": "npm run tokens:sync",
     "validateBeforeCommit": true
-  },
-  "css": {
-    "includeUtilities": false
-  },
-  "init": {
-    "scaffoldRootTailwindConfig": true
-  },
-  "shadcn": {
-    "enable": true,
-    "hsl": false
   }
 };
